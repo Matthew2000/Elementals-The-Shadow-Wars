@@ -112,10 +112,12 @@ class NPC(Character):
 		else:
 			self.move_left()
 
-	"""def interact(self, player, input_key):
+	def interact(self, player, input_key, log):
 		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:
 			if player.location[1] == self.location[1] + 1 or player.location[1] == self.location[1] - 1 or player.location[1] == self.location[1]:
-				if input_key == ord("e"):"""
+				if input_key == ord("e"):
+					log.insertln()
+					log.addstr(1, 1, "What do you want?")
 
 
 class Enemy(NPC):

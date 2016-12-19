@@ -68,9 +68,9 @@ def create_npc(name, character):  # this function must be assigned to an object
 		if name == x.name:  # name must be the same as the object name
 			var = True
 			log.write(x.name + " is already there" + "\r\n")
-		if not var:
-			name = NPC(name, character)
-			all_NPCs.append(name)
+	if not var:
+		name = NPC(name, character)
+		all_NPCs.append(name)
 	return var
 
 
@@ -90,7 +90,7 @@ def load_npcs():
 	for npc in save["all_NPCs"]:
 		name = npc["name"]
 		log.write(name + "\r\n")
-		create_enemy(name, npc["character"])
+		create_npc(name, npc["character"])
 		all_NPCs[x].name = save["all_NPCs"][x]["name"]
 		all_NPCs[x].location = save["all_NPCs"][x]["location"]
 		all_NPCs[x].prevlocation = save["all_NPCs"][x]["prevlocation"]
@@ -99,12 +99,14 @@ def load_npcs():
 		all_NPCs[x].character = save["all_NPCs"][x]["character"]
 		all_NPCs[x].inventory = save["all_NPCs"][x]["inventory"]
 		x += 1
-	log.write("load enemies" + "\r\n")
+	log.write("load NPCs" + "\r\n")
 
 
 def spawn_character(win, character, y, x):
 	character.location[0] = y
 	character.location[1] = x
+	character.prevlocation[0] = y
+	character.prevlocation[1] = x
 	win.addch(y, x, ord(character.character))
 
 
@@ -145,10 +147,16 @@ def update_enemy_status():
 	enemy_status.refresh()
 
 
+def update_journal():
+	journal.border()
+	journal.refresh()
+
+
 def update_game():
 	# update_enemy_status()
 	update_player_status()
 	update_inventory()
+	update_journal()
 
 
 def are_enemies_dead():
@@ -157,6 +165,7 @@ def are_enemies_dead():
 			if Main_Window.inch(enemy.location[0], enemy.location[1]) == ord(enemy.character):
 				enemy.death()
 				Main_Window.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
+				print_to_journal(enemy.name + " is dead")
 
 
 def update_enemy_locations():
@@ -198,10 +207,31 @@ def place_enemies():
 		x += 1
 
 
+def place_npcs():
+	x = 0
+	for npc in all_NPCs:
+		spawn_character(Main_Window, all_NPCs[x], all_NPCs[x].location[0], all_NPCs[x].location[1])
+		x += 1
+
+
 def move_enemies():
 	for enemy in all_enemies:
 		enemy.move(dims)
 
+
+def interact_npc(input_key, log):
+	for npc in all_NPCs:
+		npc.interact(player1, input_key, log)
+
+
+def print_to_journal(message):
+	journal.insertln()
+	journal.addstr(1, 1, message)
+
+
+def attack_enemies():
+	for enemy in all_enemies:
+		player1.attack(enemy)
 
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
@@ -214,10 +244,11 @@ all_NPCs = []
 
 try:
 	screen = curses.initscr()
-	Main_Window = curses.newwin(35, 175, 2, 3)
+	Main_Window = curses.newwin(35, 100, 2, 3)
 	inventory = curses.newwin(10, 20, 38, 33)
 	player_status = curses.newwin(10, 20, 38, 3)
 	enemy_status = curses.newwin(10, 20, 38, 63)
+	journal = curses.newwin(50, 65, 2, 110)
 
 	curses.curs_set(0)
 	curses.noecho()
@@ -240,16 +271,18 @@ try:
 
 	load_player()
 	load_enemies()
-
-	create_npc("Welch", "W")
+	load_npcs()
 
 	spawn_character(Main_Window, player1, player1.location[0], player1.location[1])
 	place_enemies()
+	place_npcs()
 
 	screen.refresh()
 	Main_Window.refresh()
 
 	player_turn = True
+
+	journal.addstr(1, 1, "game start")
 
 	while Key != ord("q"):
 
@@ -261,12 +294,17 @@ try:
 
 		Key = Main_Window.getch()
 
-		if Key is ord("w"):
+		if Key is ord("a"):
+			attack_enemies()
+
+		if Key is ord("W"):
 			player1.add_inventory_item("Food", 10)
 			save_player()
 
+		interact_npc(Key, journal)
+
 		if Key is ord("s"):
-			spawn_enemy("Kaitlin", "K", 20, dims[1] - 100)
+			spawn_enemy("Zack", "Z", dims[0]-2, 1)
 
 		if Key is ord("r"):
 			if player1.is_dead():
@@ -290,11 +328,13 @@ try:
 		log.flush()
 
 		update_enemy_locations()
+		update_npc_locations()
 
 		screen.refresh()
 		Main_Window.refresh()
 		update_game()
 	update_enemy_locations()
+	update_npc_locations()
 	save_npcs()
 	save_enemies()
 except:
