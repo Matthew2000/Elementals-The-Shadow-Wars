@@ -118,7 +118,6 @@ class NPC(Character):
 				if input_key == ord("e"):"""
 
 
-
 class Enemy(NPC):
 	def __init__(self, name, character):
 		super().__init__(name, character)
