@@ -154,6 +154,20 @@ def update_journal():
 	journal.refresh()
 
 
+def update_conversation():
+	dims3 = conversation.getmaxyx()
+	conversation.clear()
+	for npc in all_NPCs:
+		if npc.talking is True:
+			conversation.border()
+			conversation.addstr(0, 1, "Conversation")
+			conversation.addstr(2, 1, "t - Talk")
+			conversation.addstr(3, 1, "q - Quest")
+			conversation.addstr(4, 1, "b - Barter")
+			conversation.addstr(5, 1, "e - Leave")
+	conversation.refresh()
+
+
 def update_game():
 	update_player_status()
 	update_inventory()
@@ -245,6 +259,23 @@ def enemy_at_location(y, x):
 		return {"result": False}
 
 
+def npc_at_location(y, x):
+	for npc in all_NPCs:
+		if npc.location[0] is y and npc.location[1] is x:
+			npc.talking = True
+			return {"result": True, "npc": npc}
+	else:
+		return {"result": False}
+
+
+def load_npc_dialogue():
+	for npc in all_NPCs:
+		if os.path.exists('Dialogue/' + npc.name + '.json'):
+			with open('Dialogue/' + npc.name + '.json', 'r') as f:
+				npc.dialogue = json.load(f)
+				f.close()
+
+
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
 save = {"all_enemies": [], "player": {"character": "@", "health": 100, "inventory": {"Coins": 100}, "location": [2, 5], "max_health": 100, "name": "Matthew", "prevlocation": [3, 5]}}
@@ -257,10 +288,11 @@ all_NPCs = []
 try:
 	screen = curses.initscr()
 	Main_Window = curses.newwin(35, 100, 2, 3)
-	inventory = curses.newwin(10, 20, 38, 33)
+	inventory = curses.newwin(10, 20, 38, 30)
 	player_status = curses.newwin(10, 20, 38, 3)
-	enemy_status = curses.newwin(10, 20, 38, 63)
+	enemy_status = curses.newwin(10, 20, 38, 57)
 	journal = curses.newwin(50, 65, 2, 110)
+	conversation = curses.newwin(10, 20, 38, 84)
 
 	curses.curs_set(0)
 	curses.noecho()
@@ -289,6 +321,8 @@ try:
 	place_enemies()
 	place_npcs()
 
+	load_npc_dialogue()
+
 	screen.refresh()
 	Main_Window.refresh()
 
@@ -309,8 +343,6 @@ try:
 
 		if Key is ord("a"):
 			attack_enemies()
-
-		interact_npc(Key, journal)
 
 		if Key is ord("s"):
 			spawn_enemy("Zack", "Z", dims[0]-2, 1)
@@ -345,6 +377,24 @@ try:
 					else:
 						enemy.allow_movement = True
 						print_to_journal("You have left combat")
+				result = npc_at_location(player1.location[0], player1.location[1])
+				if result["result"] is True:
+					NPC = result["npc"]
+					NPC.interact(journal)
+					update_journal()
+					while Key is not ord("e"):
+						update_conversation()
+						Key = Main_Window.getch()
+						if Key is ord("q"):
+							print_to_journal(NPC.dialogue["quest"])
+						if Key is ord("b"):
+							print_to_journal(NPC.dialogue["trade"])
+						if Key is ord("t"):
+							print_to_journal(NPC.dialogue["talk"])
+						update_journal()
+					else:
+						NPC.talking = False
+						update_conversation()
 				update_player_location()
 				save_player()
 			player_turn = False

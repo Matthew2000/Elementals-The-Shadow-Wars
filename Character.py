@@ -98,6 +98,8 @@ class NPC(Character):
 	def __init__(self, name, character):
 		super().__init__(name, character)
 		self.allow_movement = True
+		self.talking = False
+		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": "I have no quest for you at the moment.", "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 
 	def move(self, area):
 		if self.allow_movement:
@@ -114,17 +116,16 @@ class NPC(Character):
 			else:
 				self.move_left()
 
-	def interact(self, player, input_key, log):
-		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:
-			if player.location[1] == self.location[1] + 1 or player.location[1] == self.location[1] - 1 or player.location[1] == self.location[1]:
-				if input_key == ord("e"):
-					log.insertln()
-					log.addstr(1, 1, "What do you want?")
+	def interact(self, log):
+		self.talking = True
+		log.insertln()
+		log.addstr(1, 1, self.dialogue["intro"])
 
 
 class Enemy(NPC):
 	def __init__(self, name, character):
 		super().__init__(name, character)
+		self.dialogue = {"intro": "I'm going to kill you"}
 
 	def attack(self, player):
 		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:
