@@ -97,20 +97,22 @@ class Player(Character):
 class NPC(Character):
 	def __init__(self, name, character):
 		super().__init__(name, character)
+		self.allow_movement = True
 
 	def move(self, area):
-		self.prevlocation = self.location[:]
-		direction = randint(0, 4)
-		if direction is 0:
-			pass
-		elif direction is 1:
-			self.move_up()
-		elif direction is 2:
-			self.move_down(area)
-		elif direction is 3:
-			self.move_right(area)
-		else:
-			self.move_left()
+		if self.allow_movement:
+			self.prevlocation = self.location[:]
+			direction = randint(0, 4)
+			if direction is 0:
+				pass
+			elif direction is 1:
+				self.move_up()
+			elif direction is 2:
+				self.move_down(area)
+			elif direction is 3:
+				self.move_right(area)
+			else:
+				self.move_left()
 
 	def interact(self, player, input_key, log):
 		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:

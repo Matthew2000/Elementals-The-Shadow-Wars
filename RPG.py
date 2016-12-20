@@ -141,9 +141,11 @@ def update_player_status():
 
 def update_enemy_status():
 	enemy_status.clear()
-	enemy_status.border()
-	enemy_status.addstr(0, 1, "Enemy Stats")
-	enemy_status.addstr(1, 1, "Health: " + str(Fred.health))
+	for enemy in all_enemies:
+		if enemy.allow_movement is False:
+			enemy_status.border()
+			enemy_status.addstr(0, 1, enemy.name + "'s Stats")
+			enemy_status.addstr(1, 1, "Health: " + str(enemy.health))
 	enemy_status.refresh()
 
 
@@ -153,7 +155,6 @@ def update_journal():
 
 
 def update_game():
-	# update_enemy_status()
 	update_player_status()
 	update_inventory()
 	update_journal()
@@ -233,6 +234,17 @@ def attack_enemies():
 	for enemy in all_enemies:
 		player1.attack(enemy)
 
+
+def enemy_at_location(y, x):
+	for enemy in all_enemies:
+		if enemy.location[0] is y and enemy.location[1] is x:
+			update_enemy_status()
+			enemy.allow_movement = False
+			return {"result": True, "enemy": enemy}
+	else:
+		return {"result": False}
+
+
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
 save = {"all_enemies": [], "player": {"character": "@", "health": 100, "inventory": {"Coins": 100}, "location": [2, 5], "max_health": 100, "name": "Matthew", "prevlocation": [3, 5]}}
@@ -291,15 +303,12 @@ try:
 		Main_Window.border()
 
 		update_game()
+		update_enemy_status()
 
 		Key = Main_Window.getch()
 
 		if Key is ord("a"):
 			attack_enemies()
-
-		if Key is ord("W"):
-			player1.add_inventory_item("Food", 10)
-			save_player()
 
 		interact_npc(Key, journal)
 
@@ -317,6 +326,25 @@ try:
 		if player_turn:
 			if not player1.is_dead():
 				player1.move(Key, dims)
+				result = enemy_at_location(player1.location[0], player1.location[1])
+				if result["result"] is True:
+					enemy = result["enemy"]
+					print_to_journal('Press "a" to attack or "e" to leave')
+					print_to_journal("Battle has started")
+					update_journal()
+					while Key is not ord("e"):
+						update_enemy_status()
+						Key = Main_Window.getch()
+						if Key is ord("a"):
+							player1.attack(enemy)
+						if enemy.health <= 0:
+							are_enemies_dead()
+							enemy.allow_movement = True
+							update_enemy_status()
+							break
+					else:
+						enemy.allow_movement = True
+						print_to_journal("You have left combat")
 				update_player_location()
 				save_player()
 			player_turn = False
