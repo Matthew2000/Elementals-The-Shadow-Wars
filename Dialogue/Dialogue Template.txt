@@ -1,0 +1,6 @@
+{
+	"intro": "Hi my name is _____.",
+	"quest": "I have no quest for you.",
+	"trade": "I am not a trader.",
+	"talk": "I am an NPC named _____."
+}

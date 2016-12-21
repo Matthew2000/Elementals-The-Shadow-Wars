@@ -1,4 +1,4 @@
 .idea
 __pycache__
-*.json
+save.json
 RPGLog.txt

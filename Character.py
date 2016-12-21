@@ -76,6 +76,8 @@ class Character:
 class Player(Character):
 	def __init__(self, name, character):
 		super().__init__(name, character)
+		self.quests = {}
+		self.quest_completed = False
 
 	def move(self, input_key, area):
 		self.prevlocation = self.location[:]
@@ -93,6 +95,22 @@ class Player(Character):
 			if enemy.location[1] == self.location[1] + 1 or enemy.location[1] == self.location[1] - 1 or enemy.location[1] == self.location[1]:
 				super().attack(enemy)
 
+	def add_quest(self, quest_name, requirements):
+		self.quests[quest_name] = {"requirements": requirements}
+		#for quest in self.quests:
+			#if quest_name not in self.quests:
+
+	def update_quests(self, enemies, npcs):
+		for quest in self.quests:
+			requirement = self.quests[quest]["requirements"].keys()
+			if "kill" in requirement:
+				for enemy in enemies:
+					if enemy.name == self.quests[quest]["requirements"]["kill"]:
+						if enemy.is_dead():
+							self.quest_completed = True
+						else:
+							self.quest_completed = False
+
 
 class NPC(Character):
 	def __init__(self, name, character):
@@ -100,6 +118,7 @@ class NPC(Character):
 		self.allow_movement = True
 		self.talking = False
 		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": "I have no quest for you at the moment.", "trade": "I have nothing to trade.", "talk": "I am an NPC."}
+		self.has_quest = False
 
 	def move(self, area):
 		if self.allow_movement:
@@ -116,10 +135,74 @@ class NPC(Character):
 			else:
 				self.move_left()
 
-	def interact(self, log):
+	def conversation_start(self, conversation):
+		conversation.clear()
+		conversation.border()
+		conversation.addstr(0, 1, "Conversation")
+		conversation.addstr(2, 1, "1 - Talk")
+		conversation.addstr(3, 1, "2 - Quest")
+		conversation.addstr(4, 1, "3 - Trade")
+		conversation.addstr(5, 1, "4 - Leave")
+		conversation.refresh()
+
+	def show_options(self, conversation, *options):
+		x = 2
+		conversation.clear()
+		conversation.border()
+		conversation.addstr(0, 1, "Conversation")
+		for option in options:
+			conversation.addstr(x, 1, option)
+			x += 1
+		conversation.refresh()
+
+	def interact(self, journal, conversation, input_key, player):
+		if self.talking is False:
+			journal.insertln()
+			journal.addstr(1, 1, self.dialogue["intro"])
+			self.conversation_start(conversation)
 		self.talking = True
-		log.insertln()
-		log.addstr(1, 1, self.dialogue["intro"])
+		if input_key is ord("1"):
+			journal.insertln()
+			journal.addstr(1, 1, self.dialogue["talk"])
+			self.conversation_start(conversation)
+		elif input_key is ord("2"):
+			if self.has_quest is True:
+				while 1:
+					if player.quest_completed:
+						journal.insertln()
+						journal.addstr(1, 1, "You have completed my quest, here is your reward.")
+						journal.border()
+						journal.refresh()
+						self.show_options(conversation, "1 - Accept")
+						input_key = conversation.getch()
+						if input_key is ord("1"):
+							player.inventory["Coins"] += 100
+							player.quest_completed = False
+							player.quests = {}
+							self.conversation_start(conversation)
+							break
+					else:
+						journal.insertln()
+						journal.addstr(1, 1, self.dialogue["quest"])
+						journal.border()
+						journal.refresh()
+						self.show_options(conversation, "1 - Yes", "2 - No")
+						journal.border()
+						input_key = conversation.getch()
+						if input_key is ord("1"):
+							journal.insertln()
+							journal.addstr(1, 1, "Quest accepted")
+							journal.refresh()
+							player.add_quest("Kill Alice", {"kill": "Alice"})
+							self.conversation_start(conversation)
+							break
+						if input_key is ord("2"):
+							self.conversation_start(conversation)
+							break
+		elif input_key is ord("3"):
+			journal.insertln()
+			journal.addstr(1, 1, self.dialogue["trade"])
+			self.conversation_start(conversation)
 
 
 class Enemy(NPC):

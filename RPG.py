@@ -15,6 +15,8 @@ def load_player():
 	player1.character = save["player"]["character"]
 	player1.inventory = save["player"]["inventory"]
 	player1.max_health = save["player"]["max_health"]
+	player1.quests = save["player"]["quests"]
+	player1.quest_completed = save["player"]["quest_completed"]
 	log.write("load player" + "\r\n")
 
 
@@ -98,6 +100,7 @@ def load_npcs():
 		all_NPCs[x].max_health = save["all_NPCs"][x]["max_health"]
 		all_NPCs[x].character = save["all_NPCs"][x]["character"]
 		all_NPCs[x].inventory = save["all_NPCs"][x]["inventory"]
+		all_NPCs[x].has_quest = save["all_NPCs"][x]["has_quest"]
 		x += 1
 	log.write("load NPCs" + "\r\n")
 
@@ -155,16 +158,15 @@ def update_journal():
 
 
 def update_conversation():
-	dims3 = conversation.getmaxyx()
 	conversation.clear()
 	for npc in all_NPCs:
 		if npc.talking is True:
 			conversation.border()
 			conversation.addstr(0, 1, "Conversation")
-			conversation.addstr(2, 1, "t - Talk")
-			conversation.addstr(3, 1, "q - Quest")
-			conversation.addstr(4, 1, "b - Barter")
-			conversation.addstr(5, 1, "e - Leave")
+			conversation.addstr(2, 1, "1 - Talk")
+			conversation.addstr(3, 1, "2 - Quest")
+			conversation.addstr(4, 1, "3 - Trade")
+			conversation.addstr(5, 1, "4 - Leave")
 	conversation.refresh()
 
 
@@ -262,7 +264,6 @@ def enemy_at_location(y, x):
 def npc_at_location(y, x):
 	for npc in all_NPCs:
 		if npc.location[0] is y and npc.location[1] is x:
-			npc.talking = True
 			return {"result": True, "npc": npc}
 	else:
 		return {"result": False}
@@ -356,6 +357,7 @@ try:
 		are_enemies_dead()
 
 		if player_turn:
+			player1.update_quests(all_enemies, all_NPCs)
 			if not player1.is_dead():
 				player1.move(Key, dims)
 				result = enemy_at_location(player1.location[0], player1.location[1])
@@ -380,23 +382,18 @@ try:
 				result = npc_at_location(player1.location[0], player1.location[1])
 				if result["result"] is True:
 					NPC = result["npc"]
-					NPC.interact(journal)
+					NPC.interact(journal, conversation, Key, player1)
 					update_journal()
-					while Key is not ord("e"):
-						update_conversation()
+					while Key is not ord("4"):
 						Key = Main_Window.getch()
-						if Key is ord("q"):
-							print_to_journal(NPC.dialogue["quest"])
-						if Key is ord("b"):
-							print_to_journal(NPC.dialogue["trade"])
-						if Key is ord("t"):
-							print_to_journal(NPC.dialogue["talk"])
+						NPC.interact(journal, conversation, Key, player1)
 						update_journal()
 					else:
 						NPC.talking = False
 						update_conversation()
 				update_player_location()
 				save_player()
+			player1.update_quests(all_enemies, all_NPCs)
 			player_turn = False
 
 		if not player_turn:
@@ -413,6 +410,7 @@ try:
 		update_game()
 	update_enemy_locations()
 	update_npc_locations()
+	save_player()
 	save_npcs()
 	save_enemies()
 except:
