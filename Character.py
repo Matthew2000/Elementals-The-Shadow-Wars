@@ -95,20 +95,20 @@ class Player(Character):
 			if enemy.location[1] == self.location[1] + 1 or enemy.location[1] == self.location[1] - 1 or enemy.location[1] == self.location[1]:
 				super().attack(enemy)
 
-	def add_quest(self, quest_name, requirements):
-		self.quests[quest_name] = {"requirements": requirements}
-		#for quest in self.quests:
-			#if quest_name not in self.quests:
+	def add_quest(self, quest):
+		self.quests[quest["quest name"]] = quest
 
 	def update_quests(self, enemies, npcs):
 		for quest in self.quests:
-			requirement = self.quests[quest]["requirements"].keys()
-			if "kill" in requirement:
+			requirement = self.quests[quest]["objective"]["requirement"]
+			if requirement == "kill":
 				for enemy in enemies:
-					if enemy.name == self.quests[quest]["requirements"]["kill"]:
+					if enemy.name == self.quests[quest]["objective"]["object"]:
 						if enemy.is_dead():
+							self.quests[quest]["quest completed"] = True
 							self.quest_completed = True
 						else:
+							self.quests[quest]["quest completed"] = False
 							self.quest_completed = False
 
 
@@ -117,7 +117,7 @@ class NPC(Character):
 		super().__init__(name, character)
 		self.allow_movement = True
 		self.talking = False
-		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": "I have no quest for you at the moment.", "trade": "I have nothing to trade.", "talk": "I am an NPC."}
+		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": {"quest 1": {"quest name": "name", "description": "quest description.", "objective": {"requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount"}, "quest completed": False}}, "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 		self.has_quest = False
 
 	def move(self, area):
@@ -155,7 +155,7 @@ class NPC(Character):
 			x += 1
 		conversation.refresh()
 
-	def interact(self, journal, conversation, input_key, player):
+	def interact(self, journal, conversation, input_key, player, log):
 		if self.talking is False:
 			journal.insertln()
 			journal.addstr(1, 1, self.dialogue["intro"])
@@ -169,21 +169,22 @@ class NPC(Character):
 			if self.has_quest is True:
 				while 1:
 					if player.quest_completed:
-						journal.insertln()
-						journal.addstr(1, 1, "You have completed my quest, here is your reward.")
-						journal.border()
-						journal.refresh()
-						self.show_options(conversation, "1 - Accept")
-						input_key = conversation.getch()
-						if input_key is ord("1"):
-							player.inventory["Coins"] += 100
-							player.quest_completed = False
-							player.quests = {}
-							self.conversation_start(conversation)
-							break
+						if player.quests[self.dialogue["quest"]["quest 1"]["quest name"]]["quest completed"]:
+							journal.insertln()
+							journal.addstr(1, 1, "You have completed my quest, here is your reward.")
+							journal.border()
+							journal.refresh()
+							self.show_options(conversation, "1 - Accept")
+							input_key = conversation.getch()
+							if input_key is ord("1"):
+								player.inventory["Coins"] += 100
+								player.quest_completed = False
+								player.quests = {}
+								self.conversation_start(conversation)
+								break
 					else:
 						journal.insertln()
-						journal.addstr(1, 1, self.dialogue["quest"])
+						journal.addstr(1, 1, self.dialogue["quest"]["quest 1"]["description"])
 						journal.border()
 						journal.refresh()
 						self.show_options(conversation, "1 - Yes", "2 - No")
@@ -193,12 +194,16 @@ class NPC(Character):
 							journal.insertln()
 							journal.addstr(1, 1, "Quest accepted")
 							journal.refresh()
-							player.add_quest("Kill Alice", {"kill": "Alice"})
+							player.add_quest(self.dialogue["quest"]["quest 1"])
 							self.conversation_start(conversation)
 							break
 						if input_key is ord("2"):
 							self.conversation_start(conversation)
 							break
+			else:
+				journal.insertln()
+				journal.addstr(1, 1, "I have no quest for you at the moment")
+				journal.refresh()
 		elif input_key is ord("3"):
 			journal.insertln()
 			journal.addstr(1, 1, self.dialogue["trade"])

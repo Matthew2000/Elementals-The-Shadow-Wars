@@ -272,10 +272,17 @@ def npc_at_location(y, x):
 def load_npc_dialogue():
 	for npc in all_NPCs:
 		if os.path.exists('Dialogue/' + npc.name + '.json'):
-			with open('Dialogue/' + npc.name + '.json', 'r') as f:
-				npc.dialogue = json.load(f)
-				f.close()
+			with open('Dialogue/' + npc.name + '.json', 'r') as a:
+				npc.dialogue = json.load(a)
+				a.close()
 
+
+def save_npc_dialogue():
+	for npc in all_NPCs:
+		with open('Dialogue/' + npc.name + '.json', 'w') as a:
+			json.dump(npc.dialogue, a, sort_keys=True, indent=4)
+			a.close()
+	log.write("dialogue load" + "\r\n")
 
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
@@ -346,7 +353,7 @@ try:
 			attack_enemies()
 
 		if Key is ord("s"):
-			spawn_enemy("Zack", "Z", dims[0]-2, 1)
+			spawn_npc("Welch", "W", 2, 2)
 
 		if Key is ord("r"):
 			if player1.is_dead():
@@ -382,11 +389,11 @@ try:
 				result = npc_at_location(player1.location[0], player1.location[1])
 				if result["result"] is True:
 					NPC = result["npc"]
-					NPC.interact(journal, conversation, Key, player1)
+					NPC.interact(journal, conversation, Key, player1, log)
 					update_journal()
 					while Key is not ord("4"):
 						Key = Main_Window.getch()
-						NPC.interact(journal, conversation, Key, player1)
+						NPC.interact(journal, conversation, Key, player1, log)
 						update_journal()
 					else:
 						NPC.talking = False
@@ -411,6 +418,7 @@ try:
 	update_enemy_locations()
 	update_npc_locations()
 	save_player()
+	save_npc_dialogue()
 	save_npcs()
 	save_enemies()
 except:

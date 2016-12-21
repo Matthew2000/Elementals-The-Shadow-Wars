@@ -1,6 +1,20 @@
 {
-	"intro": "Hi my name is Darius.",
-	"quest": "If you can find and kill Alice I will give you 100 coins.",
-	"talk": "I am an NPC named Darius.",
-	"trade": "I am not a trader."
+    "intro": "Hi my name is Darius.",
+    "quest": {
+        "quest 1": {
+            "description": "If you kill Alice I will give you 100 coins.",
+            "objective": {
+                "object": "Alice",
+                "requirement": "kill"
+            },
+            "quest completed": true,
+            "quest name": "kill Alice",
+            "reward": {
+                "amount": 100,
+                "object": "Coins"
+            }
+        }
+    },
+    "talk": "I am an NPC.",
+    "trade": "I have nothing to trade."
 }

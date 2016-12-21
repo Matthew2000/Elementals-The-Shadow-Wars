@@ -1,6 +1,18 @@
 {
-	"intro": "Hi my name is _____.",
-	"quest": "I have no quest for you.",
-	"trade": "I am not a trader.",
-	"talk": "I am an NPC named _____."
+    "intro": "Hi my name is _____.",
+    "quest": {
+        "quest name": {
+            "description": "quest description.",
+            "objective": {
+                "object": "object",
+                "requirement": "quest requirement"
+            },
+            "reward": {
+                "amount": "reward amount",
+                "object": "reward object"
+            }
+        }
+    },
+    "talk": "I am an NPC.",
+    "trade": "I have nothing to trade."
 }
