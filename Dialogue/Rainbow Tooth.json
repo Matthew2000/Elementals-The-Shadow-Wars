@@ -1,0 +1,21 @@
+{
+    "intro": "Hi my name is Rainbow Tooth.",
+    "quest": {
+        "quest 1": {
+            "description": "quest description.",
+            "objective": {
+                "object": "object",
+                "requirement": "quest requirement"
+            },
+            "quest completed": false,
+            "quest giver": "Rainbow Tooth",
+            "quest name": "name",
+            "reward": {
+                "amount": "reward amount",
+                "object": "reward object"
+            }
+        }
+    },
+    "talk": "I am the tribe leader in the Avaker district",
+    "trade": "I have nothing to trade."
+}

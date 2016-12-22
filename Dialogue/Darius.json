@@ -2,20 +2,20 @@
     "intro": "Hi my name is Darius.",
     "quest": {
         "quest 1": {
-            "description": "hi.",
+            "description": "If you kill Alice I will give you 100 coins.",
             "objective": {
-                "object": "object",
-                "requirement": "quest requirement"
+                "object": "Alice",
+                "requirement": "kill"
             },
             "quest completed": false,
             "quest giver": "Darius",
-            "quest name": "name",
+            "quest name": "Slay the Elf",
             "reward": {
-                "amount": "reward amount",
-                "object": "reward object"
+                "amount": 100,
+                "object": "Coins"
             }
         }
     },
     "talk": "I am an NPC.",
-    "trade": "I have nothing to trade."
+    "trade": "I am not a trader."
 }

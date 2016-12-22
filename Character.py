@@ -12,11 +12,11 @@ class AutoNumber(Enum):
 
 
 class Races(AutoNumber):
-	Human = ()
-	Avaker = ()
-	Elf = ()
-	Dragon = ()
-	Valkyrie = ()
+	Human = ()     # 1
+	Avaker = ()    # 2
+	Elf = ()       # 3
+	Dragon = ()    # 4
+	Valkyrie = ()  # 5
 
 
 class Character:
@@ -173,19 +173,21 @@ class NPC(Character):
 			if self.has_quest is True:
 				while 1:
 					if player.quest_completed:
-						if player.quests[self.dialogue["quest"]["quest 1"]["quest name"]]["quest completed"]:
-							journal.insertln()
-							journal.addstr(1, 1, "You have completed my quest, here is your reward.")
-							journal.border()
-							journal.refresh()
-							self.show_options(conversation, "1 - Accept")
-							input_key = conversation.getch()
-							if input_key is ord("1"):
-								player.inventory["Coins"] += 100
-								player.quest_completed = False
-								player.quests = {}
-								self.conversation_start(conversation)
-								break
+						for quest in self.dialogue["quest"]:
+							if player.quests[self.dialogue["quest"][quest]["quest name"]]["quest completed"]:
+								journal.insertln()
+								journal.addstr(1, 1, "You have completed my quest, here is your reward.")
+								journal.border()
+								journal.refresh()
+								self.show_options(conversation, "1 - Accept")
+								input_key = conversation.getch()
+								if input_key is ord("1"):
+									player.inventory[self.dialogue["quest"][quest]["reward"]["object"]] += self.dialogue["quest"][quest]["reward"]["amount"]
+									player.quest_completed = False
+									del player.quests[self.dialogue["quest"][quest]["quest name"]]
+									self.conversation_start(conversation)
+									break
+						break
 					else:
 						journal.insertln()
 						journal.addstr(1, 1, self.dialogue["quest"]["quest 1"]["description"])
