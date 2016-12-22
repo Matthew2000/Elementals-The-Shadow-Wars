@@ -2,16 +2,17 @@
     "intro": "Hi my name is Darius.",
     "quest": {
         "quest 1": {
-            "description": "If you kill Alice I will give you 100 coins.",
+            "description": "hi.",
             "objective": {
-                "object": "Alice",
-                "requirement": "kill"
+                "object": "object",
+                "requirement": "quest requirement"
             },
-            "quest completed": true,
-            "quest name": "kill Alice",
+            "quest completed": false,
+            "quest giver": "Darius",
+            "quest name": "name",
             "reward": {
-                "amount": 100,
-                "object": "Coins"
+                "amount": "reward amount",
+                "object": "reward object"
             }
         }
     },

@@ -1,12 +1,15 @@
 {
     "intro": "Hi my name is _____.",
     "quest": {
-        "quest name": {
+        "quest 1": {
             "description": "quest description.",
             "objective": {
                 "object": "object",
                 "requirement": "quest requirement"
             },
+            "quest completed": false,
+            "quest giver": "_____",
+            "quest name": "name",
             "reward": {
                 "amount": "reward amount",
                 "object": "reward object"

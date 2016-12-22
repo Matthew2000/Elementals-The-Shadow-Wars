@@ -20,7 +20,7 @@ class Races(AutoNumber):
 
 
 class Character:
-	def __init__(self, name, character):
+	def __init__(self, name: str, character: chr, race: Races):
 		self.location = [1, 1]
 		self.prevlocation = [1, 1]
 		self.health = 100
@@ -28,6 +28,7 @@ class Character:
 		self.inventory = {"Coins": 100}
 		self.name = name
 		self.character = character
+		self.race = race
 
 	def move_up(self):
 		if self.location[0] > 1:
@@ -74,8 +75,8 @@ class Character:
 
 
 class Player(Character):
-	def __init__(self, name, character):
-		super().__init__(name, character)
+	def __init__(self, name: str, character: chr, race: Races):
+		super().__init__(name, character, race)
 		self.quests = {}
 		self.quest_completed = False
 
@@ -98,13 +99,16 @@ class Player(Character):
 	def add_quest(self, quest):
 		self.quests[quest["quest name"]] = quest
 
-	def update_quests(self, enemies, npcs):
+	def update_quests(self, enemies, npcs, journal):
 		for quest in self.quests:
 			requirement = self.quests[quest]["objective"]["requirement"]
 			if requirement == "kill":
 				for enemy in enemies:
 					if enemy.name == self.quests[quest]["objective"]["object"]:
 						if enemy.is_dead():
+							if not self.quests[quest]["quest completed"]:
+								journal.insertln()
+								journal.addstr(1, 1, "You have completed the quest go to %s to claim your reward" % self.quests[quest]["quest giver"])
 							self.quests[quest]["quest completed"] = True
 							self.quest_completed = True
 						else:
@@ -113,11 +117,11 @@ class Player(Character):
 
 
 class NPC(Character):
-	def __init__(self, name, character):
-		super().__init__(name, character)
+	def __init__(self, name: str, character: chr, race: Races):
+		super().__init__(name, character, race)
 		self.allow_movement = True
 		self.talking = False
-		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": {"quest 1": {"quest name": "name", "description": "quest description.", "objective": {"requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount"}, "quest completed": False}}, "trade": "I have nothing to trade.", "talk": "I am an NPC."}
+		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": {"quest 1": {"quest name": "name", "description": "quest description.", "objective": {"requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount"}, "quest completed": False, "quest giver": self.name}}, "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 		self.has_quest = False
 
 	def move(self, area):
@@ -211,8 +215,8 @@ class NPC(Character):
 
 
 class Enemy(NPC):
-	def __init__(self, name, character):
-		super().__init__(name, character)
+	def __init__(self, name: str, character: chr, race: Races):
+		super().__init__(name, character, race)
 		self.dialogue = {"intro": "I'm going to kill you"}
 
 	def attack(self, player):

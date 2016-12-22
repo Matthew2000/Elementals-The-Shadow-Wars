@@ -17,11 +17,13 @@ def load_player():
 	player1.max_health = save["player"]["max_health"]
 	player1.quests = save["player"]["quests"]
 	player1.quest_completed = save["player"]["quest_completed"]
+	#player1.race = Races(save["player"]["race"])
 	log.write("load player" + "\r\n")
 
 
 def save_player():
 	save["player"] = player1.__dict__
+	save["player"]["race"] = save["player"]["race"].value
 
 
 def create_enemy(name, character):  # this function must be assigned to an object
@@ -31,16 +33,17 @@ def create_enemy(name, character):  # this function must be assigned to an objec
 			var = True
 			log.write(x.name + " is already there" + "\r\n")
 	if not var:
-		name = Enemy(name, character)
-		all_enemies.append(name)
-	return var
+		all_enemies.append(Enemy(name, character, Races.Human))
+	return all_enemies[len(all_enemies) - 1]
 
 
 def save_enemies():
 	enemies = all_enemies[:]
 	all_enemies.clear()
 	for enemy in enemies:
-		all_enemies.append(enemy.__dict__)
+		temp_enemy = enemy.__dict__
+		temp_enemy["race"] = temp_enemy["race"].value
+		all_enemies.append(temp_enemy)
 	save["all_enemies"].clear()
 	save["all_enemies"] = all_enemies[:]
 	log.write("save enemies" + "\r\n")
@@ -48,19 +51,16 @@ def save_enemies():
 
 def load_enemies():
 	all_enemies.clear()
-	x = 0
 	for enemy in save["all_enemies"]:
-		name = enemy["name"]
-		log.write(name + "\r\n")
-		create_enemy(name, enemy["character"])
-		all_enemies[x].name = save["all_enemies"][x]["name"]
-		all_enemies[x].location = save["all_enemies"][x]["location"]
-		all_enemies[x].prevlocation = save["all_enemies"][x]["prevlocation"]
-		all_enemies[x].health = save["all_enemies"][x]["health"]
-		all_enemies[x].max_health = save["all_enemies"][x]["max_health"]
-		all_enemies[x].character = save["all_enemies"][x]["character"]
-		all_enemies[x].inventory = save["all_enemies"][x]["inventory"]
-		x += 1
+		log.write(enemy["name"] + "\r\n")
+		temp_enemy = create_enemy(enemy["name"], enemy["character"])
+		temp_enemy.location = enemy["location"]
+		temp_enemy.prevlocation = enemy["prevlocation"]
+		temp_enemy.health = enemy["health"]
+		temp_enemy.max_health = enemy["max_health"]
+		temp_enemy.character = enemy["character"]
+		temp_enemy.inventory = enemy["inventory"]
+		temp_enemy.race = Races(enemy["race"])
 	log.write("load enemies" + "\r\n")
 
 
@@ -71,16 +71,17 @@ def create_npc(name, character):  # this function must be assigned to an object
 			var = True
 			log.write(x.name + " is already there" + "\r\n")
 	if not var:
-		name = NPC(name, character)
-		all_NPCs.append(name)
-	return var
+		all_NPCs.append(NPC(name, character, Races.Human))
+	return all_NPCs[len(all_NPCs) - 1]
 
 
 def save_npcs():
 	NPCs = all_NPCs[:]
 	all_NPCs.clear()
 	for npc in NPCs:
-		all_NPCs.append(npc.__dict__)
+		temp_npc = npc.__dict__
+		temp_npc["race"] = temp_npc["race"].value
+		all_NPCs.append(temp_npc)
 	save["all_NPCs"].clear()
 	save["all_NPCs"] = all_NPCs[:]
 	log.write("save NPCs" + "\r\n")
@@ -88,20 +89,18 @@ def save_npcs():
 
 def load_npcs():
 	all_NPCs.clear()
-	x = 0
 	for npc in save["all_NPCs"]:
-		name = npc["name"]
-		log.write(name + "\r\n")
-		create_npc(name, npc["character"])
-		all_NPCs[x].name = save["all_NPCs"][x]["name"]
-		all_NPCs[x].location = save["all_NPCs"][x]["location"]
-		all_NPCs[x].prevlocation = save["all_NPCs"][x]["prevlocation"]
-		all_NPCs[x].health = save["all_NPCs"][x]["health"]
-		all_NPCs[x].max_health = save["all_NPCs"][x]["max_health"]
-		all_NPCs[x].character = save["all_NPCs"][x]["character"]
-		all_NPCs[x].inventory = save["all_NPCs"][x]["inventory"]
-		all_NPCs[x].has_quest = save["all_NPCs"][x]["has_quest"]
-		x += 1
+		log.write(npc["name"] + "\r\n")
+		temp_npc = create_npc(npc["name"], npc["character"])
+		temp_npc.location = npc["location"]
+		temp_npc.prevlocation = npc["prevlocation"]
+		temp_npc.health = npc["health"]
+		temp_npc.max_health = npc["max_health"]
+		temp_npc.character = npc["character"]
+		temp_npc.inventory = npc["inventory"]
+		temp_npc.has_quest = npc["has_quest"]
+		temp_npc.race = Races(npc["race"])
+		log.write(str(temp_npc.race) + "\r\n")
 	log.write("load NPCs" + "\r\n")
 
 
@@ -113,14 +112,22 @@ def spawn_character(win, character, y, x):
 	win.addch(y, x, ord(character.character))
 
 
-def spawn_enemy(name, character, y, x):
-	if not create_enemy(name, character):
-		spawn_character(Main_Window, all_enemies[len(all_enemies) - 1], y, x)
-
-
 def spawn_npc(name, character, y, x):
-	if not create_npc(name, character):
+	for npc in all_NPCs:
+		if npc.name == name:
+			break
+	else:
+		create_npc(name, character)
 		spawn_character(Main_Window, all_NPCs[len(all_NPCs) - 1], y, x)
+
+
+def spawn_enemy(name, character, y, x):
+	for enemy in all_enemies:
+		if enemy.name == name:
+			break
+	else:
+		create_enemy(name, character)
+		spawn_character(Main_Window, all_enemies[len(all_enemies) - 1], y, x)
 
 
 def update_inventory():
@@ -282,12 +289,14 @@ def save_npc_dialogue():
 		with open('Dialogue/' + npc.name + '.json', 'w') as a:
 			json.dump(npc.dialogue, a, sort_keys=True, indent=4)
 			a.close()
-	log.write("dialogue load" + "\r\n")
+	log.write("dialogue save" + "\r\n")
 
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
-save = {"all_enemies": [], "player": {"character": "@", "health": 100, "inventory": {"Coins": 100}, "location": [2, 5], "max_health": 100, "name": "Matthew", "prevlocation": [3, 5]}}
+save = {"all_enemies": [], "all_NPCs": [], "player": {"character": "@", "health": 100, "inventory": {"Coins": 100}, "location": [2, 5], "max_health": 100, "name": "Matthew", "prevlocation": [3, 5]}}
 log = open('RPGLog.txt', 'w')
+error = open('RPGErrorLog.txt', 'w')
+sys.stderr = error
 Key = -1
 player_name = "Matthew"
 all_enemies = []
@@ -310,20 +319,20 @@ try:
 	dims = Main_Window.getmaxyx()
 	dims2 = inventory.getmaxyx()
 
+	player1 = Player("Matthew", "@", Races.Human)
+	log.write("player made" + "\r\n")
+
 	if os.path.exists('save.json'):
 		with open('save.json', 'r') as f:
 			save = json.load(f)
 			f.close()
 
-	player = save["player"].keys()
-	inventory_items = save["player"]["inventory"].keys()
+		player = save["player"].keys()
+		inventory_items = save["player"]["inventory"].keys()
 
-	player1 = Player("Matthew", "@")
-	log.write("player made" + "\r\n")
-
-	load_player()
-	load_enemies()
-	load_npcs()
+		load_player()
+		load_enemies()
+		load_npcs()
 
 	spawn_character(Main_Window, player1, player1.location[0], player1.location[1])
 	place_enemies()
@@ -353,23 +362,22 @@ try:
 			attack_enemies()
 
 		if Key is ord("s"):
-			spawn_npc("Welch", "W", 2, 2)
+			spawn_enemy("Lucifer", "L", int(dims[0]/2), int(dims[1]/2))
 
 		if Key is ord("r"):
 			if player1.is_dead():
 				player1.respawn(20, 20)
 				spawn_character(Main_Window, player1, player1.location[0], player1.location[1])
-				save_player()
 
 		are_enemies_dead()
 
 		if player_turn:
-			player1.update_quests(all_enemies, all_NPCs)
+			player1.update_quests(all_enemies, all_NPCs, journal)
 			if not player1.is_dead():
 				player1.move(Key, dims)
 				result = enemy_at_location(player1.location[0], player1.location[1])
 				if result["result"] is True:
-					enemy = result["enemy"]
+					enemy1 = result["enemy"]
 					print_to_journal('Press "a" to attack or "e" to leave')
 					print_to_journal("Battle has started")
 					update_journal()
@@ -377,14 +385,14 @@ try:
 						update_enemy_status()
 						Key = Main_Window.getch()
 						if Key is ord("a"):
-							player1.attack(enemy)
-						if enemy.health <= 0:
+							player1.attack(enemy1)
+						if enemy1.health <= 0:
 							are_enemies_dead()
-							enemy.allow_movement = True
+							enemy1.allow_movement = True
 							update_enemy_status()
 							break
 					else:
-						enemy.allow_movement = True
+						enemy1.allow_movement = True
 						print_to_journal("You have left combat")
 				result = npc_at_location(player1.location[0], player1.location[1])
 				if result["result"] is True:
@@ -399,8 +407,8 @@ try:
 						NPC.talking = False
 						update_conversation()
 				update_player_location()
-				save_player()
-			player1.update_quests(all_enemies, all_NPCs)
+
+			player1.update_quests(all_enemies, all_NPCs, journal)
 			player_turn = False
 
 		if not player_turn:
@@ -424,8 +432,12 @@ try:
 except:
 	log.write(str(sys.exc_info()))
 finally:
+	if os.path.exists('save.json.bak') and os.path.exists('save.json'):
+		os.remove('save.json.bak')
+		os.rename('save.json', 'save.json.bak')
 	with open('save.json', 'w') as f:
 		json.dump(save, f, sort_keys=True, indent=4)
 	f.close()
 	log.close()
+	error.close()
 	curses.endwin()
