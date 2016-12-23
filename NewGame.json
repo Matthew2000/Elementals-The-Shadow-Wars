@@ -1,0 +1,266 @@
+{
+	"all_NPCs": [
+        {
+            "allow_movement": true,
+            "character": "W",
+            "dialogue": {
+                "intro": "Hi my name is Welch.",
+                "quest": [
+                    {
+                        "description": "quest description.",
+                        "objective": {
+                            "object": "object",
+                            "requirement": "quest requirement"
+                        },
+                        "quest completed": false,
+                        "quest giver": "Welch",
+                        "quest name": "name",
+                        "reward": {
+                            "amount": "reward amount",
+                            "object": "reward object"
+                        }
+                    }
+                ],
+                "talk": "I am an NPC.",
+                "trade": "I have nothing to trade."
+            },
+            "has_quest": false,
+            "health": 100,
+            "inventory": {
+                "Coins": 100
+            },
+            "location": [
+                1,
+                1
+            ],
+            "max_health": 100,
+            "name": "Welch",
+            "prevlocation": [
+                1,
+                1
+            ],
+            "race": 1,
+            "talking": false
+        },
+        {
+            "allow_movement": true,
+            "character": "D",
+            "dialogue": {
+                "intro": "Hi my name is Darius.",
+                "quest": [
+                    {
+                        "description": "If you kill Alice I will give you 100 coins.",
+                        "objective": {
+                            "object": "Alice",
+                            "requirement": "kill"
+                        },
+                        "quest completed": true,
+                        "quest giver": "Darius",
+                        "quest name": "Slay the Elf",
+                        "reward": {
+                            "amount": 100,
+                            "object": "Coins"
+                        }
+                    },
+                    {
+                        "description": "If you kill Fred I will give you 4 gems.",
+                        "objective": {
+                            "object": "Fred",
+                            "requirement": "kill"
+                        },
+                        "quest completed": true,
+                        "quest giver": "Darius",
+                        "quest name": "Kill Fred",
+                        "reward": {
+                            "amount": 4,
+                            "object": "Gems"
+                        }
+                    }
+                ],
+                "talk": "I am an NPC.",
+                "trade": "I am not a trader."
+            },
+            "has_quest": true,
+            "health": 100,
+            "inventory": {
+                "Coins": 100
+            },
+            "location": [
+                33,
+                98
+            ],
+            "max_health": 100,
+            "name": "Darius",
+            "prevlocation": [
+                33,
+                98
+            ],
+            "race": 2,
+            "talking": false
+        },
+        {
+            "allow_movement": true,
+            "character": "R",
+            "dialogue": {
+                "intro": "Hi my name is Rainbow Tooth.",
+                "quest": [
+                    {
+                        "description": "quest description.",
+                        "objective": {
+                            "object": "object",
+                            "requirement": "quest requirement"
+                        },
+                        "quest completed": false,
+                        "quest giver": "Rainbow Tooth",
+                        "quest name": "name",
+                        "reward": {
+                            "amount": "reward amount",
+                            "object": "reward object"
+                        }
+                    }
+                ],
+                "talk": "I am the tribe leader in the Avaker district",
+                "trade": "I have nothing to trade."
+            },
+            "has_quest": false,
+            "health": 100,
+            "inventory": {
+                "Coins": 100
+            },
+            "location": [
+                1,
+                98
+            ],
+            "max_health": 100,
+            "name": "Rainbow Tooth",
+            "prevlocation": [
+                1,
+                98
+            ],
+            "race": 2,
+            "talking": false
+        }
+    ],
+    "all_enemies": [
+        {
+            "allow_movement": true,
+            "character": "A",
+            "dialogue": {
+                "intro": "I'm going to kill you"
+            },
+            "has_quest": false,
+            "health": 100,
+            "inventory": {
+                "Coins": 100
+            },
+            "location": [
+                10,
+                10
+            ],
+            "max_health": 100,
+            "name": "Alice",
+            "prevlocation": [
+                10,
+                10
+            ],
+            "race": 3,
+            "talking": false
+        },
+        {
+            "allow_movement": true,
+            "character": "P",
+            "dialogue": {
+                "intro": "I'm going to kill you"
+            },
+            "has_quest": false,
+            "health": 100,
+            "inventory": {
+                "Coins": 100
+            },
+            "location": [
+                20,
+                20
+            ],
+            "max_health": 100,
+            "name": "Petra",
+            "prevlocation": [
+                20,
+                20
+            ],
+            "race": 2,
+            "talking": false
+        },
+        {
+            "allow_movement": true,
+            "character": "K",
+            "dialogue": {
+                "intro": "I'm going to kill you"
+            },
+            "has_quest": false,
+            "health": 100,
+            "inventory": {
+                "Coins": 100
+            },
+            "location": [
+                15,
+                10
+            ],
+            "max_health": 100,
+            "name": "Kaitlin",
+            "prevlocation": [
+                15,
+                10
+            ],
+            "race": 5,
+            "talking": false
+        },
+        {
+            "allow_movement": true,
+            "character": "J",
+            "dialogue": {
+                "intro": "I'm going to kill you"
+            },
+            "has_quest": false,
+            "health": 100,
+            "inventory": {
+                "Coins": 100
+            },
+            "location": [
+                5,
+                20
+            ],
+            "max_health": 100,
+            "name": "Jack",
+            "prevlocation": [
+                5,
+                20
+            ],
+            "race": 1,
+            "talking": false
+        },
+        {
+            "allow_movement": true,
+            "character": "F",
+            "dialogue": {
+                "intro": "I'm going to kill you"
+            },
+            "has_quest": false,
+            "health": 100,
+            "inventory": {
+                "Coins": 100
+            },
+            "location": [
+                20,
+                30
+            ],
+            "max_health": 100,
+            "name": "Fred",
+            "prevlocation": [
+                20,
+                30
+            ],
+            "race": 1,
+            "talking": false
+        }
+    ]
+}

@@ -7,6 +7,12 @@ import curses
 import json
 
 
+def create_player(name: str, character: chr, race: Races):
+	temp_player = Player(name, character, race)
+	temp_player.location = [int(dims[0]/2), int(dims[1]/2)]
+	return temp_player
+
+
 def load_player():
 	player1.name = save["player"]["name"]
 	log.write(player1.name + " ")
@@ -51,7 +57,7 @@ def save_enemies():
 	log.write("save enemies" + "\r\n")
 
 
-def load_enemies():
+def load_enemies(save):
 	all_enemies.clear()
 	for enemy in save["all_enemies"]:
 		log.write(enemy["name"] + " ")
@@ -89,7 +95,7 @@ def save_npcs():
 	log.write("save NPCs" + "\r\n")
 
 
-def load_npcs():
+def load_npcs(save):
 	all_NPCs.clear()
 	for npc in save["all_NPCs"]:
 		log.write(npc["name"] + " ")
@@ -347,6 +353,14 @@ def enter_combat(player, enemy, key):
 		enemy.allow_movement = True
 		print_to_journal("You have left combat")
 
+
+def new_game(save):
+	with open('NewGame.json', 'r') as f:
+		save = json.load(f)
+		f.close()
+	load_enemies(save)
+	load_npcs(save)
+
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
 save = {"all_enemies": [], "all_NPCs": [], "player": {"character": "@", "health": 100, "inventory": {"Coins": 100}, "location": [2, 5], "max_health": 100, "name": "Matthew", "prevlocation": [3, 5]}}
@@ -375,7 +389,7 @@ try:
 	dims = Main_Window.getmaxyx()
 	dims2 = inventory.getmaxyx()
 
-	player1 = Player("Matthew", "@", Races.Human)
+	player1 = create_player("Matthew", "@", Races.Human)
 
 	if os.path.exists('save.json'):
 		with open('save.json', 'r') as f:
@@ -386,8 +400,10 @@ try:
 		inventory_items = save["player"]["inventory"].keys()
 
 		load_player()
-		load_enemies()
-		load_npcs()
+		load_enemies(save)
+		load_npcs(save)
+	else:
+		new_game(save)
 
 	spawn_character(Main_Window, player1, player1.location[0], player1.location[1])
 	place_enemies()
