@@ -78,17 +78,16 @@ class Player(Character):
 	def __init__(self, name: str, character: chr, race: Races):
 		super().__init__(name, character, race)
 		self.quests = {}
-		self.quest_completed = False
 
 	def move(self, input_key, area):
 		self.prevlocation = self.location[:]
-		if input_key == curses.KEY_UP:
+		if input_key == curses.KEY_UP or input_key == ord("w"):
 			self.move_up()
-		elif input_key == curses.KEY_DOWN:
+		elif input_key == curses.KEY_DOWN or input_key == ord("s"):
 			self.move_down(area)
-		elif input_key == curses.KEY_LEFT:
+		elif input_key == curses.KEY_LEFT or input_key == ord("a"):
 			self.move_left()
-		elif input_key == curses.KEY_RIGHT:
+		elif input_key == curses.KEY_RIGHT or input_key == ord("d"):
 			self.move_right(area)
 
 	def attack(self, enemy):
@@ -110,10 +109,7 @@ class Player(Character):
 								journal.insertln()
 								journal.addstr(1, 1, "You have completed the quest go to %s to claim your reward" % self.quests[quest]["quest giver"])
 							self.quests[quest]["quest completed"] = True
-							self.quest_completed = True
 						else:
-							if not self.quest_completed:
-								self.quest_completed = False
 							self.quests[quest]["quest completed"] = False
 
 
@@ -179,70 +175,66 @@ class NPC(Character):
 			journal.addstr(1, 1, self.dialogue["talk"])
 			self.conversation_start(conversation)
 		elif input_key is ord("2"):
+
 			def choose_quest(key, quests):
 				log.write(str(int(chr(int(key)-1))) + "\r\n")
 				quest_list = quests
+				quest = quest_list[int(chr(int(key)-1))]
 				if str(int(chr(key))-1) >= str(len(quest_list)):
 					pass
 				else:
-					journal.insertln()
-					journal.addstr(1, 1, quest_list[int(chr(int(key)-1))]["description"])
-					log.write("not fail" + "\r\n")
-					journal.border()
-					journal.refresh()
-					list_key = int(chr(int(key)-1))
-					while 1:
-						self.show_options(conversation, log, "Yes", "No")
-						key = conversation.getch()
-						if key is ord("1"):
-							journal.insertln()
-							journal.addstr(1, 1, "You have accepted the quest")
-							journal.refresh()
-							player.add_quest(quest_list[list_key])
-							self.conversation_start(conversation)
-							break
-						elif key is ord("2"):
-							break
-			if self.has_quest is True:
-				while 1:
-					if player.quest_completed:
-						for quest in self.dialogue["quest"]:
-							if quest["quest name"] not in player.quests:
-								pass
-							elif player.quests[quest["quest name"]]["quest completed"]:
-								journal.insertln()
-								journal.addstr(1, 1, "You have completed my quest, here is your reward.")
-								journal.border()
-								journal.refresh()
-								self.show_options(conversation, log, "1 - Accept")
-								input_key = conversation.getch()
-								if input_key is ord("1"):
-									if quest["reward"]["object"] not in player.inventory:
-										player.add_inventory_item(quest["reward"]["object"], 0)
-									player.inventory[quest["reward"]["object"]] += quest["reward"]["amount"]
-									player.quest_completed = False
-									del player.quests[quest["quest name"]]
-									self.conversation_start(conversation)
-									break
-						break
-					else:
+					if quest["quest name"] not in player.quests:
 						journal.insertln()
-						journal.addstr(1, 1, "These are the quests that I have")
+						journal.addstr(1, 1, quest["description"])
+						log.write("not fail" + "\r\n")
 						journal.border()
 						journal.refresh()
-						quest_list = []
-						for quest in self.dialogue["quest"]:
-							log.write(quest["quest name"] + "\r\n")
-							quest_list.append(quest["quest name"])
-						self.show_options(conversation, log, quest_list)
+						list_key = int(chr(int(key) - 1))
+						while 1:
+							self.show_options(conversation, log, "Yes", "No")
+							key = conversation.getch()
+							if key is ord("1"):
+								journal.insertln()
+								journal.addstr(1, 1, "You have accepted the quest")
+								journal.refresh()
+								player.add_quest(quest_list[list_key])
+								self.conversation_start(conversation)
+								break
+							elif key is ord("2"):
+								break
+					elif player.quests[quest["quest name"]]["quest completed"]:
+						journal.insertln()
+						journal.addstr(1, 1, "You have completed my quest, here is your reward.")
+						journal.border()
+						journal.refresh()
+						self.show_options(conversation, log, "1 - Accept")
+						key = conversation.getch()
+						if key is ord("1"):
+							if quest["reward"]["object"] not in player.inventory:
+								player.add_inventory_item(quest["reward"]["object"], 0)
+							player.inventory[quest["reward"]["object"]] += quest["reward"]["amount"]
+							del player.quests[quest["quest name"]]
+							self.conversation_start(conversation)
 
-						quest_number = []
-						for quest in self.dialogue["quest"]:
-							quest_number.append(quest)
-						input_key = conversation.getch()
-						choose_quest(input_key, quest_number)
-						self.conversation_start(conversation)
-						break
+			if self.has_quest is True:
+				while 1:
+					journal.insertln()
+					journal.addstr(1, 1, "These are the quests that I have")
+					journal.border()
+					journal.refresh()
+					quest_list = []
+					for quest in self.dialogue["quest"]:
+						log.write(quest["quest name"] + "\r\n")
+						quest_list.append(quest["quest name"])
+					self.show_options(conversation, log, quest_list)
+
+					quest_number = []
+					for quest in self.dialogue["quest"]:
+						quest_number.append(quest)
+					input_key = conversation.getch()
+					choose_quest(input_key, quest_number)
+					self.conversation_start(conversation)
+					break
 			else:
 				journal.insertln()
 				journal.addstr(1, 1, "I have no quest for you at the moment")

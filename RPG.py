@@ -17,7 +17,6 @@ def load_player():
 	player1.inventory = save["player"]["inventory"]
 	player1.max_health = save["player"]["max_health"]
 	player1.quests = save["player"]["quests"]
-	player1.quest_completed = save["player"]["quest_completed"]
 	player1.race = Races(save["player"]["race"])
 	log.write("Race: " + str(player1.race)[6:] + "\r\n")
 	log.write("load player" + "\r\n")
@@ -229,17 +228,13 @@ def update_npc_locations():
 
 
 def place_enemies():
-	x = 0
 	for enemy in all_enemies:
-		spawn_character(Main_Window, all_enemies[x], all_enemies[x].location[0], all_enemies[x].location[1])
-		x += 1
+		spawn_character(Main_Window, enemy, enemy.location[0], enemy.location[1])
 
 
 def place_npcs():
-	x = 0
 	for npc in all_NPCs:
-		spawn_character(Main_Window, all_NPCs[x], all_NPCs[x].location[0], all_NPCs[x].location[1])
-		x += 1
+		spawn_character(Main_Window, npc, npc.location[0], npc.location[1])
 
 
 def move_enemies():
@@ -255,11 +250,6 @@ def interact_npc(input_key, log):
 def print_to_journal(message):
 	journal.insertln()
 	journal.addstr(1, 1, message)
-
-
-def attack_enemies():
-	for enemy in all_enemies:
-		player1.attack(enemy)
 
 
 def enemy_at_location(y, x):
@@ -361,10 +351,7 @@ try:
 
 		Key = Main_Window.getch()
 
-		if Key is ord("a"):
-			attack_enemies()
-
-		if Key is ord("s"):
+		if Key is ord("g"):
 			spawn_npc("Rainbow Tooth", "R", Races.Avaker, 1, int(dims[1])-1)
 
 		if Key is ord("r"):
@@ -381,13 +368,13 @@ try:
 				result = enemy_at_location(player1.location[0], player1.location[1])
 				if result["result"] is True:
 					enemy1 = result["enemy"]
-					print_to_journal('Press "a" to attack or "e" to leave')
+					print_to_journal('Press "1" to attack or "2" to leave')
 					print_to_journal("Battle has started")
 					update_journal()
-					while Key is not ord("e"):
+					while Key is not ord("2"):
 						update_enemy_status()
 						Key = Main_Window.getch()
-						if Key is ord("a"):
+						if Key is ord("1"):
 							player1.attack(enemy1)
 						if enemy1.health <= 0:
 							are_enemies_dead()
