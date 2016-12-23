@@ -1,7 +1,7 @@
 {
     "intro": "Hi my name is Welch.",
-    "quest": {
-        "quest 1": {
+    "quest": [
+        {
             "description": "quest description.",
             "objective": {
                 "object": "object",
@@ -15,7 +15,7 @@
                 "object": "reward object"
             }
         }
-    },
+    ],
     "talk": "I am an NPC.",
     "trade": "I have nothing to trade."
 }

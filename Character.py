@@ -112,8 +112,9 @@ class Player(Character):
 							self.quests[quest]["quest completed"] = True
 							self.quest_completed = True
 						else:
+							if not self.quest_completed:
+								self.quest_completed = False
 							self.quests[quest]["quest completed"] = False
-							self.quest_completed = False
 
 
 class NPC(Character):
@@ -121,7 +122,7 @@ class NPC(Character):
 		super().__init__(name, character, race)
 		self.allow_movement = True
 		self.talking = False
-		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": {"quest 1": {"quest name": "name", "description": "quest description.", "objective": {"requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount"}, "quest completed": False, "quest giver": self.name}}, "trade": "I have nothing to trade.", "talk": "I am an NPC."}
+		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": [{"quest name": "name", "description": "quest description.", "objective": {"requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount"}, "quest completed": False, "quest giver": self.name}], "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 		self.has_quest = False
 
 	def move(self, area):
@@ -149,14 +150,22 @@ class NPC(Character):
 		conversation.addstr(5, 1, "4 - Leave")
 		conversation.refresh()
 
-	def show_options(self, conversation, *options):
+	def show_options(self, conversation, log, *options):
 		x = 2
+		y = 1
 		conversation.clear()
 		conversation.border()
 		conversation.addstr(0, 1, "Conversation")
 		for option in options:
-			conversation.addstr(x, 1, option)
-			x += 1
+			if option == str(option):
+				conversation.addstr(x, 1, str(y) + " - " + str(option))
+				x += 1
+				y += 1
+			else:
+				for option1 in option:
+					conversation.addstr(x, 1, str(y) + " - " + str(option1))
+					x += 1
+					y += 1
 		conversation.refresh()
 
 	def interact(self, journal, conversation, input_key, player, log):
@@ -170,42 +179,70 @@ class NPC(Character):
 			journal.addstr(1, 1, self.dialogue["talk"])
 			self.conversation_start(conversation)
 		elif input_key is ord("2"):
+			def choose_quest(key, quests):
+				log.write(str(int(chr(int(key)-1))) + "\r\n")
+				quest_list = quests
+				if str(int(chr(key))-1) >= str(len(quest_list)):
+					pass
+				else:
+					journal.insertln()
+					journal.addstr(1, 1, quest_list[int(chr(int(key)-1))]["description"])
+					log.write("not fail" + "\r\n")
+					journal.border()
+					journal.refresh()
+					list_key = int(chr(int(key)-1))
+					while 1:
+						self.show_options(conversation, log, "Yes", "No")
+						key = conversation.getch()
+						if key is ord("1"):
+							journal.insertln()
+							journal.addstr(1, 1, "You have accepted the quest")
+							journal.refresh()
+							player.add_quest(quest_list[list_key])
+							self.conversation_start(conversation)
+							break
+						elif key is ord("2"):
+							break
 			if self.has_quest is True:
 				while 1:
 					if player.quest_completed:
 						for quest in self.dialogue["quest"]:
-							if player.quests[self.dialogue["quest"][quest]["quest name"]]["quest completed"]:
+							if quest["quest name"] not in player.quests:
+								pass
+							elif player.quests[quest["quest name"]]["quest completed"]:
 								journal.insertln()
 								journal.addstr(1, 1, "You have completed my quest, here is your reward.")
 								journal.border()
 								journal.refresh()
-								self.show_options(conversation, "1 - Accept")
+								self.show_options(conversation, log, "1 - Accept")
 								input_key = conversation.getch()
 								if input_key is ord("1"):
-									player.inventory[self.dialogue["quest"][quest]["reward"]["object"]] += self.dialogue["quest"][quest]["reward"]["amount"]
+									if quest["reward"]["object"] not in player.inventory:
+										player.add_inventory_item(quest["reward"]["object"], 0)
+									player.inventory[quest["reward"]["object"]] += quest["reward"]["amount"]
 									player.quest_completed = False
-									del player.quests[self.dialogue["quest"][quest]["quest name"]]
+									del player.quests[quest["quest name"]]
 									self.conversation_start(conversation)
 									break
 						break
 					else:
 						journal.insertln()
-						journal.addstr(1, 1, self.dialogue["quest"]["quest 1"]["description"])
+						journal.addstr(1, 1, "These are the quests that I have")
 						journal.border()
 						journal.refresh()
-						self.show_options(conversation, "1 - Yes", "2 - No")
-						journal.border()
+						quest_list = []
+						for quest in self.dialogue["quest"]:
+							log.write(quest["quest name"] + "\r\n")
+							quest_list.append(quest["quest name"])
+						self.show_options(conversation, log, quest_list)
+
+						quest_number = []
+						for quest in self.dialogue["quest"]:
+							quest_number.append(quest)
 						input_key = conversation.getch()
-						if input_key is ord("1"):
-							journal.insertln()
-							journal.addstr(1, 1, "Quest accepted")
-							journal.refresh()
-							player.add_quest(self.dialogue["quest"]["quest 1"])
-							self.conversation_start(conversation)
-							break
-						if input_key is ord("2"):
-							self.conversation_start(conversation)
-							break
+						choose_quest(input_key, quest_number)
+						self.conversation_start(conversation)
+						break
 			else:
 				journal.insertln()
 				journal.addstr(1, 1, "I have no quest for you at the moment")

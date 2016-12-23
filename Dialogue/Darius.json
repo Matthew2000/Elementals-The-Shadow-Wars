@@ -1,7 +1,7 @@
 {
     "intro": "Hi my name is Darius.",
-    "quest": {
-        "quest 1": {
+    "quest": [
+        {
             "description": "If you kill Alice I will give you 100 coins.",
             "objective": {
                 "object": "Alice",
@@ -14,8 +14,22 @@
                 "amount": 100,
                 "object": "Coins"
             }
+        },
+        {
+            "description": "If you kill Fred I will give you 4 gems.",
+            "objective": {
+                "object": "Fred",
+                "requirement": "kill"
+            },
+            "quest completed": false,
+            "quest giver": "Darius",
+            "quest name": "Kill Fred",
+            "reward": {
+                "amount": 4,
+                "object": "Gems"
+            }
         }
-    },
+    ],
     "talk": "I am an NPC.",
     "trade": "I am not a trader."
 }
