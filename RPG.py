@@ -193,6 +193,7 @@ def are_enemies_dead():
 				enemy.death()
 				Main_Window.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
 				print_to_journal(enemy.name + " is dead")
+				enemy.death()
 
 
 def update_enemy_locations():
@@ -239,7 +240,17 @@ def place_npcs():
 
 def move_enemies():
 	for enemy in all_enemies:
-		enemy.move(dims)
+		if not enemy.is_dead():
+			if enemy.is_near_player(player1, 5):
+				follow_the_player()
+				if player_at_location(enemy.location[0], enemy.location[1]):
+					enemy.allow_movement = False
+					enter_combat(player1, enemy, -1)
+			else:
+				enemy.move(dims)
+				if player_at_location(enemy.location[0], enemy.location[1]):
+					enemy.allow_movement = False
+					enter_combat(player1, enemy, -1)
 
 
 def interact_npc(input_key, log):
@@ -260,6 +271,14 @@ def enemy_at_location(y, x):
 			return {"result": True, "enemy": enemy}
 	else:
 		return {"result": False}
+
+
+def player_at_location(y, x):
+	if player1.location[0] is y and player1.location[1] is x:
+		update_enemy_status()
+		return True
+	else:
+		return False
 
 
 def npc_at_location(y, x):
@@ -284,6 +303,49 @@ def save_npc_dialogue():
 			json.dump(npc.dialogue, a, sort_keys=True, indent=4)
 			a.close()
 	log.write("dialogue save" + "\r\n")
+
+
+def player_dead():
+	if player1.is_dead():
+		if Main_Window.inch(player1.location[0], player1.location[1]) == ord(player1.character):
+			player1.death()
+			Main_Window.addch(player1.prevlocation[0], player1.prevlocation[1], " ")
+			print_to_journal(player1.name + " is dead")
+
+
+def follow_the_player():
+	for enemy in all_enemies:
+		enemy.follow_player(player1)
+
+
+def enter_combat(player, enemy, key):
+	print_to_journal('Press "1" to attack or "2" to leave')
+	print_to_journal("Battle has started")
+	update_journal()
+	update_enemy_status()
+	update_player_status()
+	while key is not ord("2"):
+		update_enemy_status()
+		update_player_status()
+		if enemy.health <= 0:
+			are_enemies_dead()
+			enemy.allow_movement = True
+			update_enemy_status()
+			break
+		if player1.health <= 0:
+			if player.is_dead():
+				player_dead()
+				update_player_location()
+			enemy.allow_movement = True
+			update_enemy_status()
+			break
+		key = Main_Window.getch()
+		if key is ord("1"):
+			player.attack(enemy)
+		enemy.attack(player)
+	else:
+		enemy.allow_movement = True
+		print_to_journal("You have left combat")
 
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
@@ -349,6 +411,9 @@ try:
 		update_game()
 		update_enemy_status()
 
+		are_enemies_dead()
+		player_dead()
+
 		Key = Main_Window.getch()
 
 		if Key is ord("g"):
@@ -359,8 +424,6 @@ try:
 				player1.respawn(20, 20)
 				spawn_character(Main_Window, player1, player1.location[0], player1.location[1])
 
-		are_enemies_dead()
-
 		if player_turn:
 			player1.update_quests(all_enemies, all_NPCs, journal)
 			if not player1.is_dead():
@@ -368,22 +431,7 @@ try:
 				result = enemy_at_location(player1.location[0], player1.location[1])
 				if result["result"] is True:
 					enemy1 = result["enemy"]
-					print_to_journal('Press "1" to attack or "2" to leave')
-					print_to_journal("Battle has started")
-					update_journal()
-					while Key is not ord("2"):
-						update_enemy_status()
-						Key = Main_Window.getch()
-						if Key is ord("1"):
-							player1.attack(enemy1)
-						if enemy1.health <= 0:
-							are_enemies_dead()
-							enemy1.allow_movement = True
-							update_enemy_status()
-							break
-					else:
-						enemy1.allow_movement = True
-						print_to_journal("You have left combat")
+					enter_combat(player1, enemy1, -1)
 				result = npc_at_location(player1.location[0], player1.location[1])
 				if result["result"] is True:
 					NPC = result["npc"]
@@ -400,6 +448,9 @@ try:
 
 			player1.update_quests(all_enemies, all_NPCs, journal)
 			player_turn = False
+
+		are_enemies_dead()
+		player_dead()
 
 		if not player_turn:
 			move_enemies()

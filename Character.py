@@ -47,7 +47,12 @@ class Character:
 			self.location[1] += 1
 
 	def attack(self, opponent):  # what you attack must inherit from Character
-		opponent.health -= 10
+		x = randint(0, 2)
+		if x is 0:
+			pass
+		else:
+			damage = randint(1, 11)
+			opponent.health -= damage
 
 	def death(self):  # kills the Character
 		if self.health <= 0:
@@ -57,9 +62,6 @@ class Character:
 	def is_dead(self):  # returns True if the characters health is at or below 0
 		if self.health <= 0:
 			return True
-
-	def add_coin(self, amount):
-		self.inventory["Coins"] += amount
 
 	def add_inventory_item(self, item, amount=0):
 		var = False
@@ -244,6 +246,47 @@ class NPC(Character):
 			journal.addstr(1, 1, self.dialogue["trade"])
 			self.conversation_start(conversation)
 
+	def move_to(self, y, x):
+		if y == self.location[0] and x == self.location[1]:
+			self.prevlocation = self.location[:]
+			pass
+		elif self.location[0] == y:
+			self.prevlocation = self.location[:]
+			if x > self.location[1]:
+				self.location[1] += 1
+			else:
+				self.location[1] -= 1
+		elif self.location[1] == x:
+			self.prevlocation = self.location[:]
+			if y > self.location[0]:
+				self.location[0] += 1
+			else:
+				self.location[0] -= 1
+		elif abs(x - self.location[1]) >= abs(y - self.location[0]):
+			self.prevlocation = self.location[:]
+			if x > self.location[1]:
+				self.location[1] += 1
+			else:
+				self.location[1] -= 1
+		elif abs(x - self.location[1]) <= abs(y - self.location[0]):
+			self.prevlocation = self.location[:]
+			if y > self.location[0]:
+				self.location[0] += 1
+			else:
+				self.location[0] -= 1
+
+	def is_near_player(self, player, distance):
+		x = False
+		y = False
+		if distance >= (player.location[0] - self.location[0]) >= (distance * -1):
+			y = True
+		if distance >= (player.location[1] - self.location[1]) >= (distance * -1):
+			x = True
+		if x and y:
+			return True
+		else:
+			return False
+
 
 class Enemy(NPC):
 	def __init__(self, name: str, character: chr, race: Races):
@@ -254,3 +297,7 @@ class Enemy(NPC):
 		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:
 			if player.location[1] == self.location[1] + 1 or player.location[1] == self.location[1] - 1 or player.location[1] == self.location[1]:
 				super().attack(player)
+
+	def follow_player(self, player):
+		if self.is_near_player(player, 5):
+			self.move_to(player.location[0], player.location[1])

@@ -7,7 +7,7 @@
                 "object": "Alice",
                 "requirement": "kill"
             },
-            "quest completed": false,
+            "quest completed": true,
             "quest giver": "Darius",
             "quest name": "Slay the Elf",
             "reward": {
@@ -21,7 +21,7 @@
                 "object": "Fred",
                 "requirement": "kill"
             },
-            "quest completed": false,
+            "quest completed": true,
             "quest giver": "Darius",
             "quest name": "Kill Fred",
             "reward": {
