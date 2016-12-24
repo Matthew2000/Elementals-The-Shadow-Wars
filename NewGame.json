@@ -17,6 +17,7 @@
                         "quest name": "name",
                         "reward": {
                             "amount": "reward amount",
+                            "exp": 0,
                             "object": "reward object"
                         }
                     }
@@ -24,11 +25,14 @@
                 "talk": "I am an NPC.",
                 "trade": "I have nothing to trade."
             },
+            "exp_for_next_level": 0,
+            "exp_to_next_level": 25,
             "has_quest": false,
             "health": 100,
             "inventory": {
                 "Coins": 100
             },
+            "level": 1,
             "location": [
                 1,
                 1
@@ -40,7 +44,9 @@
                 1
             ],
             "race": 1,
-            "talking": false
+            "strength": 10,
+            "talking": false,
+            "total_exp": 0
         },
         {
             "allow_movement": true,
@@ -54,11 +60,12 @@
                             "object": "Alice",
                             "requirement": "kill"
                         },
-                        "quest completed": true,
+                        "quest completed": false,
                         "quest giver": "Darius",
                         "quest name": "Slay the Elf",
                         "reward": {
                             "amount": 100,
+                            "exp": 100,
                             "object": "Coins"
                         }
                     },
@@ -68,11 +75,12 @@
                             "object": "Fred",
                             "requirement": "kill"
                         },
-                        "quest completed": true,
+                        "quest completed": false,
                         "quest giver": "Darius",
                         "quest name": "Kill Fred",
                         "reward": {
                             "amount": 4,
+                            "exp": 100,
                             "object": "Gems"
                         }
                     }
@@ -80,11 +88,14 @@
                 "talk": "I am an NPC.",
                 "trade": "I am not a trader."
             },
+            "exp_for_next_level": 0,
+            "exp_to_next_level": 25,
             "has_quest": true,
             "health": 100,
             "inventory": {
                 "Coins": 100
             },
+            "level": 1,
             "location": [
                 33,
                 98
@@ -96,7 +107,9 @@
                 98
             ],
             "race": 2,
-            "talking": false
+            "strength": 10,
+            "talking": false,
+            "total_exp": 0
         },
         {
             "allow_movement": true,
@@ -115,6 +128,7 @@
                         "quest name": "name",
                         "reward": {
                             "amount": "reward amount",
+                            "exp": 0,
                             "object": "reward object"
                         }
                     }
@@ -122,11 +136,14 @@
                 "talk": "I am the tribe leader in the Avaker district",
                 "trade": "I have nothing to trade."
             },
+            "exp_for_next_level": 0,
+            "exp_to_next_level": 25,
             "has_quest": false,
             "health": 100,
             "inventory": {
                 "Coins": 100
             },
+            "level": 1,
             "location": [
                 1,
                 98
@@ -138,7 +155,9 @@
                 98
             ],
             "race": 2,
-            "talking": false
+            "strength": 10,
+            "talking": false,
+            "total_exp": 0
         }
     ],
     "all_enemies": [
@@ -148,11 +167,15 @@
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "exp_for_next_level": 0,
+            "exp_to_next_level": 25,
             "has_quest": false,
             "health": 100,
+            "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
             },
+            "level": 1,
             "location": [
                 10,
                 10
@@ -164,7 +187,9 @@
                 10
             ],
             "race": 3,
-            "talking": false
+            "strength": 10,
+            "talking": false,
+            "total_exp": 0
         },
         {
             "allow_movement": true,
@@ -172,11 +197,15 @@
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "exp_for_next_level": 0,
+            "exp_to_next_level": 25,
             "has_quest": false,
             "health": 100,
+            "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
             },
+            "level": 1,
             "location": [
                 20,
                 20
@@ -188,7 +217,9 @@
                 20
             ],
             "race": 2,
-            "talking": false
+            "strength": 10,
+            "talking": false,
+            "total_exp": 0
         },
         {
             "allow_movement": true,
@@ -196,11 +227,15 @@
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "exp_for_next_level": 0,
+            "exp_to_next_level": 25,
             "has_quest": false,
             "health": 100,
+            "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
             },
+            "level": 1,
             "location": [
                 15,
                 10
@@ -212,7 +247,9 @@
                 10
             ],
             "race": 5,
-            "talking": false
+            "strength": 10,
+            "talking": false,
+            "total_exp": 0
         },
         {
             "allow_movement": true,
@@ -220,11 +257,15 @@
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "exp_for_next_level": 0,
+            "exp_to_next_level": 25,
             "has_quest": false,
             "health": 100,
+            "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
             },
+            "level": 1,
             "location": [
                 5,
                 20
@@ -236,7 +277,9 @@
                 20
             ],
             "race": 1,
-            "talking": false
+            "strength": 10,
+            "talking": false,
+            "total_exp": 0
         },
         {
             "allow_movement": true,
@@ -244,11 +287,15 @@
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "exp_for_next_level": 0,
+            "exp_to_next_level": 25,
             "has_quest": false,
             "health": 100,
+            "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
             },
+            "level": 1,
             "location": [
                 20,
                 30
@@ -260,7 +307,9 @@
                 30
             ],
             "race": 1,
-            "talking": false
+            "strength": 10,
+            "talking": false,
+            "total_exp": 0
         }
     ]
 }

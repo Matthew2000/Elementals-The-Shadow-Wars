@@ -24,6 +24,11 @@ def load_player():
 	player1.max_health = save["player"]["max_health"]
 	player1.quests = save["player"]["quests"]
 	player1.race = Races(save["player"]["race"])
+	player1.level = save["player"]["level"]
+	player1.total_exp = save["player"]["total_exp"]
+	player1.exp_for_next_level = save["player"]["exp_for_next_level"]
+	player1.exp_to_next_level = save["player"]["exp_to_next_level"]
+	player1.strength = save["player"]["strength"]
 	log.write("Race: " + str(player1.race)[6:] + "\r\n")
 	log.write("load player" + "\r\n")
 
@@ -153,7 +158,10 @@ def update_player_status():
 	player_status.border()
 	player_status.addstr(0, 1, "Player Stats")
 	player_status.addstr(1, 1, "Health: " + str(player1.health))
-	player_status.addstr(2, 1, "Race: " + str(player1.race)[6:])
+	player_status.addstr(2, 1, "Strength: " + str(player1.strength))
+	player_status.addstr(3, 1, "Race: " + str(player1.race)[6:])
+	player_status.addstr(4, 1, "Level: " + str(player1.level))
+	player_status.addstr(5, 1, "exp needed: " + str(player1.exp_to_next_level-player1.exp_for_next_level)[:len(str(player1.exp_to_next_level-player1.exp_for_next_level))-2])
 	player_status.refresh()
 
 
@@ -196,10 +204,12 @@ def are_enemies_dead():
 	for enemy in all_enemies:
 		if enemy.is_dead():
 			if Main_Window.inch(enemy.location[0], enemy.location[1]) == ord(enemy.character):
-				enemy.death()
+				enemy.death(player1)
 				Main_Window.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
 				print_to_journal(enemy.name + " is dead")
-				enemy.death()
+				enemy.death(player1)
+				log.write("player exp is: " + str(player1.total_exp) + "\r\n")
+				print_to_journal("you gained " + str(enemy.increase_exp_by) + " exp")
 
 
 def update_enemy_locations():
@@ -247,16 +257,10 @@ def place_npcs():
 def move_enemies():
 	for enemy in all_enemies:
 		if not enemy.is_dead():
-			if enemy.is_near_player(player1, 5):
-				follow_the_player()
-				if player_at_location(enemy.location[0], enemy.location[1]):
-					enemy.allow_movement = False
-					enter_combat(player1, enemy, -1)
-			else:
-				enemy.move(dims)
-				if player_at_location(enemy.location[0], enemy.location[1]):
-					enemy.allow_movement = False
-					enter_combat(player1, enemy, -1)
+			enemy.move(dims, player1)
+			if player_at_location(enemy.location[0], enemy.location[1]):
+				enemy.allow_movement = False
+				enter_combat(player1, enemy, -1)
 
 
 def interact_npc(input_key, log):
@@ -360,6 +364,11 @@ def new_game(save):
 		f.close()
 	load_enemies(save)
 	load_npcs(save)
+	for npc in save["all_NPCs"]:
+		with open('Dialogue/' + npc["name"] + '.json', 'w') as a:
+			json.dump(npc["dialogue"], a, sort_keys=True, indent=4)
+			a.close()
+	load_npc_dialogue()
 
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
@@ -402,14 +411,13 @@ try:
 		load_player()
 		load_enemies(save)
 		load_npcs(save)
+		load_npc_dialogue()
 	else:
 		new_game(save)
 
 	spawn_character(Main_Window, player1, player1.location[0], player1.location[1])
 	place_enemies()
 	place_npcs()
-
-	load_npc_dialogue()
 
 	screen.refresh()
 	Main_Window.refresh()
@@ -429,6 +437,9 @@ try:
 
 		are_enemies_dead()
 		player_dead()
+
+		if player1.exp_is_enough():
+			player1.level_up()
 
 		Key = Main_Window.getch()
 
@@ -473,6 +484,11 @@ try:
 			player_turn = True
 
 		log.flush()
+
+		if player1.exp_is_enough():
+			player1.level_up()
+
+		update_game()
 
 		update_enemy_locations()
 		update_npc_locations()

@@ -12,6 +12,7 @@
             "quest name": "name",
             "reward": {
                 "amount": "reward amount",
+                "exp": 0,
                 "object": "reward object"
             }
         }

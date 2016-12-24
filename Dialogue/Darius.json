@@ -7,11 +7,12 @@
                 "object": "Alice",
                 "requirement": "kill"
             },
-            "quest completed": true,
+            "quest completed": false,
             "quest giver": "Darius",
             "quest name": "Slay the Elf",
             "reward": {
                 "amount": 100,
+                "exp": 100,
                 "object": "Coins"
             }
         },
@@ -21,11 +22,12 @@
                 "object": "Fred",
                 "requirement": "kill"
             },
-            "quest completed": true,
+            "quest completed": false,
             "quest giver": "Darius",
             "quest name": "Kill Fred",
             "reward": {
                 "amount": 4,
+                "exp": 100,
                 "object": "Gems"
             }
         }

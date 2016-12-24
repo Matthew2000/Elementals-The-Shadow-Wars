@@ -29,6 +29,11 @@ class Character:
 		self.name = name
 		self.character = character
 		self.race = race
+		self.level = 1
+		self.strength = 10
+		self.total_exp = 0
+		self.exp_for_next_level = 0
+		self.exp_to_next_level = float(25)
 
 	def move_up(self):
 		if self.location[0] > 1:
@@ -47,11 +52,11 @@ class Character:
 			self.location[1] += 1
 
 	def attack(self, opponent):  # what you attack must inherit from Character
-		x = randint(0, 2)
+		x = randint(0, 3)
 		if x is 0:
 			pass
 		else:
-			damage = randint(1, 11)
+			damage = randint(self.strength-9, self.strength+1)
 			opponent.health -= damage
 
 	def death(self):  # kills the Character
@@ -74,6 +79,22 @@ class Character:
 	def respawn(self, y, x):
 		self.health = self.max_health
 		self.location = [y, x]
+
+	def increase_exp(self, amount):
+		self.total_exp += amount
+		self.exp_for_next_level += amount
+
+	def exp_is_enough(self):
+		if self.exp_for_next_level >= self.exp_to_next_level:
+			return True
+
+	def level_up(self):
+		self.exp_for_next_level -= self.exp_to_next_level
+		self.level += 1
+		self.exp_to_next_level = float(int((self.level ** 2) / .04))
+		self.strength += 5
+		self.max_health += 10
+		self.health = self.max_health
 
 
 class Player(Character):
@@ -120,7 +141,7 @@ class NPC(Character):
 		super().__init__(name, character, race)
 		self.allow_movement = True
 		self.talking = False
-		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": [{"quest name": "name", "description": "quest description.", "objective": {"requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount"}, "quest completed": False, "quest giver": self.name}], "trade": "I have nothing to trade.", "talk": "I am an NPC."}
+		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": [{"quest name": "name", "description": "quest description.", "objective": {"requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount", "exp": 0}, "quest completed": False, "quest giver": self.name}], "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 		self.has_quest = False
 
 	def move(self, area):
@@ -167,6 +188,8 @@ class NPC(Character):
 		conversation.refresh()
 
 	def interact(self, journal, conversation, input_key, player, log):
+		if not self.dialogue["quest"]:
+			self.has_quest = False
 		if self.talking is False:
 			journal.insertln()
 			journal.addstr(1, 1, self.dialogue["intro"])
@@ -181,10 +204,11 @@ class NPC(Character):
 			def choose_quest(key, quests):
 				log.write(str(int(chr(int(key)-1))) + "\r\n")
 				quest_list = quests
-				quest = quest_list[int(chr(int(key)-1))]
-				if str(int(chr(key))-1) >= str(len(quest_list)):
+				if int(chr(key))-1 >= len(quest_list):
 					pass
 				else:
+					quest = quest_list[int(chr(int(key) - 1))]
+					index = int(chr(int(key) - 1))
 					if quest["quest name"] not in player.quests:
 						journal.insertln()
 						journal.addstr(1, 1, quest["description"])
@@ -204,7 +228,7 @@ class NPC(Character):
 								break
 							elif key is ord("2"):
 								break
-					elif player.quests[quest["quest name"]]["quest completed"]:
+					elif player.quests[quest["quest name"]]["quest completed"] == True:
 						journal.insertln()
 						journal.addstr(1, 1, "You have completed my quest, here is your reward.")
 						journal.border()
@@ -215,8 +239,15 @@ class NPC(Character):
 							if quest["reward"]["object"] not in player.inventory:
 								player.add_inventory_item(quest["reward"]["object"], 0)
 							player.inventory[quest["reward"]["object"]] += quest["reward"]["amount"]
+							player.increase_exp(quest["reward"]["exp"])
 							del player.quests[quest["quest name"]]
+							del self.dialogue["quest"][index]
 							self.conversation_start(conversation)
+					else:
+						journal.insertln()
+						journal.addstr(1, 1, "You have already accepted that quest.")
+						journal.border()
+						journal.refresh()
 
 			if self.has_quest is True:
 				while 1:
@@ -292,6 +323,7 @@ class Enemy(NPC):
 	def __init__(self, name: str, character: chr, race: Races):
 		super().__init__(name, character, race)
 		self.dialogue = {"intro": "I'm going to kill you"}
+		self.increase_exp_by = int((self.level**2)/.4)
 
 	def attack(self, player):
 		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:
@@ -301,3 +333,16 @@ class Enemy(NPC):
 	def follow_player(self, player):
 		if self.is_near_player(player, 5):
 			self.move_to(player.location[0], player.location[1])
+
+	def move(self, area, player):
+		if ((player.level - self.level) >= 9) is False:
+			if self.is_near_player(player, 5):
+				self.follow_player(player)
+			else:
+				super().move(area)
+		else:
+			super().move(area)
+
+	def death(self, player):
+		super().death()
+		player.increase_exp(self.increase_exp_by/2)
