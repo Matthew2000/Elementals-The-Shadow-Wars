@@ -2,33 +2,20 @@
     "intro": "Hi my name is Darius.",
     "quest": [
         {
-            "description": "If you kill Alice I will give you 100 coins.",
+            "description": "for every wolf pelt you me i will give you 10 coins.",
             "objective": {
-                "object": "Alice",
-                "requirement": "kill"
+                "amount": 1,
+                "object": "Wolf Pelt",
+                "requirement": "collect"
             },
             "quest completed": false,
             "quest giver": "Darius",
-            "quest name": "Slay the Elf",
+            "quest name": "Wolf Pelts",
+            "quest type": "repeat",
             "reward": {
-                "amount": 100,
-                "exp": 100,
+                "amount": 10,
+                "exp": 10,
                 "object": "Coins"
-            }
-        },
-        {
-            "description": "If you kill Fred I will give you 4 gems.",
-            "objective": {
-                "object": "Fred",
-                "requirement": "kill"
-            },
-            "quest completed": false,
-            "quest giver": "Darius",
-            "quest name": "Kill Fred",
-            "reward": {
-                "amount": 4,
-                "exp": 100,
-                "object": "Gems"
             }
         }
     ],

@@ -39,14 +39,14 @@ def save_player():
 	log.write("player saved" + "\r\n")
 
 
-def create_enemy(name, character, race: Races):  # this function must be assigned to an object
+def create_enemy(ID, name, character, race: Races):  # this function must be assigned to an object
 	var = False
 	for x in all_enemies:
-		if name == x.name:  # name must be the same as the object name
+		if ID == x.ID:
 			var = True
-			log.write(x.name + " is already there" + "\r\n")
+			log.write(x.ID + " is already there" + "\r\n")
 	if not var:
-		all_enemies.append(Enemy(name, character, race))
+		all_enemies.append(Enemy(ID, name, character, race))
 	return all_enemies[len(all_enemies) - 1]
 
 
@@ -66,13 +66,19 @@ def load_enemies(save):
 	all_enemies.clear()
 	for enemy in save["all_enemies"]:
 		log.write(enemy["name"] + " ")
-		temp_enemy = create_enemy(enemy["name"], enemy["character"], Races(enemy["race"]))
+		temp_enemy = create_enemy(enemy["ID"], enemy["name"], enemy["character"], Races(enemy["race"]))
 		temp_enemy.location = enemy["location"]
 		temp_enemy.prevlocation = enemy["prevlocation"]
 		temp_enemy.health = enemy["health"]
 		temp_enemy.max_health = enemy["max_health"]
 		temp_enemy.character = enemy["character"]
 		temp_enemy.inventory = enemy["inventory"]
+		temp_enemy.level = enemy["level"]
+		temp_enemy.total_exp = enemy["total_exp"]
+		temp_enemy.exp_for_next_level = enemy["exp_for_next_level"]
+		temp_enemy.exp_to_next_level = enemy["exp_to_next_level"]
+		temp_enemy.strength = enemy["strength"]
+		temp_enemy.increase_exp_by = enemy["increase_exp_by"]
 		log.write("Race: " + str(temp_enemy.race)[6:] + "\r\n")
 	log.write("load enemies" + "\r\n")
 
@@ -112,6 +118,11 @@ def load_npcs(save):
 		temp_npc.character = npc["character"]
 		temp_npc.inventory = npc["inventory"]
 		temp_npc.has_quest = npc["has_quest"]
+		temp_npc.level = npc["level"]
+		temp_npc.total_exp = npc["total_exp"]
+		temp_npc.exp_for_next_level = npc["exp_for_next_level"]
+		temp_npc.exp_to_next_level = npc["exp_to_next_level"]
+		temp_npc.strength = npc["strength"]
 		log.write("Race: " + str(temp_npc.race)[6:] + "\r\n")
 	log.write("load NPCs" + "\r\n")
 
@@ -171,8 +182,10 @@ def update_enemy_status():
 		if enemy.allow_movement is False:
 			enemy_status.border()
 			enemy_status.addstr(0, 1, enemy.name + "'s Stats")
-			enemy_status.addstr(1, 1, "Health: " + str(enemy.health))
-			enemy_status.addstr(2, 1, "Race: " + str(enemy.race)[6:])
+			enemy_status.addstr(1, 1, "Race: " + str(enemy.race)[6:])
+			enemy_status.addstr(2, 1, "Health: " + str(enemy.health))
+			enemy_status.addstr(3, 1, "Level: " + str(enemy.level))
+			enemy_status.addstr(4, 1, "Strength: " + str(enemy.strength))
 	enemy_status.refresh()
 
 
@@ -207,7 +220,8 @@ def are_enemies_dead():
 				enemy.death(player1)
 				Main_Window.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
 				print_to_journal(enemy.name + " is dead")
-				enemy.death(player1)
+				enemy.prevlocation = enemy.location[:]
+				enemy.location = [0, 0]
 				log.write("player exp is: " + str(player1.total_exp) + "\r\n")
 				print_to_journal("you gained " + str(enemy.increase_exp_by) + " exp")
 
@@ -265,7 +279,7 @@ def move_enemies():
 
 def interact_npc(input_key, log):
 	for npc in all_NPCs:
-		npc.interact(player1, input_key, log)
+		npc.interact(player1, input_key, log, all_enemies, all_NPCs)
 
 
 def print_to_journal(message):
@@ -358,12 +372,21 @@ def enter_combat(player, enemy, key):
 		print_to_journal("You have left combat")
 
 
+def set_all_stats():
+	for npc in all_NPCs:
+		npc.set_stats()
+	for enemy in all_enemies:
+		enemy.set_stats()
+		enemy.increase_exp_by = int((enemy.level**2)/.4)
+
+
 def new_game(save):
 	with open('NewGame.json', 'r') as f:
 		save = json.load(f)
 		f.close()
 	load_enemies(save)
 	load_npcs(save)
+	set_all_stats()
 	for npc in save["all_NPCs"]:
 		with open('Dialogue/' + npc["name"] + '.json', 'w') as a:
 			json.dump(npc["dialogue"], a, sort_keys=True, indent=4)
@@ -462,11 +485,12 @@ try:
 				result = npc_at_location(player1.location[0], player1.location[1])
 				if result["result"] is True:
 					NPC = result["npc"]
-					NPC.interact(journal, conversation, Key, player1, log)
+					NPC.interact(journal, conversation, Key, player1, log, all_enemies, all_NPCs)
 					update_journal()
+					update_player_status()
 					while Key is not ord("4"):
 						Key = Main_Window.getch()
-						NPC.interact(journal, conversation, Key, player1, log)
+						NPC.interact(journal, conversation, Key, player1, log, all_enemies, all_NPCs)
 						update_journal()
 					else:
 						NPC.talking = False

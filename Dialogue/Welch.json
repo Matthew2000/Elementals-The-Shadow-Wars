@@ -4,12 +4,14 @@
         {
             "description": "quest description.",
             "objective": {
+                "amount": 0,
                 "object": "object",
                 "requirement": "quest requirement"
             },
             "quest completed": false,
             "quest giver": "Welch",
             "quest name": "name",
+            "quest type": "unique",
             "reward": {
                 "amount": "reward amount",
                 "exp": 0,

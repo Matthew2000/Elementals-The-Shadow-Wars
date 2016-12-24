@@ -17,6 +17,7 @@ class Races(AutoNumber):
 	Elf = ()       # 3
 	Dragon = ()    # 4
 	Valkyrie = ()  # 5
+	Wolf = ()      # 6
 
 
 class Character:
@@ -71,8 +72,9 @@ class Character:
 	def add_inventory_item(self, item, amount=0):
 		var = False
 		for x in self.inventory:
-			if item.lower() == x.lower:
+			if item.lower() == x.lower():
 				var = True
+				self.inventory[item] += amount
 		if not var:
 			self.inventory[item] = amount
 
@@ -95,6 +97,10 @@ class Character:
 		self.strength += 5
 		self.max_health += 10
 		self.health = self.max_health
+
+	def set_stats(self):
+		self.strength += 5 * (self.level-1)
+		self.health += 10 * (self.level-1)
 
 
 class Player(Character):
@@ -134,6 +140,14 @@ class Player(Character):
 							self.quests[quest]["quest completed"] = True
 						else:
 							self.quests[quest]["quest completed"] = False
+			if requirement.lower() == "collect":
+				item = self.quests[quest]["objective"]["object"]
+				amount = self.quests[quest]["objective"]["amount"]
+				if item in self.inventory:
+						if self.inventory[item] >= amount:
+							self.quests[quest]["quest completed"] = True
+						else:
+							self.quests[quest]["quest completed"] = False
 
 
 class NPC(Character):
@@ -141,7 +155,7 @@ class NPC(Character):
 		super().__init__(name, character, race)
 		self.allow_movement = True
 		self.talking = False
-		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": [{"quest name": "name", "description": "quest description.", "objective": {"requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount", "exp": 0}, "quest completed": False, "quest giver": self.name}], "trade": "I have nothing to trade.", "talk": "I am an NPC."}
+		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": [{"quest name": "name", "quest type": "unique", "description": "quest description.", "objective": {"amount": 0, "requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount", "exp": 0}, "quest completed": False, "quest giver": self.name}], "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 		self.has_quest = False
 
 	def move(self, area):
@@ -187,7 +201,7 @@ class NPC(Character):
 					y += 1
 		conversation.refresh()
 
-	def interact(self, journal, conversation, input_key, player, log):
+	def interact(self, journal, conversation, input_key, player, log, enemies, npcs):
 		if not self.dialogue["quest"]:
 			self.has_quest = False
 		if self.talking is False:
@@ -202,6 +216,7 @@ class NPC(Character):
 		elif input_key is ord("2"):
 
 			def choose_quest(key, quests):
+				player.update_quests(enemies, npcs, journal)
 				log.write(str(int(chr(int(key)-1))) + "\r\n")
 				quest_list = quests
 				if int(chr(key))-1 >= len(quest_list):
@@ -236,12 +251,15 @@ class NPC(Character):
 						self.show_options(conversation, log, "1 - Accept")
 						key = conversation.getch()
 						if key is ord("1"):
-							if quest["reward"]["object"] not in player.inventory:
-								player.add_inventory_item(quest["reward"]["object"], 0)
-							player.inventory[quest["reward"]["object"]] += quest["reward"]["amount"]
+							player.add_inventory_item(quest["reward"]["object"], quest["reward"]["amount"])
 							player.increase_exp(quest["reward"]["exp"])
+							if quest["objective"]["requirement"] == "collect":
+								item = quest["objective"]["object"]
+								amount = quest["objective"]["amount"]
+								player.inventory[item] -= amount
 							del player.quests[quest["quest name"]]
-							del self.dialogue["quest"][index]
+							if quest["quest type"] == "unique":
+								del self.dialogue["quest"][index]
 							self.conversation_start(conversation)
 					else:
 						journal.insertln()
@@ -320,10 +338,11 @@ class NPC(Character):
 
 
 class Enemy(NPC):
-	def __init__(self, name: str, character: chr, race: Races):
+	def __init__(self, ID, name: str, character: chr, race: Races):
 		super().__init__(name, character, race)
 		self.dialogue = {"intro": "I'm going to kill you"}
 		self.increase_exp_by = int((self.level**2)/.4)
+		self.ID = ID
 
 	def attack(self, player):
 		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:
@@ -345,4 +364,6 @@ class Enemy(NPC):
 
 	def death(self, player):
 		super().death()
-		player.increase_exp(self.increase_exp_by/2)
+		player.increase_exp(self.increase_exp_by)
+		if self.race is Races.Wolf:
+			player.add_inventory_item("Wolf Pelt", 1)
