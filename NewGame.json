@@ -46,7 +46,10 @@
                 1
             ],
             "race": 1,
+	        "respawnable": false,
             "strength": 10,
+	        "respawn_counter": 0,
+	        "spawn_location": [1, 1],
             "talking": false,
             "total_exp": 0
         },
@@ -113,7 +116,10 @@
                 98
             ],
             "race": 2,
+	        "respawnable": false,
             "strength": 10,
+	        "respawn_counter": 0,
+	        "spawn_location": [33, 98],
             "talking": false,
             "total_exp": 0
         },
@@ -163,7 +169,10 @@
                 98
             ],
             "race": 2,
+	        "respawnable": false,
             "strength": 10,
+	        "respawn_counter": 0,
+	        "spawn_location": [1, 98],
             "talking": false,
             "total_exp": 0
         }
@@ -195,7 +204,9 @@
                 10
             ],
             "race": 3,
+	        "respawnable": false,
             "strength": 10,
+	        "spawn_location": [10, 10],
             "total_exp": 0
         },
         {
@@ -224,7 +235,10 @@
                 20
             ],
             "race": 6,
+	        "respawnable": true,
             "strength": 10,
+	        "respawn_counter": 0,
+	        "spawn_location": [10, 20],
             "total_exp": 0
         },
         {
@@ -253,7 +267,10 @@
                 20
             ],
             "race": 6,
+	        "respawnable": true,
             "strength": 10,
+	        "respawn_counter": 0,
+	        "spawn_location": [20, 20],
             "total_exp": 0
         },
         {
@@ -282,7 +299,10 @@
                 10
             ],
             "race": 6,
+	        "respawnable": true,
             "strength": 10,
+	        "respawn_counter": 0,
+	        "spawn_location": [20, 10],
             "total_exp": 0
         },
         {
@@ -311,7 +331,10 @@
                 30
             ],
             "race": 6,
+	        "respawnable": true,
             "strength": 10,
+	        "respawn_counter": 0,
+	        "spawn_location": [10, 30],
             "total_exp": 0
         },
         {
@@ -340,7 +363,10 @@
                 30
             ],
             "race": 6,
+	        "respawnable": true,
             "strength": 10,
+	        "respawn_counter": 0,
+	        "spawn_location": [20, 30],
             "total_exp": 0
         }
     ]

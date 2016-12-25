@@ -157,6 +157,9 @@ class NPC(Character):
 		self.talking = False
 		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": [{"quest name": "name", "quest type": "unique", "description": "quest description.", "objective": {"amount": 0, "requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount", "exp": 0}, "quest completed": False, "quest giver": self.name}], "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 		self.has_quest = False
+		self.spawn_location = [10, 10]
+		self.respawn_counter = 0
+		self.respawnable = False
 
 	def move(self, area):
 		if self.allow_movement:
@@ -335,6 +338,10 @@ class NPC(Character):
 			return True
 		else:
 			return False
+
+	def respawn(self):
+		self.health = self.max_health
+		self.location = self.spawn_location[:]
 
 
 class Enemy(NPC):

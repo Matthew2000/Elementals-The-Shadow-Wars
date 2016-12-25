@@ -79,6 +79,7 @@ def load_enemies(save):
 		temp_enemy.exp_to_next_level = enemy["exp_to_next_level"]
 		temp_enemy.strength = enemy["strength"]
 		temp_enemy.increase_exp_by = enemy["increase_exp_by"]
+		temp_enemy.respawnable = enemy["respawnable"]
 		log.write("Race: " + str(temp_enemy.race)[6:] + "\r\n")
 	log.write("load enemies" + "\r\n")
 
@@ -123,6 +124,7 @@ def load_npcs(save):
 		temp_npc.exp_for_next_level = npc["exp_for_next_level"]
 		temp_npc.exp_to_next_level = npc["exp_to_next_level"]
 		temp_npc.strength = npc["strength"]
+		temp_npc.respawnable = npc["respawnable"]
 		log.write("Race: " + str(temp_npc.race)[6:] + "\r\n")
 	log.write("load NPCs" + "\r\n")
 
@@ -393,6 +395,17 @@ def new_game(save):
 			a.close()
 	load_npc_dialogue()
 
+
+def respawn_enemies():
+	for enemy in all_enemies:
+		if enemy.is_dead():
+			if enemy.respawnable:
+				enemy.respawn_counter += 1
+				if enemy.respawn_counter == 20:
+					enemy.respawn_counter = 0
+					enemy.respawn()
+
+
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
 save = {"all_enemies": [], "all_NPCs": [], "player": {"character": "@", "health": 100, "inventory": {"Coins": 100}, "location": [2, 5], "max_health": 100, "name": "Matthew", "prevlocation": [3, 5]}}
@@ -446,6 +459,7 @@ try:
 	Main_Window.refresh()
 
 	player_turn = True
+	number_of_turns = 0
 
 	journal.addstr(1, 1, "game start")
 
@@ -465,6 +479,8 @@ try:
 			player1.level_up()
 
 		Key = Main_Window.getch()
+
+		number_of_turns += 1
 
 		if Key is ord("g"):
 			spawn_npc("Rainbow Tooth", "R", Races.Avaker, 1, int(dims[1])-1)
@@ -511,6 +527,8 @@ try:
 
 		if player1.exp_is_enough():
 			player1.level_up()
+
+		respawn_enemies()
 
 		update_game()
 
