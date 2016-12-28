@@ -9,14 +9,14 @@
                     {
                         "description": "quest description.",
                         "objective": {
-	                        "amount": 0,
+                            "amount": 0,
                             "object": "object",
                             "requirement": "quest requirement"
                         },
                         "quest completed": false,
                         "quest giver": "Welch",
                         "quest name": "name",
-	                    "quest type": "unique",
+                        "quest type": "unique",
                         "reward": {
                             "amount": "reward amount",
                             "exp": 0,
@@ -26,6 +26,15 @@
                 ],
                 "talk": "I am an NPC.",
                 "trade": "I have nothing to trade."
+            },
+            "equipped": {
+                "belt": null,
+                "chest": null,
+                "gloves": null,
+                "helmet": null,
+                "pants": null,
+                "shoes": null,
+                "weapon": null
             },
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
@@ -46,10 +55,13 @@
                 1
             ],
             "race": 1,
-	        "respawnable": false,
+            "respawn_counter": 0,
+            "respawnable": false,
+            "spawn_location": [
+                10,
+                10
+            ],
             "strength": 10,
-	        "respawn_counter": 0,
-	        "spawn_location": [1, 1],
             "talking": false,
             "total_exp": 0
         },
@@ -62,31 +74,31 @@
                     {
                         "description": "If you kill Alice I will give you 100 coins.",
                         "objective": {
-	                        "amount": 0,
+                            "amount": 0,
                             "object": "Alice",
                             "requirement": "kill"
                         },
                         "quest completed": false,
                         "quest giver": "Darius",
                         "quest name": "Slay the Elf",
-	                    "quest type": "unique",
+                        "quest type": "unique",
                         "reward": {
                             "amount": 100,
                             "exp": 200,
                             "object": "Coins"
                         }
                     },
-	                {
+                    {
                         "description": "for every wolf pelt you me i will give you 10 coins.",
                         "objective": {
-	                        "amount": 1,
+                            "amount": 1,
                             "object": "Wolf Pelt",
                             "requirement": "collect"
                         },
                         "quest completed": false,
                         "quest giver": "Darius",
-		                "quest type": "repeat",
                         "quest name": "Wolf Pelts",
+                        "quest type": "repeat",
                         "reward": {
                             "amount": 10,
                             "exp": 10,
@@ -97,10 +109,19 @@
                 "talk": "I am an NPC.",
                 "trade": "I am not a trader."
             },
+            "equipped": {
+                "belt": null,
+                "chest": null,
+                "gloves": null,
+                "helmet": null,
+                "pants": null,
+                "shoes": null,
+                "weapon": null
+            },
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
             "has_quest": true,
-            "health": 100,
+            "health": 120,
             "inventory": {
                 "Coins": 100
             },
@@ -116,10 +137,13 @@
                 98
             ],
             "race": 2,
-	        "respawnable": false,
-            "strength": 10,
-	        "respawn_counter": 0,
-	        "spawn_location": [33, 98],
+            "respawn_counter": 0,
+            "respawnable": false,
+            "spawn_location": [
+                10,
+                10
+            ],
+            "strength": 20,
             "talking": false,
             "total_exp": 0
         },
@@ -132,14 +156,14 @@
                     {
                         "description": "quest description.",
                         "objective": {
-	                        "amount": 0,
+                            "amount": 0,
                             "object": "object",
                             "requirement": "quest requirement"
                         },
                         "quest completed": false,
                         "quest giver": "Rainbow Tooth",
                         "quest name": "name",
-	                    "quest type": "unique",
+                        "quest type": "unique",
                         "reward": {
                             "amount": "reward amount",
                             "exp": 0,
@@ -149,6 +173,15 @@
                 ],
                 "talk": "I am the tribe leader in the Avaker district",
                 "trade": "I have nothing to trade."
+            },
+            "equipped": {
+                "belt": null,
+                "chest": null,
+                "gloves": null,
+                "helmet": null,
+                "pants": null,
+                "shoes": null,
+                "weapon": null
             },
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
@@ -169,26 +202,39 @@
                 98
             ],
             "race": 2,
-	        "respawnable": false,
+            "respawn_counter": 0,
+            "respawnable": false,
+            "spawn_location": [
+                10,
+                10
+            ],
             "strength": 10,
-	        "respawn_counter": 0,
-	        "spawn_location": [1, 98],
             "talking": false,
             "total_exp": 0
         }
     ],
     "all_enemies": [
         {
+            "ID": "Alice",
             "allow_movement": true,
             "character": "A",
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "equipped": {
+                "belt": "Leather Belt",
+                "chest": "Leather Armour",
+                "gloves": "Leather Gloves",
+                "helmet": "Leather Helmet",
+                "pants": "Leather Pants",
+                "shoes": "Leather Shoes",
+                "weapon": "Iron Sword"
+            },
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
-            "health": 100,
-	        "ID": "Alice",
-            "increase_exp_by": 2,
+            "has_quest": false,
+            "health": 120,
+            "increase_exp_by": 22,
             "inventory": {
                 "Coins": 100
             },
@@ -204,21 +250,28 @@
                 10
             ],
             "race": 3,
-	        "respawnable": false,
-            "strength": 10,
-	        "spawn_location": [10, 10],
+            "respawn_counter": 0,
+            "respawnable": false,
+            "spawn_location": [
+                10,
+                10
+            ],
+            "strength": 20,
+            "talking": false,
             "total_exp": 0
         },
         {
+            "ID": "Wolf 1",
             "allow_movement": true,
             "character": "W",
             "dialogue": {
-                "intro": "Grr"
+                "intro": "I'm going to kill you"
             },
+            "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
+            "has_quest": false,
             "health": 100,
-	        "ID": "Wolf 1",
             "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
@@ -235,22 +288,28 @@
                 20
             ],
             "race": 6,
-	        "respawnable": true,
+            "respawn_counter": 0,
+            "respawnable": true,
+            "spawn_location": [
+                10,
+                10
+            ],
             "strength": 10,
-	        "respawn_counter": 0,
-	        "spawn_location": [10, 20],
+            "talking": false,
             "total_exp": 0
         },
         {
+            "ID": "Wolf 2",
             "allow_movement": true,
             "character": "W",
             "dialogue": {
-                "intro": "Grr"
+                "intro": "I'm going to kill you"
             },
+            "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
+            "has_quest": false,
             "health": 100,
-	        "ID": "Wolf 2",
             "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
@@ -267,22 +326,28 @@
                 20
             ],
             "race": 6,
-	        "respawnable": true,
+            "respawn_counter": 0,
+            "respawnable": true,
+            "spawn_location": [
+                10,
+                10
+            ],
             "strength": 10,
-	        "respawn_counter": 0,
-	        "spawn_location": [20, 20],
+            "talking": false,
             "total_exp": 0
         },
         {
+            "ID": "Wolf 3",
             "allow_movement": true,
             "character": "W",
             "dialogue": {
-                "intro": "Grr"
+                "intro": "I'm going to kill you"
             },
+            "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
+            "has_quest": false,
             "health": 100,
-	        "ID": "Wolf 3",
             "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
@@ -299,22 +364,28 @@
                 10
             ],
             "race": 6,
-	        "respawnable": true,
+            "respawn_counter": 0,
+            "respawnable": true,
+            "spawn_location": [
+                10,
+                10
+            ],
             "strength": 10,
-	        "respawn_counter": 0,
-	        "spawn_location": [20, 10],
+            "talking": false,
             "total_exp": 0
         },
         {
+            "ID": "Wolf 4",
             "allow_movement": true,
             "character": "W",
             "dialogue": {
-                "intro": "Grr"
+                "intro": "I'm going to kill you"
             },
+            "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
+            "has_quest": false,
             "health": 100,
-	        "ID": "Wolf 4",
             "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
@@ -331,22 +402,28 @@
                 30
             ],
             "race": 6,
-	        "respawnable": true,
+            "respawn_counter": 0,
+            "respawnable": true,
+            "spawn_location": [
+                10,
+                10
+            ],
             "strength": 10,
-	        "respawn_counter": 0,
-	        "spawn_location": [10, 30],
+            "talking": false,
             "total_exp": 0
         },
         {
+            "ID": "Wolf 5",
             "allow_movement": true,
             "character": "W",
             "dialogue": {
-                "intro": "Grr"
+                "intro": "I'm going to kill you"
             },
+            "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
+            "has_quest": false,
             "health": 100,
-	        "ID": "Wolf 5",
             "increase_exp_by": 2,
             "inventory": {
                 "Coins": 100
@@ -363,10 +440,14 @@
                 30
             ],
             "race": 6,
-	        "respawnable": true,
+            "respawn_counter": 0,
+            "respawnable": true,
+            "spawn_location": [
+                10,
+                10
+            ],
             "strength": 10,
-	        "respawn_counter": 0,
-	        "spawn_location": [20, 30],
+            "talking": false,
             "total_exp": 0
         }
     ]

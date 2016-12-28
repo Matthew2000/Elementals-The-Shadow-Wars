@@ -1,6 +1,7 @@
 import curses
 from enum import Enum
 from random import randint
+from Items import *
 
 
 class AutoNumber(Enum):
@@ -27,6 +28,7 @@ class Character:
 		self.health = 100
 		self.max_health = 100
 		self.inventory = {"Coins": 100}
+		self.equipped = {"helmet": None, "chest": None, "gloves": None, "belt": None, "pants": None, "shoes": None, "weapon": None}
 		self.name = name
 		self.character = character
 		self.race = race
@@ -102,6 +104,14 @@ class Character:
 		self.strength += 5 * (self.level-1)
 		self.health += 10 * (self.level-1)
 
+	def equip_armour(self, item: Armour):
+		slot = item.armour_type.value
+		self.equipped[slot] = item
+
+	def equip_weapon(self, item: Weapon):
+		self.equipped["weapon"] = item
+
+
 
 class Player(Character):
 	def __init__(self, name: str, character: chr, race: Races):
@@ -128,6 +138,7 @@ class Player(Character):
 		self.quests[quest["quest name"]] = quest
 
 	def update_quests(self, enemies, npcs, journal):
+		# TODO make function for updating each type of quest
 		for quest in self.quests:
 			requirement = self.quests[quest]["objective"]["requirement"]
 			if requirement == "kill":
@@ -213,12 +224,15 @@ class NPC(Character):
 			self.conversation_start(conversation)
 		self.talking = True
 		if input_key is ord("1"):
+			# TODO make more complex conversations
 			journal.insertln()
 			journal.addstr(1, 1, self.dialogue["talk"])
 			self.conversation_start(conversation)
 		elif input_key is ord("2"):
 
 			def choose_quest(key, quests):
+				# TODO check to see if the quest is already completed when choosing quests
+				# TODO make a new type of quest to talk to another npc
 				player.update_quests(enemies, npcs, journal)
 				log.write(str(int(chr(int(key)-1))) + "\r\n")
 				quest_list = quests
@@ -297,6 +311,8 @@ class NPC(Character):
 			journal.insertln()
 			journal.addstr(1, 1, self.dialogue["trade"])
 			self.conversation_start(conversation)
+
+	# TODO make a trade system
 
 	def move_to(self, y, x):
 		if y == self.location[0] and x == self.location[1]:

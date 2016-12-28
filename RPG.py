@@ -33,9 +33,59 @@ def load_player():
 	log.write("load player" + "\r\n")
 
 
+def load_player_equipment():  # TODO loop through list of armour and weapons to load equipped items
+	equipped_item = save["player"]["equipped"]
+	for weapon in all_weapons:
+		if equipped_item["weapon"] is not None:
+			if equipped_item["weapon"] == weapon.name:
+				player1.equipped["weapon"] = weapon
+	for armour in all_armours:
+		if equipped_item["helmet"] is not None:
+			if equipped_item["helmet"] == armour.name:
+				player1.equipped["helmet"] = armour
+		if equipped_item["chest"] is not None:
+			if equipped_item["chest"] == armour.name:
+				player1.equipped["chest"] = armour
+		if equipped_item["gloves"] is not None:
+			if equipped_item["gloves"] == armour.name:
+				player1.equipped["gloves"] = armour
+		if equipped_item["belt"] is not None:
+			if equipped_item["belt"] == armour.name:
+				player1.equipped["belt"] = armour
+		if equipped_item["pants"] is not None:
+			if equipped_item["pants"] == armour.name:
+				player1.equipped["pants"] = armour
+		if equipped_item["shoes"] is not None:
+			if equipped_item["shoes"] == armour.name:
+				player1.equipped["shoes"] = armour
+
+
 def save_player():
 	save["player"] = player1.__dict__
 	save["player"]["race"] = save["player"]["race"].value
+	equipped_item = save["player"]["equipped"]
+	if equipped_item["helmet"] is not None:
+		equipped_item["helmet"] = equipped_item["helmet"].__dict__
+		equipped_item["helmet"] = equipped_item["helmet"]["name"]
+		log.write(str(equipped_item["helmet"]) + "\r\n")
+	if equipped_item["chest"] is not None:
+		equipped_item["chest"] = equipped_item["chest"].__dict__
+		equipped_item["chest"] = equipped_item["chest"]["name"]
+	if equipped_item["gloves"] is not None:
+		equipped_item["gloves"] = equipped_item["gloves"].__dict__
+		equipped_item["gloves"] = equipped_item["gloves"]["name"]
+	if equipped_item["belt"] is not None:
+		equipped_item["belt"] = equipped_item["belt"].__dict__
+		equipped_item["belt"] = equipped_item["belt"]["name"]
+	if equipped_item["pants"] is not None:
+		equipped_item["pants"] = equipped_item["pants"].__dict__
+		equipped_item["pants"] = equipped_item["pants"]["name"]
+	if equipped_item["shoes"] is not None:
+		equipped_item["shoes"] = equipped_item["shoes"].__dict__
+		equipped_item["shoes"] = equipped_item["shoes"]["name"]
+	if equipped_item["weapon"] is not None:
+		equipped_item["weapon"] = equipped_item["weapon"].__dict__
+		equipped_item["weapon"] = equipped_item["weapon"]["name"]
 	log.write("player saved" + "\r\n")
 
 
@@ -56,6 +106,31 @@ def save_enemies():
 	for enemy in enemies:
 		temp_enemy = enemy.__dict__
 		temp_enemy["race"] = temp_enemy["race"].value
+		equipped_item = temp_enemy["equipped"]
+		if temp_enemy["race"] == 6:
+			pass
+		else:
+			if equipped_item["helmet"] is not None:
+				equipped_item["helmet"] = equipped_item["helmet"].__dict__
+				equipped_item["helmet"] = equipped_item["helmet"]["name"]
+			if equipped_item["chest"] is not None:
+				equipped_item["chest"] = equipped_item["chest"].__dict__
+				equipped_item["chest"] = equipped_item["chest"]["name"]
+			if equipped_item["gloves"] is not None:
+				equipped_item["gloves"] = equipped_item["gloves"].__dict__
+				equipped_item["gloves"] = equipped_item["gloves"]["name"]
+			if equipped_item["belt"] is not None:
+				equipped_item["belt"] = equipped_item["belt"].__dict__
+				equipped_item["belt"] = equipped_item["belt"]["name"]
+			if equipped_item["pants"] is not None:
+				equipped_item["pants"] = equipped_item["pants"].__dict__
+				equipped_item["pants"] = equipped_item["pants"]["name"]
+			if equipped_item["shoes"] is not None:
+				equipped_item["shoes"] = equipped_item["shoes"].__dict__
+				equipped_item["shoes"] = equipped_item["shoes"]["name"]
+			if equipped_item["weapon"] is not None:
+				equipped_item["weapon"] = equipped_item["weapon"].__dict__
+				equipped_item["weapon"] = equipped_item["weapon"]["name"]
 		all_enemies.append(temp_enemy)
 	save["all_enemies"].clear()
 	save["all_enemies"] = all_enemies[:]
@@ -80,6 +155,34 @@ def load_enemies(save):
 		temp_enemy.strength = enemy["strength"]
 		temp_enemy.increase_exp_by = enemy["increase_exp_by"]
 		temp_enemy.respawnable = enemy["respawnable"]
+		# load equipped enemy items
+		if temp_enemy.race is not Races.Wolf:
+			equipped_item = enemy["equipped"]
+			for weapon in all_weapons:
+				if equipped_item["weapon"] is not None:
+					if equipped_item["weapon"] == weapon.name:
+						temp_enemy.equipped["weapon"] = weapon
+			for armour in all_armours:
+				if equipped_item["helmet"] is not None:
+					if equipped_item["helmet"] == armour.name:
+						temp_enemy.equipped["helmet"] = armour
+				if equipped_item["chest"] is not None:
+					if equipped_item["chest"] == armour.name:
+						temp_enemy.equipped["chest"] = armour
+				if equipped_item["gloves"] is not None:
+					if equipped_item["gloves"] == armour.name:
+						temp_enemy.equipped["gloves"] = armour
+				if equipped_item["belt"] is not None:
+					if equipped_item["belt"] == armour.name:
+						temp_enemy.equipped["belt"] = armour
+				if equipped_item["pants"] is not None:
+					if equipped_item["pants"] == armour.name:
+						temp_enemy.equipped["pants"] = armour
+				if equipped_item["shoes"] is not None:
+					if equipped_item["shoes"] == armour.name:
+						temp_enemy.equipped["shoes"] = armour
+		elif temp_enemy.race is Races.Wolf:
+			temp_enemy.equipped = {}
 		log.write("Race: " + str(temp_enemy.race)[6:] + "\r\n")
 	log.write("load enemies" + "\r\n")
 
@@ -101,6 +204,29 @@ def save_npcs():
 	for npc in NPCs:
 		temp_npc = npc.__dict__
 		temp_npc["race"] = temp_npc["race"].value
+		equipped_item = temp_npc["equipped"]
+		if equipped_item["helmet"] is not None:
+			equipped_item["helmet"] = equipped_item["helmet"].__dict__
+			equipped_item["helmet"] = equipped_item["helmet"]["name"]
+			log.write(str(equipped_item["helmet"]) + "\r\n")
+		if equipped_item["chest"] is not None:
+			equipped_item["chest"] = equipped_item["chest"].__dict__
+			equipped_item["chest"] = equipped_item["chest"]["name"]
+		if equipped_item["gloves"] is not None:
+			equipped_item["gloves"] = equipped_item["gloves"].__dict__
+			equipped_item["gloves"] = equipped_item["gloves"]["name"]
+		if equipped_item["belt"] is not None:
+			equipped_item["belt"] = equipped_item["belt"].__dict__
+			equipped_item["belt"] = equipped_item["belt"]["name"]
+		if equipped_item["pants"] is not None:
+			equipped_item["pants"] = equipped_item["pants"].__dict__
+			equipped_item["pants"] = equipped_item["pants"]["name"]
+		if equipped_item["shoes"] is not None:
+			equipped_item["shoes"] = equipped_item["shoes"].__dict__
+			equipped_item["shoes"] = equipped_item["shoes"]["name"]
+		if equipped_item["weapon"] is not None:
+			equipped_item["weapon"] = equipped_item["weapon"].__dict__
+			equipped_item["weapon"] = equipped_item["weapon"]["name"]
 		all_NPCs.append(temp_npc)
 	save["all_NPCs"].clear()
 	save["all_NPCs"] = all_NPCs[:]
@@ -125,8 +251,37 @@ def load_npcs(save):
 		temp_npc.exp_to_next_level = npc["exp_to_next_level"]
 		temp_npc.strength = npc["strength"]
 		temp_npc.respawnable = npc["respawnable"]
+		# load equipped npc items
+		if temp_npc.race is not Races.Wolf:
+			equipped_item = npc["equipped"]
+			for weapon in all_weapons:
+				if equipped_item["weapon"] is not None:
+					if equipped_item["weapon"] == weapon.name:
+						temp_npc.equipped["weapon"] = weapon
+			for armour in all_armours:
+				if equipped_item["helmet"] is not None:
+					if equipped_item["helmet"] == armour.name:
+						temp_npc.equipped["helmet"] = armour
+				if equipped_item["chest"] is not None:
+					if equipped_item["chest"] == armour.name:
+						temp_npc.equipped["chest"] = armour
+				if equipped_item["gloves"] is not None:
+					if equipped_item["gloves"] == armour.name:
+						temp_npc.equipped["gloves"] = armour
+				if equipped_item["belt"] is not None:
+					if equipped_item["belt"] == armour.name:
+						temp_npc.equipped["belt"] = armour
+				if equipped_item["pants"] is not None:
+					if equipped_item["pants"] == armour.name:
+						temp_npc.equipped["pants"] = armour
+				if equipped_item["shoes"] is not None:
+					if equipped_item["shoes"] == armour.name:
+						temp_npc.equipped["shoes"] = armour
 		log.write("Race: " + str(temp_npc.race)[6:] + "\r\n")
 	log.write("load NPCs" + "\r\n")
+
+
+# TODO make function to load equipped npc items
 
 
 def spawn_character(win, character, y, x):
@@ -445,6 +600,7 @@ try:
 		inventory_items = save["player"]["inventory"].keys()
 
 		load_player()
+		load_player_equipment()
 		load_enemies(save)
 		load_npcs(save)
 		load_npc_dialogue()
