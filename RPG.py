@@ -29,16 +29,19 @@ def load_player():
 	player1.exp_for_next_level = save["player"]["exp_for_next_level"]
 	player1.exp_to_next_level = save["player"]["exp_to_next_level"]
 	player1.strength = save["player"]["strength"]
+	player1.endurance = save["player"]["endurance"]
+	player1.defence = save["player"]["defence"]
 	log.write("Race: " + str(player1.race)[6:] + "\r\n")
 	log.write("load player" + "\r\n")
 
 
-def load_player_equipment():  # TODO loop through list of armour and weapons to load equipped items
+def load_player_equipment():
 	equipped_item = save["player"]["equipped"]
 	for weapon in all_weapons:
 		if equipped_item["weapon"] is not None:
 			if equipped_item["weapon"] == weapon.name:
 				player1.equipped["weapon"] = weapon
+
 	for armour in all_armours:
 		if equipped_item["helmet"] is not None:
 			if equipped_item["helmet"] == armour.name:
@@ -67,7 +70,6 @@ def save_player():
 	if equipped_item["helmet"] is not None:
 		equipped_item["helmet"] = equipped_item["helmet"].__dict__
 		equipped_item["helmet"] = equipped_item["helmet"]["name"]
-		log.write(str(equipped_item["helmet"]) + "\r\n")
 	if equipped_item["chest"] is not None:
 		equipped_item["chest"] = equipped_item["chest"].__dict__
 		equipped_item["chest"] = equipped_item["chest"]["name"]
@@ -155,6 +157,9 @@ def load_enemies(save):
 		temp_enemy.strength = enemy["strength"]
 		temp_enemy.increase_exp_by = enemy["increase_exp_by"]
 		temp_enemy.respawnable = enemy["respawnable"]
+		temp_enemy.spawn_location = enemy["spawn_location"]
+		temp_enemy.endurance = enemy["endurance"]
+		temp_enemy.defence = enemy["defence"]
 		# load equipped enemy items
 		if temp_enemy.race is not Races.Wolf:
 			equipped_item = enemy["equipped"]
@@ -251,6 +256,9 @@ def load_npcs(save):
 		temp_npc.exp_to_next_level = npc["exp_to_next_level"]
 		temp_npc.strength = npc["strength"]
 		temp_npc.respawnable = npc["respawnable"]
+		temp_npc.spawn_location = npc["spawn_location"]
+		temp_npc.endurance = npc["endurance"]
+		temp_npc.defence = npc["defence"]
 		# load equipped npc items
 		if temp_npc.race is not Races.Wolf:
 			equipped_item = npc["equipped"]
@@ -279,9 +287,6 @@ def load_npcs(save):
 						temp_npc.equipped["shoes"] = armour
 		log.write("Race: " + str(temp_npc.race)[6:] + "\r\n")
 	log.write("load NPCs" + "\r\n")
-
-
-# TODO make function to load equipped npc items
 
 
 def spawn_character(win, character, y, x):
@@ -327,9 +332,10 @@ def update_player_status():
 	player_status.addstr(0, 1, "Player Stats")
 	player_status.addstr(1, 1, "Health: " + str(player1.health))
 	player_status.addstr(2, 1, "Strength: " + str(player1.strength))
-	player_status.addstr(3, 1, "Race: " + str(player1.race)[6:])
-	player_status.addstr(4, 1, "Level: " + str(player1.level))
-	player_status.addstr(5, 1, "exp needed: " + str(player1.exp_to_next_level-player1.exp_for_next_level)[:len(str(player1.exp_to_next_level-player1.exp_for_next_level))-2])
+	player_status.addstr(3, 1, "Defence: " + str(player1.defence))
+	player_status.addstr(4, 1, "Race: " + str(player1.race)[6:])
+	player_status.addstr(5, 1, "Level: " + str(player1.level))
+	player_status.addstr(6, 1, "exp needed: " + str(player1.exp_to_next_level-player1.exp_for_next_level)[:len(str(player1.exp_to_next_level-player1.exp_for_next_level))-2])
 	player_status.refresh()
 
 
@@ -343,6 +349,7 @@ def update_enemy_status():
 			enemy_status.addstr(2, 1, "Health: " + str(enemy.health))
 			enemy_status.addstr(3, 1, "Level: " + str(enemy.level))
 			enemy_status.addstr(4, 1, "Strength: " + str(enemy.strength))
+			enemy_status.addstr(5, 1, "Defence: " + str(enemy.defence))
 	enemy_status.refresh()
 
 
@@ -476,6 +483,7 @@ def load_npc_dialogue():
 			with open('Dialogue/' + npc.name + '.json', 'r') as a:
 				npc.dialogue = json.load(a)
 				a.close()
+	log.write("load npc dialogue" + "\r\n")
 
 
 def save_npc_dialogue():
@@ -513,7 +521,7 @@ def enter_combat(player, enemy, key):
 			enemy.allow_movement = True
 			update_enemy_status()
 			break
-		if player1.health <= 0:
+		if player.health <= 0:
 			if player.is_dead():
 				player_dead()
 				update_player_location()
@@ -531,10 +539,10 @@ def enter_combat(player, enemy, key):
 
 def set_all_stats():
 	for npc in all_NPCs:
-		npc.set_stats()
+		npc.set_stats_by_level_and_race()
 	for enemy in all_enemies:
-		enemy.set_stats()
-		enemy.increase_exp_by = int((enemy.level**2)/.4)
+		enemy.set_stats_by_level_and_race()
+		enemy.increase_exp_by = int((enemy.level**2)/.4) + 5
 
 
 def new_game(save):
@@ -559,6 +567,23 @@ def respawn_enemies():
 				if enemy.respawn_counter == 20:
 					enemy.respawn_counter = 0
 					enemy.respawn()
+
+
+def player_health_regen():
+	if not (player1.health >= player1.max_health):
+		player1.health += player1.health_regen
+		if player1.health >= player1.max_health:
+			player1.health = player1.max_health
+	update_player_status()
+
+
+def enemy_health_regen():
+	for enemy in all_enemies:
+		if not enemy.is_dead():
+			if enemy.health < enemy.max_health:
+				enemy.health += enemy.health_regen
+				if enemy.health >= enemy.max_health:
+					enemy.health = enemy.max_health
 
 
 locale.setlocale(locale.LC_ALL, '')
@@ -643,7 +668,7 @@ try:
 
 		if Key is ord("r"):
 			if player1.is_dead():
-				player1.respawn(20, 20)
+				player1.respawn(30, 50)
 				spawn_character(Main_Window, player1, player1.location[0], player1.location[1])
 
 		if player_turn:
@@ -654,6 +679,8 @@ try:
 				if result["result"] is True:
 					enemy1 = result["enemy"]
 					enter_combat(player1, enemy1, -1)
+				else:
+					player_health_regen()
 				result = npc_at_location(player1.location[0], player1.location[1])
 				if result["result"] is True:
 					NPC = result["npc"]
@@ -668,7 +695,6 @@ try:
 						NPC.talking = False
 						update_conversation()
 				update_player_location()
-
 			player1.update_quests(all_enemies, all_NPCs, journal)
 			player_turn = False
 
@@ -677,6 +703,7 @@ try:
 
 		if not player_turn:
 			move_enemies()
+			enemy_health_regen()
 			player_turn = True
 
 		log.flush()

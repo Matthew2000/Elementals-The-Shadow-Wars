@@ -34,9 +34,13 @@ class Character:
 		self.race = race
 		self.level = 1
 		self.strength = 10
+		self.defence = 0
+		self.endurance = 0
+		self.damage = 0
 		self.total_exp = 0
 		self.exp_for_next_level = 0
 		self.exp_to_next_level = float(25)
+		self.health_regen = 5
 
 	def move_up(self):
 		if self.location[0] > 1:
@@ -55,12 +59,17 @@ class Character:
 			self.location[1] += 1
 
 	def attack(self, opponent):  # what you attack must inherit from Character
-		x = randint(0, 3)
+		x = randint(0, 11)
 		if x is 0:
 			pass
 		else:
-			damage = randint(self.strength-9, self.strength+1)
-			opponent.health -= damage
+			self.damage = int((randint(5, 11) + (self.strength * .2)) - ((randint(5, 11) + (self.strength * .1)) * opponent.defence / 100))
+			if self.race is not Races.Wolf:
+				if self.equipped["weapon"] is not None:
+					self.damage = int(((randint(5, 11) + (self.strength * .2)) * self.equipped["weapon"].damage) - ((randint(5, 11) + (self.strength * .1)) * opponent.defence / 100))
+			if self.damage <= 0:
+				self.damage = 0
+			opponent.health -= self.damage
 
 	def death(self):  # kills the Character
 		if self.health <= 0:
@@ -92,17 +101,26 @@ class Character:
 		if self.exp_for_next_level >= self.exp_to_next_level:
 			return True
 
-	def level_up(self):
-		self.exp_for_next_level -= self.exp_to_next_level
-		self.level += 1
-		self.exp_to_next_level = float(int((self.level ** 2) / .04))
-		self.strength += 5
-		self.max_health += 10
-		self.health = self.max_health
-
-	def set_stats(self):
-		self.strength += 5 * (self.level-1)
-		self.health += 10 * (self.level-1)
+	def set_stats_by_level_and_race(self):
+		armour_defence = self.get_defence_from_armour()
+		if self.race is Races.Wolf:
+			self.endurance = int(5 * (self.level - 1)) + 2
+			self.defence = self.endurance
+			self.strength = int(10 + (5 * (self.level-1))) + 10
+			self.max_health = int((100 + (100 * (self.endurance * .3))))
+			self.health = int(self.max_health)
+		elif self.race is Races.Elf:
+			self.endurance = int(5 * (self.level - 1)) + 5
+			self.defence = self.endurance + armour_defence
+			self.strength = int(10 + (5 * (self.level - 1))) + 5
+			self.max_health = int((100 + (100 * (self.endurance * .3)))) + 50
+			self.health = int(self.max_health)
+		elif self.race is Races.Human:
+			self.endurance = int(5 * (self.level - 1))
+			self.defence = self.endurance + armour_defence
+			self.strength = int(10 + (5 * (self.level - 1)))
+			self.max_health = int((100 + (100 * (self.endurance * .3))))
+			self.health = int(self.max_health)
 
 	def equip_armour(self, item: Armour):
 		slot = item.armour_type.value
@@ -111,12 +129,29 @@ class Character:
 	def equip_weapon(self, item: Weapon):
 		self.equipped["weapon"] = item
 
+	def get_defence_from_armour(self):
+		temp_defence = 0
+		if self.equipped != {}:
+			if self.equipped["helmet"] is not None:
+				temp_defence += self.equipped["helmet"].protection
+			if self.equipped["chest"] is not None:
+				temp_defence += self.equipped["chest"].protection
+			if self.equipped["gloves"] is not None:
+				temp_defence += self.equipped["gloves"].protection
+			if self.equipped["belt"] is not None:
+				temp_defence += self.equipped["belt"].protection
+			if self.equipped["pants"] is not None:
+				temp_defence += self.equipped["pants"].protection
+			if self.equipped["shoes"] is not None:
+				temp_defence += self.equipped["shoes"].protection
+		return temp_defence
 
 
 class Player(Character):
 	def __init__(self, name: str, character: chr, race: Races):
 		super().__init__(name, character, race)
 		self.quests = {}
+		self.equipped = {"helmet": None, "chest": None, "gloves": None, "belt": None, "pants": None, "shoes": None, "weapon": IronDagger}
 
 	def move(self, input_key, area):
 		self.prevlocation = self.location[:]
@@ -159,6 +194,12 @@ class Player(Character):
 							self.quests[quest]["quest completed"] = True
 						else:
 							self.quests[quest]["quest completed"] = False
+
+	def level_up(self):
+		self.exp_for_next_level -= self.exp_to_next_level
+		self.level += 1
+		self.exp_to_next_level = float(int((self.level ** 2) / .04))
+		self.set_stats_by_level_and_race()
 
 
 class NPC(Character):
@@ -364,8 +405,9 @@ class Enemy(NPC):
 	def __init__(self, ID, name: str, character: chr, race: Races):
 		super().__init__(name, character, race)
 		self.dialogue = {"intro": "I'm going to kill you"}
-		self.increase_exp_by = int((self.level**2)/.4)
+		self.increase_exp_by = int((self.level**2)/.4) + 5
 		self.ID = ID
+		self.health_regen = 15
 
 	def attack(self, player):
 		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:

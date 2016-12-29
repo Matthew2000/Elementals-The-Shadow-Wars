@@ -51,10 +51,10 @@ IronDagger = Weapon("Iron Dagger", 20, "a dagger made out of iron", 5, Weapons.D
 IronClub = Weapon("Iron Club", 30, "a club made out of iron", 10, Weapons.Club)
 
 LeatherHelmet = Armour("Leather Helmet", 10, "a helmet made out of leather", 10, Armours.Helmet)
-LeatherArmour = Armour("Leather Armour", 10, "armour made out of leather", 20, Armours.Chest)
+LeatherArmour = Armour("Leather Armour", 10, "armour made out of leather", 15, Armours.Chest)
 LeatherGloves = Armour("Leather Gloves", 10, "gloves made out of leather", 5, Armours.Gloves)
 LeatherBelt = Armour("Leather Belt", 10, "a belt made out of leather", 5, Armours.Belt)
-LeatherPants = Armour("Leather Pants", 10, "pants made out of leather", 20, Armours.Pants)
+LeatherPants = Armour("Leather Pants", 10, "pants made out of leather", 15, Armours.Pants)
 LeatherShoes = Armour("Leather Shoes", 10, "shoes made out of leather", 5, Armours.Shoes)
 
 all_weapons = [

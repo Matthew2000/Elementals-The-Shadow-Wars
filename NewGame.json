@@ -3,6 +3,8 @@
         {
             "allow_movement": true,
             "character": "W",
+            "damage": 0,
+            "defence": 0,
             "dialogue": {
                 "intro": "Hi my name is Welch.",
                 "quest": [
@@ -27,6 +29,7 @@
                 "talk": "I am an NPC.",
                 "trade": "I have nothing to trade."
             },
+            "endurance": 0,
             "equipped": {
                 "belt": null,
                 "chest": null,
@@ -68,6 +71,8 @@
         {
             "allow_movement": true,
             "character": "D",
+            "damage": 0,
+            "defence": 10,
             "dialogue": {
                 "intro": "Hi my name is Darius.",
                 "quest": [
@@ -109,6 +114,7 @@
                 "talk": "I am an NPC.",
                 "trade": "I am not a trader."
             },
+            "endurance": 10,
             "equipped": {
                 "belt": null,
                 "chest": null,
@@ -121,7 +127,7 @@
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
             "has_quest": true,
-            "health": 120,
+            "health": 400,
             "inventory": {
                 "Coins": 100
             },
@@ -130,7 +136,7 @@
                 33,
                 98
             ],
-            "max_health": 100,
+            "max_health": 400,
             "name": "Darius",
             "prevlocation": [
                 33,
@@ -150,6 +156,8 @@
         {
             "allow_movement": true,
             "character": "R",
+            "damage": 0,
+            "defence": 0,
             "dialogue": {
                 "intro": "Hi my name is Rainbow Tooth.",
                 "quest": [
@@ -174,6 +182,7 @@
                 "talk": "I am the tribe leader in the Avaker district",
                 "trade": "I have nothing to trade."
             },
+            "endurance": 0,
             "equipped": {
                 "belt": null,
                 "chest": null,
@@ -218,9 +227,12 @@
             "ID": "Alice",
             "allow_movement": true,
             "character": "A",
+            "damage": 0,
+            "defence": 15,
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "endurance": 15,
             "equipped": {
                 "belt": "Leather Belt",
                 "chest": "Leather Armour",
@@ -233,8 +245,8 @@
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
             "has_quest": false,
-            "health": 120,
-            "increase_exp_by": 22,
+            "health": 600,
+            "increase_exp_by": 27,
             "inventory": {
                 "Coins": 100
             },
@@ -243,7 +255,7 @@
                 10,
                 10
             ],
-            "max_health": 100,
+            "max_health": 600,
             "name": "Alice",
             "prevlocation": [
                 10,
@@ -256,7 +268,7 @@
                 10,
                 10
             ],
-            "strength": 20,
+            "strength": 25,
             "talking": false,
             "total_exp": 0
         },
@@ -264,15 +276,18 @@
             "ID": "Wolf 1",
             "allow_movement": true,
             "character": "W",
+            "damage": 0,
+            "defence": 2,
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "endurance": 2,
             "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
             "has_quest": false,
-            "health": 100,
-            "increase_exp_by": 2,
+            "health": 160,
+            "increase_exp_by": 7,
             "inventory": {
                 "Coins": 100
             },
@@ -281,7 +296,7 @@
                 10,
                 20
             ],
-            "max_health": 100,
+            "max_health": 160,
             "name": "Wolf",
             "prevlocation": [
                 10,
@@ -292,9 +307,9 @@
             "respawnable": true,
             "spawn_location": [
                 10,
-                10
+                20
             ],
-            "strength": 10,
+            "strength": 20,
             "talking": false,
             "total_exp": 0
         },
@@ -302,15 +317,18 @@
             "ID": "Wolf 2",
             "allow_movement": true,
             "character": "W",
+            "damage": 0,
+            "defence": 2,
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "endurance": 2,
             "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
             "has_quest": false,
-            "health": 100,
-            "increase_exp_by": 2,
+            "health": 160,
+            "increase_exp_by": 7,
             "inventory": {
                 "Coins": 100
             },
@@ -319,7 +337,7 @@
                 20,
                 20
             ],
-            "max_health": 100,
+            "max_health": 160,
             "name": "Wolf",
             "prevlocation": [
                 20,
@@ -329,10 +347,10 @@
             "respawn_counter": 0,
             "respawnable": true,
             "spawn_location": [
-                10,
-                10
+                20,
+                20
             ],
-            "strength": 10,
+            "strength": 20,
             "talking": false,
             "total_exp": 0
         },
@@ -340,15 +358,18 @@
             "ID": "Wolf 3",
             "allow_movement": true,
             "character": "W",
+            "damage": 0,
+            "defence": 2,
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "endurance": 2,
             "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
             "has_quest": false,
-            "health": 100,
-            "increase_exp_by": 2,
+            "health": 160,
+            "increase_exp_by": 7,
             "inventory": {
                 "Coins": 100
             },
@@ -357,7 +378,7 @@
                 20,
                 10
             ],
-            "max_health": 100,
+            "max_health": 160,
             "name": "Wolf",
             "prevlocation": [
                 20,
@@ -367,10 +388,10 @@
             "respawn_counter": 0,
             "respawnable": true,
             "spawn_location": [
-                10,
+                20,
                 10
             ],
-            "strength": 10,
+            "strength": 20,
             "talking": false,
             "total_exp": 0
         },
@@ -378,15 +399,18 @@
             "ID": "Wolf 4",
             "allow_movement": true,
             "character": "W",
+            "damage": 0,
+            "defence": 2,
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "endurance": 2,
             "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
             "has_quest": false,
-            "health": 100,
-            "increase_exp_by": 2,
+            "health": 160,
+            "increase_exp_by": 7,
             "inventory": {
                 "Coins": 100
             },
@@ -395,7 +419,7 @@
                 10,
                 30
             ],
-            "max_health": 100,
+            "max_health": 160,
             "name": "Wolf",
             "prevlocation": [
                 10,
@@ -406,9 +430,9 @@
             "respawnable": true,
             "spawn_location": [
                 10,
-                10
+                30
             ],
-            "strength": 10,
+            "strength": 20,
             "talking": false,
             "total_exp": 0
         },
@@ -416,15 +440,18 @@
             "ID": "Wolf 5",
             "allow_movement": true,
             "character": "W",
+            "damage": 0,
+            "defence": 2,
             "dialogue": {
                 "intro": "I'm going to kill you"
             },
+            "endurance": 2,
             "equipped": {},
             "exp_for_next_level": 0,
             "exp_to_next_level": 25,
             "has_quest": false,
-            "health": 100,
-            "increase_exp_by": 2,
+            "health": 160,
+            "increase_exp_by": 7,
             "inventory": {
                 "Coins": 100
             },
@@ -433,7 +460,7 @@
                 20,
                 30
             ],
-            "max_health": 100,
+            "max_health": 160,
             "name": "Wolf",
             "prevlocation": [
                 20,
@@ -443,10 +470,10 @@
             "respawn_counter": 0,
             "respawnable": true,
             "spawn_location": [
-                10,
-                10
+                20,
+                30
             ],
-            "strength": 10,
+            "strength": 20,
             "talking": false,
             "total_exp": 0
         }
