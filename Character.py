@@ -354,6 +354,7 @@ class NPC(Character):
 			self.conversation_start(conversation)
 
 	# TODO make a trade system
+	#def trade(self):
 
 	def move_to(self, y, x):
 		if y == self.location[0] and x == self.location[1]:
@@ -401,13 +402,61 @@ class NPC(Character):
 		self.location = self.spawn_location[:]
 
 
-class Enemy(NPC):
+class Enemy(Character):
 	def __init__(self, ID, name: str, character: chr, race: Races):
 		super().__init__(name, character, race)
-		self.dialogue = {"intro": "I'm going to kill you"}
 		self.increase_exp_by = int((self.level**2)/.4) + 5
 		self.ID = ID
 		self.health_regen = 15
+		self.spawn_location = [10, 10]
+		self.respawn_counter = 0
+		self.respawnable = False
+		self.allow_movement = True
+
+	def respawn(self):
+		self.health = self.max_health
+		self.location = self.spawn_location[:]
+
+	def is_near_player(self, player, distance):
+		x = False
+		y = False
+		if distance >= (player.location[0] - self.location[0]) >= (distance * -1):
+			y = True
+		if distance >= (player.location[1] - self.location[1]) >= (distance * -1):
+			x = True
+		if x and y:
+			return True
+		else:
+			return False
+
+	def move_to(self, y, x):
+		if y == self.location[0] and x == self.location[1]:
+			self.prevlocation = self.location[:]
+			pass
+		elif self.location[0] == y:
+			self.prevlocation = self.location[:]
+			if x > self.location[1]:
+				self.location[1] += 1
+			else:
+				self.location[1] -= 1
+		elif self.location[1] == x:
+			self.prevlocation = self.location[:]
+			if y > self.location[0]:
+				self.location[0] += 1
+			else:
+				self.location[0] -= 1
+		elif abs(x - self.location[1]) >= abs(y - self.location[0]):
+			self.prevlocation = self.location[:]
+			if x > self.location[1]:
+				self.location[1] += 1
+			else:
+				self.location[1] -= 1
+		elif abs(x - self.location[1]) <= abs(y - self.location[0]):
+			self.prevlocation = self.location[:]
+			if y > self.location[0]:
+				self.location[0] += 1
+			else:
+				self.location[0] -= 1
 
 	def attack(self, player):
 		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:
@@ -423,9 +472,33 @@ class Enemy(NPC):
 			if self.is_near_player(player, 5):
 				self.follow_player(player)
 			else:
-				super().move(area)
+				if self.allow_movement:
+					self.prevlocation = self.location[:]
+					direction = randint(0, 4)
+					if direction is 0:
+						pass
+					elif direction is 1:
+						self.move_up()
+					elif direction is 2:
+						self.move_down(area)
+					elif direction is 3:
+						self.move_right(area)
+					else:
+						self.move_left()
 		else:
-			super().move(area)
+			if self.allow_movement:
+				self.prevlocation = self.location[:]
+				direction = randint(0, 4)
+				if direction is 0:
+					pass
+				elif direction is 1:
+					self.move_up()
+				elif direction is 2:
+					self.move_down(area)
+				elif direction is 3:
+					self.move_right(area)
+				else:
+					self.move_left()
 
 	def death(self, player):
 		super().death()
