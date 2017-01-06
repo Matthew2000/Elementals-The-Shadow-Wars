@@ -44,6 +44,12 @@ def save_npcs(save, npcs, log):
 		if equipped_item["weapon"] is not None:
 			equipped_item["weapon"] = equipped_item["weapon"].__dict__
 			equipped_item["weapon"] = equipped_item["weapon"]["name"]
+		if temp_npc["trade_inventory"] is not []:
+			x = 0
+			for item in temp_npc["trade_inventory"]:
+				item = item.__dict__
+				temp_npc["trade_inventory"][x] = item["name"]
+				x += 1
 		npcs.append(temp_npc)
 	save["all_NPCs"].clear()
 	save["all_NPCs"] = npcs[:]
@@ -97,6 +103,12 @@ def load_npcs(save, npcs, log):
 				if equipped_item["shoes"] is not None:
 					if equipped_item["shoes"] == armour.name:
 						temp_npc.equipped["shoes"] = armour
+		# load items to trade
+		temp_npc.trade_inventory.clear()
+		for trade_item in npc["trade_inventory"]:
+			for item in all_items:
+				if trade_item == item.name:
+					temp_npc.trade_inventory.append(item)
 		log.write("Race: " + str(temp_npc.race)[6:] + "\r\n")
 	log.write("load NPCs" + "\r\n")
 

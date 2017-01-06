@@ -212,6 +212,7 @@ class NPC(Character):
 		self.spawn_location = [10, 10]
 		self.respawn_counter = 0
 		self.respawnable = False
+		self.trade_inventory = [LeatherArmour, LeatherHelmet, LeatherShoes, LeatherPants, LeatherBelt, LeatherGloves]
 
 	def move(self, area):
 		if self.allow_movement:
@@ -351,10 +352,47 @@ class NPC(Character):
 		elif input_key is ord("3"):
 			journal.insertln()
 			journal.addstr(1, 1, self.dialogue["trade"])
+			if self.trade_inventory is not []:
+				self.trade( player, journal, conversation, log)
 			self.conversation_start(conversation)
 
-	# TODO make a trade system
-	#def trade(self):
+	def refesh_trade_menu(self, journal):
+		for item in self.trade_inventory:
+			journal.deleteln()
+			journal.border()
+			journal.refresh()
+
+	# TODO improve the trade system
+	def trade(self, player, journal, conversation, log):
+		for item in self.trade_inventory:
+			journal.insertln()
+		conversation.keypad(True)
+		option = 0
+		input_key = -1
+		while input_key is not ord("2"):
+			self.refesh_trade_menu(journal)
+			selection = [0] * len(self.trade_inventory)
+			selection[option] = curses.A_REVERSE
+			for item in self.trade_inventory:
+				journal.insertln()
+				journal.addstr(1, 1, item.name, selection[self.trade_inventory.index(item)])
+				journal.addstr(1, 20, "value: " + str(item.value))
+			journal.border()
+			journal.refresh()
+			input_key = conversation.getch()
+			if input_key == curses.KEY_UP:
+				option += 1
+			elif input_key == curses.KEY_DOWN:
+				option -= 1
+			if option < 0:
+				option = len(self.trade_inventory) - 1
+			elif option >= len(self.trade_inventory):
+				option = 0
+			if input_key == ord("1"):
+				if player.inventory["Coins"] >= self.trade_inventory[option].value:
+					player.inventory["Coins"] -= self.trade_inventory[option].value
+					player.equip_armour(self.trade_inventory[option])
+					player.set_stats_by_level_and_race()
 
 	def move_to(self, y, x):
 		if y == self.location[0] and x == self.location[1]:

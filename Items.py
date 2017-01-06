@@ -71,3 +71,15 @@ all_armours = [
 	LeatherPants,
 	LeatherShoes
 ]
+
+all_items = [
+	LeatherHelmet,
+	LeatherArmour,
+	LeatherGloves,
+	LeatherBelt,
+	LeatherPants,
+	LeatherShoes,
+	IronSword,
+	IronDagger,
+	IronClub
+]

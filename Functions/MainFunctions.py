@@ -196,10 +196,6 @@ def new_game(save, enemies, npcs, log):
 	load_enemies(save, enemies, log)
 	load_npcs(save, npcs, log)
 	set_all_stats(enemies, npcs)
-	for npc in save["all_NPCs"]:
-		with open('Dialogue/' + npc["name"] + '.json', 'w') as a:
-			json.dump(npc["dialogue"], a, sort_keys=True, indent=4)
-			a.close()
 	load_npc_dialogue(npcs, log)
 
 
