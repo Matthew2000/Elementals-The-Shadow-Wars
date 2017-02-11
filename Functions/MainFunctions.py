@@ -1,6 +1,6 @@
 from Functions.EnemyFunctions import *
 from Functions.NPCFunctions import *
-
+import string
 
 def create_player(name: str, character: chr, race: Races, area):
 	temp_player = Player(name, character, race)
@@ -25,7 +25,7 @@ def load_player(player, save, log):
 	player.exp_to_next_level = save["player"]["exp_to_next_level"]
 	player.strength = save["player"]["strength"]
 	player.endurance = save["player"]["endurance"]
-	player.defence = save["player"]["defence"]
+	player.defense = save["player"]["defense"]
 	log.write("Race: " + str(player.race)[6:] + "\r\n")
 	log.write("load player" + "\r\n")
 
@@ -103,7 +103,7 @@ def update_player_status(player, player_stat_win):
 	player_stat_win.addstr(0, 1, "Player Stats")
 	player_stat_win.addstr(1, 1, "Health: " + str(player.health))
 	player_stat_win.addstr(2, 1, "Strength: " + str(player.strength))
-	player_stat_win.addstr(3, 1, "Defence: " + str(player.defence))
+	player_stat_win.addstr(3, 1, "Defense: " + str(player.defense))
 	player_stat_win.addstr(4, 1, "Race: " + str(player.race)[6:])
 	player_stat_win.addstr(5, 1, "Level: " + str(player.level))
 	player_stat_win.addstr(6, 1, "exp needed: " + str(player.exp_to_next_level - player.exp_for_next_level)[:len(str(player.exp_to_next_level - player.exp_for_next_level)) - 2])
@@ -197,6 +197,7 @@ def new_game(save, enemies, npcs, log):
 	load_npcs(save, npcs, log)
 	set_all_stats(enemies, npcs)
 	load_npc_dialogue(npcs, log)
+	log.write('len: ' + str(len(npcs)))
 
 
 def player_health_regen(player):

@@ -72,7 +72,7 @@ def load_enemies(save, enemies, log):
 		temp_enemy.respawnable = enemy["respawnable"]
 		temp_enemy.spawn_location = enemy["spawn_location"]
 		temp_enemy.endurance = enemy["endurance"]
-		temp_enemy.defence = enemy["defence"]
+		temp_enemy.defense = enemy["defense"]
 		# load equipped enemy items
 		if temp_enemy.race is not Races.Wolf:
 			equipped_item = enemy["equipped"]
@@ -114,7 +114,7 @@ def update_enemy_status(enemy, enemy_stat_win):
 		enemy_stat_win.addstr(2, 1, "Health: " + str(enemy.health))
 		enemy_stat_win.addstr(3, 1, "Level: " + str(enemy.level))
 		enemy_stat_win.addstr(4, 1, "Strength: " + str(enemy.strength))
-		enemy_stat_win.addstr(5, 1, "Defence: " + str(enemy.defence))
+		enemy_stat_win.addstr(5, 1, "Defense: " + str(enemy.defense))
 	enemy_stat_win.refresh()
 
 

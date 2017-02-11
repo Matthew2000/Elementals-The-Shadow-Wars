@@ -1,18 +1,18 @@
 import os.path
 from Character import *
+from Functions.Func import *
 import curses
 import json
 
-
-def create_npc(name, character, race: Races, nps, log):  # this function must be assigned to an object
+def create_npc(name, character, race: Races, npcs, log):  # this function must be assigned to an object
 	var = False
-	for x in nps:
+	for x in npcs:
 		if name == x.name:  # name must be the same as the object name
 			var = True
 			log.write(x.name + " is already there" + "\r\n")
 	if not var:
-		nps.append(NPC(name, character, race))
-	return nps[len(nps) - 1]
+		npcs.append(NPC(name, character, race))
+	return npcs[len(npcs) - 1]
 
 
 def save_npcs(save, npcs, log):
@@ -59,7 +59,6 @@ def save_npcs(save, npcs, log):
 def load_npcs(save, npcs, log):
 	npcs.clear()
 	for npc in save["all_NPCs"]:
-		log.write(npc["name"] + " ")
 		temp_npc = create_npc(npc["name"], npc["character"], Races(npc["race"]), npcs, log)
 		temp_npc.location = npc["location"]
 		temp_npc.prevlocation = npc["prevlocation"]
@@ -76,7 +75,7 @@ def load_npcs(save, npcs, log):
 		temp_npc.respawnable = npc["respawnable"]
 		temp_npc.spawn_location = npc["spawn_location"]
 		temp_npc.endurance = npc["endurance"]
-		temp_npc.defence = npc["defence"]
+		temp_npc.defense = npc["defense"]
 		# load equipped npc items
 		if temp_npc.race is not Races.Wolf:
 			equipped_item = npc["equipped"]
@@ -109,8 +108,8 @@ def load_npcs(save, npcs, log):
 			for item in all_items:
 				if trade_item == item.name:
 					temp_npc.trade_inventory.append(item)
-		log.write("Race: " + str(temp_npc.race)[6:] + "\r\n")
-	log.write("load NPCs" + "\r\n")
+		log.write(temp_npc.name + " Race: " + str(temp_npc.race)[6:] + "\r\n")
+	log.write("load NPCs: " + str(len(npcs)) + "\r\n")
 
 
 def update_npc_locations(npcs, map):
@@ -147,8 +146,9 @@ def npc_at_location(y, x, npcs):
 
 def load_npc_dialogue(npcs, log):
 	for npc in npcs:
-		if os.path.exists('Dialogue/' + npc.name + '.json'):
-			with open('Dialogue/' + npc.name + '.json', 'r') as a:
+		filename = 'Dialogue/' + sanitize_filename(npc.name) + '.json'
+		if os.path.exists(filename):
+			with open(filename, 'r') as a:
 				npc.dialogue = json.load(a)
 				a.close()
 	log.write("load npc dialogue" + "\r\n")
@@ -156,7 +156,7 @@ def load_npc_dialogue(npcs, log):
 
 def save_npc_dialogue(npcs, log):
 	for npc in npcs:
-		with open('Dialogue/' + npc.name + '.json', 'w') as a:
+		with open('Dialogue/' + sanitize_filename(npc.name) + '.json', 'w') as a:
 			json.dump(npc.dialogue, a, sort_keys=True, indent=4)
 			a.close()
 	log.write("dialogue save" + "\r\n")
