@@ -59,6 +59,8 @@ def load_player_equipment(player, save):
 
 
 def save_player(player, save, log):
+	del player.inventory_win
+	del player.player_status
 	save["player"] = player.__dict__
 	save["player"]["race"] = save["player"]["race"].value
 	equipped_item = save["player"]["equipped"]
@@ -115,9 +117,10 @@ def update_journal(journal):
 	journal.refresh()
 
 
-def update_game(player, player_stat_win, inventory, journal):
-	update_player_status(player, player_stat_win)
-	update_inventory(player, inventory)
+def update_game(player, journal):
+	player.update_player_status()
+	#update_player_status(player, player_stat_win)
+	player.update_inventory()
 	update_journal(journal)
 
 
@@ -136,8 +139,8 @@ def print_to_journal(journal, message):
 	journal.addstr(1, 1, message)
 
 
-def player_at_location(player, y, x):
-	if player.location[0] is y and player.location[1] is x:
+def player_at_location(player, location):
+	if player.location[0] is location[0] and player.location[1] is location[1]:
 		return True
 	else:
 		return False
@@ -151,34 +154,10 @@ def player_dead(player, map, journal):
 			print_to_journal(journal, player.name + " is dead")
 
 
-def enter_combat(player, enemy, key, map, enemy_stat_win, player_stat_win, log, journal):
+def print_combat_intro_text(journal):
 	print_to_journal(journal, 'Press "1" to attack or "2" to leave')
 	print_to_journal(journal, "Battle has started")
 	update_journal(journal)
-	update_enemy_status(enemy, enemy_stat_win)
-	update_player_status(player, enemy_stat_win)
-	while key is not ord("2"):
-		update_enemy_status(enemy, enemy_stat_win)
-		update_player_status(player, player_stat_win)
-		if enemy.health <= 0:
-			is_enemy_dead(enemy, player, map, journal, log)
-			enemy.allow_movement = True
-			update_enemy_status(enemy, enemy_stat_win)
-			break
-		if player.health <= 0:
-			if player.is_dead():
-				player_dead(player, map, journal)
-				update_player_location(player, map)
-			enemy.allow_movement = True
-			update_enemy_status(enemy, enemy_stat_win)
-			break
-		key = map.getch()
-		if key is ord("1"):
-			player.attack(enemy)
-		enemy.attack(player)
-	else:
-		enemy.allow_movement = True
-		print_to_journal(journal, "You have left combat")
 
 
 def set_all_stats(npcs, enemies):
@@ -197,17 +176,10 @@ def new_game(save, enemies, npcs, log):
 	load_npcs(save, npcs, log)
 	set_all_stats(enemies, npcs)
 	load_npc_dialogue(npcs, log)
-	log.write('len: ' + str(len(npcs)))
+	log.write('len: ' + str(len(npcs)) + "\r\n")
 
 
-def player_health_regen(player):
-	if not (player.health >= player.max_health):
-		player.health += player.health_regen
-		if player.health >= player.max_health:
-			player.health = player.max_health
-
-
-def is_enemy_dead(enemy, player, map, journal, log):
+def is_enemy_dead(enemy, player, map, journal):
 	if enemy.is_dead():
 		if map.inch(enemy.location[0], enemy.location[1]) == ord(enemy.character):
 			enemy.death(player)
@@ -215,14 +187,4 @@ def is_enemy_dead(enemy, player, map, journal, log):
 			print_to_journal(journal, enemy.name + " is dead")
 			enemy.prevlocation = enemy.location[:]
 			enemy.location = [0, 0]
-			log.write("player exp is: " + str(player.total_exp) + "\r\n")
 			print_to_journal(journal, "you gained " + str(enemy.increase_exp_by) + " exp")
-
-
-def move_enemies(enemies, player, area, log, enemy_stat_win, map, player_stat_win, journal):
-	for enemy in enemies:
-		if not enemy.is_dead():
-			enemy.move(area, player)
-			if player_at_location(player, enemy.location[0], enemy.location[1]):
-				enemy.allow_movement = False
-				enter_combat(player, enemy, -1, map, enemy_stat_win, player_stat_win, log, journal)

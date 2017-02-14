@@ -136,9 +136,9 @@ def place_npcs(npcs, map):
 		spawn_character(map, npc, npc.location[0], npc.location[1])
 
 
-def npc_at_location(y, x, npcs):
+def npc_at_location(location, npcs):
 	for npc in npcs:
-		if npc.location[0] is y and npc.location[1] is x:
+		if npc.location[0] is location[0] and npc.location[1] is location[1]:
 			return {"result": True, "npc": npc}
 	else:
 		return {"result": False}

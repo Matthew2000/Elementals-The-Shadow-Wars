@@ -8,7 +8,7 @@ from Functions.MainFunctions import *
 
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
-save = {"all_enemies": [], "all_NPCs": [], "player": {"character": "@", "health": 100, "inventory": {"Coins": 100}, "location": [2, 5], "max_health": 100, "name": "Matthew", "prevlocation": [3, 5]}}
+save = {"all_NPCs": [], "all_enemies": [], "player": {}}
 DebugLog = open('RPGLog.txt', 'w')
 error = open('RPGErrorLog.txt', 'w')
 sys.stderr = error
@@ -17,10 +17,41 @@ player_name = "Matthew"
 all_enemies = []
 all_NPCs = []
 
+
+def start_combat(player, enemy):
+	global Key
+	print_combat_intro_text(journal)
+	update_enemy_status(enemy, enemy_status)
+	player.update_player_status()
+	while Key is not ord("2"):
+		update_enemy_status(enemy, enemy_status)
+		player.update_player_status()
+		if enemy.health <= 0:
+			is_enemy_dead(enemy, player, MAP, journal)
+			enemy.allow_movement = True
+			update_enemy_status(enemy, enemy_status)
+			break
+		if player.health <= 0:
+			if player.is_dead():
+				player_dead(player, MAP, journal)
+				update_player_location(player, MAP)
+			enemy.allow_movement = True
+			update_enemy_status(enemy, enemy_status)
+			break
+		Key = MAP.getch()
+		if ord("1") <= Key >= ord("2"):
+			continue
+		if Key is ord("1"):
+			player.attack(enemy)
+		enemy.attack(player)
+	else:
+		enemy.allow_movement = True
+		print_to_journal(journal, "You have left combat")
+
 try:
 	screen = curses.initscr()
 	MAP = curses.newwin(35, 100, 2, 3)
-	inventory = curses.newwin(10, 20, 38, 30)
+	inventory_win = curses.newwin(10, 20, 38, 30)
 	player_status = curses.newwin(10, 20, 38, 3)
 	enemy_status = curses.newwin(10, 20, 38, 57)
 	journal = curses.newwin(50, 65, 2, 110)
@@ -33,7 +64,6 @@ try:
 	journal.keypad(True)
 
 	dims = MAP.getmaxyx()
-	dims2 = inventory.getmaxyx()
 
 	player1 = create_player("Matthew", "@", Races.Human, dims)
 
@@ -42,7 +72,6 @@ try:
 			save = json.load(f)
 			f.close()
 
-		player = save["player"].keys()
 		inventory_items = save["player"]["inventory"].keys()
 
 		load_player(player1, save, DebugLog)
@@ -71,7 +100,7 @@ try:
 		MAP.refresh()
 		MAP.border()
 
-		update_game(player1, player_status, inventory, journal)
+		update_game(player1, journal)
 
 		player_dead(player1, MAP, journal)
 
@@ -91,19 +120,19 @@ try:
 			player1.update_quests(all_enemies, all_NPCs, journal)
 			if not player1.is_dead():
 				player1.move(Key, dims)
-				result = enemy_at_location(all_enemies, player1.location[0], player1.location[1], enemy_status)
+				result = enemy_at_location(all_enemies, player1.location, enemy_status)
 				if result["result"] is True:
 					enemy1 = result["enemy"]
-					enter_combat(player1, enemy1, Key, MAP, enemy_status, player_status, DebugLog, journal)
+					start_combat(player1, enemy1)
 				else:
-					player_health_regen(player1)
-					update_player_status(player1, player_status)
-				result = npc_at_location(player1.location[0], player1.location[1], all_NPCs)
+					player1.regenerate_health()
+					player1.update_player_status()
+				result = npc_at_location(player1.location, all_NPCs)
 				if result["result"] is True:
 					NPC = result["npc"]
 					NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs)
 					update_journal(journal)
-					update_player_status(player1, player_status)
+					player1.update_player_status()
 					while Key is not ord("4"):
 						Key = MAP.getch()
 						NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs)
@@ -119,8 +148,14 @@ try:
 		player_dead(player1, MAP, journal)
 
 		if not player_turn:
-			move_enemies(all_enemies, player1, dims, DebugLog, enemy_status, MAP, player_status, journal)
-			enemy_health_regen(all_enemies)
+			for enemy in all_enemies:
+				if not enemy.is_dead():
+					enemy.move(dims, player1)
+					enemy.regenerate_health()
+					if player_at_location(player1, enemy.location):
+						enemy.location= enemy.prevlocation[:]
+						enemy.allow_movement = False
+						start_combat(player1, enemy)
 			player_turn = True
 
 		DebugLog.flush()
@@ -130,14 +165,14 @@ try:
 
 		respawn_enemies(all_enemies)
 
-		update_game(player1, player_status, inventory, journal)
+		update_game(player1, journal)
 
 		update_enemy_locations(all_enemies, MAP)
 		update_npc_locations(all_NPCs, MAP)
 
 		screen.refresh()
 		MAP.refresh()
-		update_game(player1, player_status, inventory, journal)
+		update_game(player1, journal)
 	update_enemy_locations(all_enemies, MAP)
 	update_npc_locations(all_NPCs, MAP)
 	save_player(player1, save, DebugLog)

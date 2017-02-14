@@ -142,9 +142,9 @@ def place_enemies(enemies, map):
 		spawn_character(map, enemy, enemy.location[0], enemy.location[1])
 
 
-def enemy_at_location(enemies, y, x, enemy_stat_win):
+def enemy_at_location(enemies, location, enemy_stat_win):
 	for enemy in enemies:
-		if enemy.location[0] is y and enemy.location[1] is x:
+		if enemy.location[0] is location[0] and enemy.location[1] is location[1]:
 			update_enemy_status(enemy, enemy_stat_win)
 			enemy.allow_movement = False
 			return {"result": True, "enemy": enemy}
@@ -172,12 +172,3 @@ def respawn_enemies(enemies):
 				if enemy.respawn_counter == 20:
 					enemy.respawn_counter = 0
 					enemy.respawn()
-
-
-def enemy_health_regen(enemies):
-	for enemy in enemies:
-		if not enemy.is_dead():
-			if enemy.health < enemy.max_health:
-				enemy.health += enemy.health_regen
-				if enemy.health >= enemy.max_health:
-					enemy.health = enemy.max_health
