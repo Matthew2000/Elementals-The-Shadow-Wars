@@ -82,12 +82,15 @@ class Character:
 
 	def add_inventory_item(self, item, amount=0):
 		var = False
-		for x in self.inventory:
-			if item.lower() == x.lower():
-				var = True
-				self.inventory[item] += amount
-		if not var:
-			self.inventory[item] = amount
+		if not isinstance(item, Item):
+			for x in self.inventory:
+				if item.lower() == x.lower():
+					var = True
+					self.inventory[item] += amount
+			if not var:
+				self.inventory[item] = amount
+		else:
+			self.inventory[item.name] = item
 
 	def respawn(self, y, x):
 		self.health = self.max_health
@@ -126,8 +129,15 @@ class Character:
 		slot = item.armour_type.value
 		self.equipped[slot] = item
 
+	def unequip_armour(self, item: Armour):
+		slot = item.armour_type.value
+		self.equipped[slot] = None
+
 	def equip_weapon(self, item: Weapon):
 		self.equipped["weapon"] = item
+
+	def unequip_weapon(self):
+		self.equipped["weapon"] = None
 
 	def get_defense_from_armour(self):
 		temp_defense = 0
@@ -159,7 +169,8 @@ class Player(Character):
 		super().__init__(name, character, race)
 		self.quests = {}
 		self.equipped = {"helmet": None, "chest": None, "gloves": None, "belt": None, "pants": None, "shoes": None, "weapon": IronDagger}
-		self.inventory_win = curses.newwin(10, 20, 38, 30)
+		self.inventory["Iron Dagger"] = IronDagger
+		self.inventory_win = curses.newwin(50, 65, 2, 110)
 		self.player_status = curses.newwin(10, 20, 38, 3)
 
 	def move(self, input_key, area):
@@ -211,19 +222,14 @@ class Player(Character):
 		self.set_stats_by_level_and_race()
 
 	def update_inventory(self):
-		x = 1
 		self.inventory_win.clear()
 		self.inventory_win.border()
 		self.inventory_win.addstr(0, 1, "Inventory")
-		for item in self.inventory:
-			self.inventory_win.addstr(x, 1, item + ": " + str(self.inventory[item]))
-			x += 1
-			self.inventory_win.refresh()
 
 	def update_player_status(self):
 		self.player_status.clear()
 		self.player_status.border()
-		self.player_status.addstr(0, 1, "Player Stats")
+		self.player_status.addstr(0, 1, "Player Info")
 		self.player_status.addstr(1, 1, "Health: " + str(self.health))
 		self.player_status.addstr(2, 1, "Strength: " + str(self.strength))
 		self.player_status.addstr(3, 1, "Defense: " + str(self.defense))
@@ -232,6 +238,64 @@ class Player(Character):
 		self.player_status.addstr(6, 1, "exp needed: " + str(self.exp_to_next_level - self.exp_for_next_level)[:len(
 			str(self.exp_to_next_level - self.exp_for_next_level)) - 2])
 		self.player_status.refresh()
+
+	def refresh_inventory_menu(self):
+		for item in self.inventory:
+			self.inventory_win.deleteln()
+		self.inventory_win.refresh()
+
+	def open_inventory(self, log):
+		self.update_inventory()
+		self.inventory_win.keypad(True)
+		option = len(self.inventory) - 1
+		input_key = -1
+		while input_key is not ord("i"):
+			self.refresh_inventory_menu()
+			selection = [0] * len(self.inventory)
+			selection[option] = curses.A_REVERSE
+			inventory_keys = list(self.inventory.keys())
+			equipped_items = list(self.equipped.values())
+			for item in inventory_keys:
+				self.inventory_win.insertln()
+				if not isinstance(self.inventory[item], Item):
+					self.inventory_win.addstr(1, 1, item, selection[inventory_keys.index(item)])
+					self.inventory_win.addstr(1, 20, "amount: " + str(self.inventory[item]))
+				else:
+					self.inventory_win.addstr(1, 1, self.inventory[item].name, selection[inventory_keys.index(item)])
+					self.inventory_win.addstr(1, 20, "amount: 1")
+					if self.inventory[item] in equipped_items:
+						self.inventory_win.addstr(1, 35, "equipped")
+			self.inventory_win.border()
+			self.inventory_win.addstr(0, 1, "Inventory")
+			self.inventory_win.refresh()
+			input_key = self.inventory_win.getch()
+			if input_key == curses.KEY_UP:
+				option += 1
+			elif input_key == curses.KEY_DOWN:
+				option -= 1
+			if option < 0:
+				option = len(self.inventory) - 1
+			elif option >= len(self.inventory):
+				option = 0
+			if input_key == ord("1"):
+				item = self.inventory[inventory_keys[option]]
+				if isinstance(item, Item):
+					if isinstance(item, Armour):
+						self.equip_armour(item)
+					elif isinstance(item, Weapon):
+						self.equip_weapon(item)
+					self.set_stats_by_level_and_race()
+					self.update_player_status()
+			elif input_key == ord("2"):
+				item = self.inventory[inventory_keys[option]]
+				if isinstance(item, Item):
+					if isinstance(item, Armour):
+						self.unequip_armour(item)
+					elif isinstance(item, Weapon):
+						self.unequip_weapon()
+					self.set_stats_by_level_and_race()
+					self.update_player_status()
+
 
 
 class NPC(Character):
@@ -350,7 +414,7 @@ class NPC(Character):
 				journal.border()
 				journal.refresh()
 
-	def interact(self, journal, conversation, input_key, player, log, enemies, npcs):
+	def interact(self, journal, conversation, input_key, player, log, enemies, npcs, trade_window):
 		if not self.dialogue["quest"]:
 			self.has_quest = False
 		if self.talking is False:
@@ -389,13 +453,12 @@ class NPC(Character):
 			journal.insertln()
 			journal.addstr(1, 1, self.dialogue["trade"])
 			if self.trade_inventory is not []:
-				self.trade( player, journal, conversation, log)
+				self.trade(player, trade_window, conversation, log)
 			self.conversation_start(conversation)
 
 	def refresh_trade_menu(self, journal):
 		for item in self.trade_inventory:
 			journal.deleteln()
-			journal.border()
 			journal.refresh()
 
 	# TODO improve the trade system
@@ -427,10 +490,12 @@ class NPC(Character):
 			if input_key == ord("1"):
 				if player.inventory["Coins"] >= self.trade_inventory[option].value:
 					player.inventory["Coins"] -= self.trade_inventory[option].value
-					player.equip_armour(self.trade_inventory[option])
-					player.set_stats_by_level_and_race()
-					player.update_inventory()
-					player.update_player_status()
+					player.add_inventory_item(self.trade_inventory[option])
+		else:
+			for item in self.trade_inventory:
+				journal.deleteln()
+				journal.border()
+				journal.refresh()
 
 	def move_to(self, y, x):
 		if y == self.location[0] and x == self.location[1]:

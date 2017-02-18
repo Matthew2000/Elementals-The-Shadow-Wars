@@ -15,7 +15,6 @@ def load_player(player, save, log):
 	player.prevlocation = save["player"]["prevlocation"]
 	player.health = save["player"]["health"]
 	player.character = save["player"]["character"]
-	player.inventory = save["player"]["inventory"]
 	player.max_health = save["player"]["max_health"]
 	player.quests = save["player"]["quests"]
 	player.race = Races(save["player"]["race"])
@@ -36,6 +35,8 @@ def load_player_equipment(player, save):
 		if equipped_item["weapon"] is not None:
 			if equipped_item["weapon"] == weapon.name:
 				player.equipped["weapon"] = weapon
+		else:
+			player.equipped["weapon"] = None
 
 	for armour in all_armours:
 		if equipped_item["helmet"] is not None:
@@ -56,6 +57,14 @@ def load_player_equipment(player, save):
 		if equipped_item["shoes"] is not None:
 			if equipped_item["shoes"] == armour.name:
 				player.equipped["shoes"] = armour
+
+
+def load_player_inventory(player, save):
+	player.inventory = save["player"]["inventory"]
+	for inv_item in player.inventory:
+		for item in all_items:
+			if inv_item == item.name:
+				player.inventory[inv_item] = item
 
 
 def save_player(player, save, log):
@@ -85,18 +94,10 @@ def save_player(player, save, log):
 	if equipped_item["weapon"] is not None:
 		equipped_item["weapon"] = equipped_item["weapon"].__dict__
 		equipped_item["weapon"] = equipped_item["weapon"]["name"]
+	for item in list(save["player"]["inventory"].keys()):
+		if isinstance(save["player"]["inventory"][item], Item):
+			save["player"]["inventory"][item] = save["player"]["inventory"][item].name
 	log.write("player saved" + "\r\n")
-
-
-def update_inventory(player, inventory):
-	x = 1
-	inventory.clear()
-	inventory.border()
-	inventory.addstr(0, 1, "Inventory")
-	for item in player.inventory:
-		inventory.addstr(x, 1, item + ": " + str(player.inventory[item]))
-		x += 1
-	inventory.refresh()
 
 
 def update_player_status(player, player_stat_win):
@@ -120,7 +121,7 @@ def update_journal(journal):
 def update_game(player, journal):
 	player.update_player_status()
 	#update_player_status(player, player_stat_win)
-	player.update_inventory()
+	#player.update_inventory()
 	update_journal(journal)
 
 

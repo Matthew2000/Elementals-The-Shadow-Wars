@@ -51,8 +51,7 @@ def start_combat(player, enemy):
 try:
 	screen = curses.initscr()
 	MAP = curses.newwin(35, 100, 2, 3)
-	inventory_win = curses.newwin(10, 20, 38, 30)
-	player_status = curses.newwin(10, 20, 38, 3)
+	trade_win = curses.newwin(50, 65, 2, 110)
 	enemy_status = curses.newwin(10, 20, 38, 57)
 	journal = curses.newwin(50, 65, 2, 110)
 	conversation = curses.newwin(10, 20, 38, 84)
@@ -75,6 +74,7 @@ try:
 		inventory_items = save["player"]["inventory"].keys()
 
 		load_player(player1, save, DebugLog)
+		load_player_inventory(player1, save)
 		load_player_equipment(player1, save)
 		load_enemies(save, all_enemies, DebugLog)
 		load_npcs(save, all_NPCs, DebugLog)
@@ -111,6 +111,15 @@ try:
 
 		number_of_turns += 1
 
+		if Key is ord("i"):
+			conversation.border()
+			conversation.addstr(1, 1, "1 - equip")
+			conversation.addstr(2, 1, "2 - unequip")
+			conversation.refresh()
+			player1.open_inventory(DebugLog)
+			conversation.clear()
+			conversation.refresh()
+
 		if Key is ord("r"):
 			if player1.is_dead():
 				player1.respawn(30, 50)
@@ -130,12 +139,12 @@ try:
 				result = npc_at_location(player1.location, all_NPCs)
 				if result["result"] is True:
 					NPC = result["npc"]
-					NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs)
+					NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs, trade_win)
 					update_journal(journal)
 					player1.update_player_status()
 					while Key is not ord("4"):
 						Key = MAP.getch()
-						NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs)
+						NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs, trade_win)
 						update_journal(journal)
 					else:
 						NPC.talking = False
