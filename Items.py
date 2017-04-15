@@ -45,6 +45,8 @@ class Armour(Item):
 		self.protection = protection
 		self.armour_type = armour_type
 
+WolfPelt = Item("Wolf Pelt", 10, "The hide of a wolf", False)
+
 # TODO add more weapons and armours
 IronSword = Weapon("Iron Sword", 50, "a sword made out of iron", 20, Weapons.Sword)
 IronDagger = Weapon("Iron Dagger", 20, "a dagger made out of iron", 5, Weapons.Dagger)
@@ -81,5 +83,6 @@ all_items = [
 	LeatherShoes,
 	IronSword,
 	IronDagger,
-	IronClub
+	IronClub,
+	WolfPelt
 ]

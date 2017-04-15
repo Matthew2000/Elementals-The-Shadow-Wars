@@ -25,6 +25,7 @@ def load_player(player, save, log):
 	player.strength = save["player"]["strength"]
 	player.endurance = save["player"]["endurance"]
 	player.defense = save["player"]["defense"]
+	player.coins = save["player"]["coins"]
 	log.write("Race: " + str(player.race)[6:] + "\r\n")
 	log.write("load player" + "\r\n")
 
@@ -61,10 +62,11 @@ def load_player_equipment(player, save):
 
 def load_player_inventory(player, save):
 	player.inventory = save["player"]["inventory"]
-	for inv_item in player.inventory:
+	for inv_item in player.inventory[0]:
+		index = player.inventory[0].index(inv_item)
 		for item in all_items:
 			if inv_item == item.name:
-				player.inventory[inv_item] = item
+				player.inventory[0][index] = item
 
 
 def save_player(player, save, log):
@@ -94,9 +96,10 @@ def save_player(player, save, log):
 	if equipped_item["weapon"] is not None:
 		equipped_item["weapon"] = equipped_item["weapon"].__dict__
 		equipped_item["weapon"] = equipped_item["weapon"]["name"]
-	for item in list(save["player"]["inventory"].keys()):
-		if isinstance(save["player"]["inventory"][item], Item):
-			save["player"]["inventory"][item] = save["player"]["inventory"][item].name
+	for item in save["player"]["inventory"][0]:
+		index = save["player"]["inventory"][0].index(item)
+		if isinstance(save["player"]["inventory"][0][index], Item):
+			save["player"]["inventory"][0][index] = save["player"]["inventory"][0][index].name
 	log.write("player saved" + "\r\n")
 
 

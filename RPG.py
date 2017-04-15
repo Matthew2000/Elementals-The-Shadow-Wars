@@ -71,7 +71,6 @@ try:
 			save = json.load(f)
 			f.close()
 
-		inventory_items = save["player"]["inventory"].keys()
 
 		load_player(player1, save, DebugLog)
 		load_player_inventory(player1, save)

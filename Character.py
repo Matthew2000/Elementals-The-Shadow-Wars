@@ -27,7 +27,11 @@ class Character:
 		self.prevlocation = [1, 1]
 		self.health = 100
 		self.max_health = 100
-		self.inventory = {"Coins": 100}
+		self.coins = 100
+		self.inventory = [
+							[WolfPelt],
+							[1]
+						]
 		self.equipped = {"helmet": None, "chest": None, "gloves": None, "belt": None, "pants": None, "shoes": None, "weapon": None}
 		self.name = name
 		self.character = character
@@ -80,17 +84,22 @@ class Character:
 		if self.health <= 0:
 			return True
 
-	def add_inventory_item(self, item, amount=0):
+	def add_inventory_item(self, item: Item, amount=1):
 		var = False
-		if not isinstance(item, Item):
-			for x in self.inventory:
-				if item.lower() == x.lower():
-					var = True
-					self.inventory[item] += amount
-			if not var:
-				self.inventory[item] = amount
-		else:
-			self.inventory[item.name] = item
+		index = 0
+		for x in self.inventory[0]:
+			if item == x:
+				var = True
+				self.inventory[1][index] += amount
+			index += 1
+		if not var:
+			self.inventory[0].append(item)
+			self.inventory[1].append(1)
+
+	def remove_inventory_item(self, item, amount=1):
+		index = self.inventory[0].index(item)
+		self.inventory[0].remove(item)
+		del self.inventory[1][index]
 
 	def respawn(self, y, x):
 		self.health = self.max_health
@@ -169,7 +178,7 @@ class Player(Character):
 		super().__init__(name, character, race)
 		self.quests = {}
 		self.equipped = {"helmet": None, "chest": None, "gloves": None, "belt": None, "pants": None, "shoes": None, "weapon": IronDagger}
-		self.inventory["Iron Dagger"] = IronDagger
+		self.add_inventory_item(IronDagger, 1)
 		self.inventory_win = curses.newwin(50, 65, 2, 110)
 		self.player_status = curses.newwin(10, 20, 38, 3)
 
@@ -207,10 +216,11 @@ class Player(Character):
 						else:
 							self.quests[quest]["quest completed"] = False
 			if requirement.lower() == "collect":
-				item = self.quests[quest]["objective"]["object"]
+				item_name = self.quests[quest]["objective"]["object"]
 				amount = self.quests[quest]["objective"]["amount"]
-				if item in self.inventory:
-						if self.inventory[item] >= amount:
+				for inv_item in self.inventory[0]:
+					if item_name == inv_item.name:
+						if self.inventory[1][self.inventory[0].index(inv_item)] >= amount:
 							self.quests[quest]["quest completed"] = True
 						else:
 							self.quests[quest]["quest completed"] = False
@@ -232,39 +242,39 @@ class Player(Character):
 		self.player_status.addstr(0, 1, "Player Info")
 		self.player_status.addstr(1, 1, "Health: " + str(self.health))
 		self.player_status.addstr(2, 1, "Strength: " + str(self.strength))
-		self.player_status.addstr(3, 1, "Defense: " + str(self.defense))
-		self.player_status.addstr(4, 1, "Race: " + str(self.race)[6:])
-		self.player_status.addstr(5, 1, "Level: " + str(self.level))
-		self.player_status.addstr(6, 1, "exp needed: " + str(self.exp_to_next_level - self.exp_for_next_level)[:len(
+		self.player_status.addstr(3, 1, "Coins: " + str(self.coins))
+		self.player_status.addstr(4, 1, "Defense: " + str(self.defense))
+		self.player_status.addstr(5, 1, "Race: " + str(self.race)[6:])
+		self.player_status.addstr(6, 1, "Level: " + str(self.level))
+		self.player_status.addstr(7, 1, "exp needed: " + str(self.exp_to_next_level - self.exp_for_next_level)[:len(
 			str(self.exp_to_next_level - self.exp_for_next_level)) - 2])
 		self.player_status.refresh()
 
 	def refresh_inventory_menu(self):
-		for item in self.inventory:
+		for item in self.inventory[0]:
 			self.inventory_win.deleteln()
 		self.inventory_win.refresh()
 
 	def open_inventory(self, log):
+		if not self.inventory[0]:
+			return
 		self.update_inventory()
 		self.inventory_win.keypad(True)
-		option = len(self.inventory) - 1
+		option = len(self.inventory[0]) - 1
 		input_key = -1
 		while input_key is not ord("i"):
 			self.refresh_inventory_menu()
-			selection = [0] * len(self.inventory)
+			selection = [0] * len(self.inventory[0])
 			selection[option] = curses.A_REVERSE
-			inventory_keys = list(self.inventory.keys())
 			equipped_items = list(self.equipped.values())
-			for item in inventory_keys:
+			for item in self.inventory[0]:
 				self.inventory_win.insertln()
-				if not isinstance(self.inventory[item], Item):
-					self.inventory_win.addstr(1, 1, item, selection[inventory_keys.index(item)])
-					self.inventory_win.addstr(1, 20, "amount: " + str(self.inventory[item]))
-				else:
-					self.inventory_win.addstr(1, 1, self.inventory[item].name, selection[inventory_keys.index(item)])
-					self.inventory_win.addstr(1, 20, "amount: 1")
-					if self.inventory[item] in equipped_items:
-						self.inventory_win.addstr(1, 35, "equipped")
+				index = self.inventory[0].index(item)
+				if isinstance(item, Item):
+					self.inventory_win.addstr(1, 1, item.name, selection[index])
+					self.inventory_win.addstr(1, 20, "amount: " + str(self.inventory[1][index]))
+				if self.inventory[0][index] in equipped_items:
+					self.inventory_win.addstr(1, 35, "equipped")
 			self.inventory_win.border()
 			self.inventory_win.addstr(0, 1, "Inventory")
 			self.inventory_win.refresh()
@@ -274,20 +284,19 @@ class Player(Character):
 			elif input_key == curses.KEY_DOWN:
 				option -= 1
 			if option < 0:
-				option = len(self.inventory) - 1
-			elif option >= len(self.inventory):
+				option = len(self.inventory[0]) - 1
+			elif option >= len(self.inventory[0]):
 				option = 0
 			if input_key == ord("1"):
-				item = self.inventory[inventory_keys[option]]
-				if isinstance(item, Item):
-					if isinstance(item, Armour):
-						self.equip_armour(item)
-					elif isinstance(item, Weapon):
-						self.equip_weapon(item)
-					self.set_stats_by_level_and_race()
-					self.update_player_status()
+				item = self.inventory[0][option]
+				if isinstance(item, Armour):
+					self.equip_armour(item)
+				elif isinstance(item, Weapon):
+					self.equip_weapon(item)
+				self.set_stats_by_level_and_race()
+				self.update_player_status()
 			elif input_key == ord("2"):
-				item = self.inventory[inventory_keys[option]]
+				item = self.inventory[0][option]
 				if isinstance(item, Item):
 					if isinstance(item, Armour):
 						self.unequip_armour(item)
@@ -397,12 +406,19 @@ class NPC(Character):
 				self.show_options(conversation, log, "1 - Accept")
 				key = conversation.getch()
 				if key is ord("1"):
-					player.add_inventory_item(quest["reward"]["object"], quest["reward"]["amount"])
+					if quest["reward"]["object"] == "Coins":
+						player.coins += quest["reward"]["amount"]
+					else:
+						player.add_inventory_item(quest["reward"]["object"], quest["reward"]["amount"])
 					player.increase_exp(quest["reward"]["exp"])
 					if quest["objective"]["requirement"] == "collect":
 						item = quest["objective"]["object"]
 						amount = quest["objective"]["amount"]
-						player.inventory[item] -= amount
+						for inv_item in player.inventory[0]:
+							if inv_item.name == item:
+								index = player.inventory[0].index(inv_item)
+						player.inventory[1][index] -= amount
+						log.write("working\n")
 					del player.quests[quest["quest name"]]
 					if quest["quest type"] == "unique":
 						del self.dialogue["quest"][index]
@@ -456,29 +472,55 @@ class NPC(Character):
 				self.trade(player, trade_window, conversation, log)
 			self.conversation_start(conversation)
 
-	def refresh_trade_menu(self, journal):
-		for item in self.trade_inventory:
+	def refresh_trade_menu(self, journal, inv):
+		for item in inv:
 			journal.deleteln()
 			journal.refresh()
 
 	# TODO improve the trade system
 	def trade(self, player, journal, conversation, log):
-		for item in self.trade_inventory:
-			journal.insertln()
+		input_key = -1
 		conversation.keypad(True)
 		conversation.clear()
 		conversation.border()
-		conversation.addstr(1, 1, "1 - buy item")
-		conversation.addstr(2, 1, "2 - leave trade")
-		option = 0
+		conversation.addstr(1, 1, "1 - buy")
+		conversation.addstr(2, 1, "2 - sell")
+		conversation.addstr(3, 1, "3 - leave")
+		buy = True
+		while input_key != ord("3"):
+			input_key = conversation.getch()
+			if input_key == ord("1"):
+				break
+			elif input_key == ord("2"):
+				buy = False
+				if not player.inventory[0]:
+					return
+				else:
+					break
+		else:
+			return
 		input_key = -1
+		conversation.clear()
+		conversation.border()
+		if buy:
+			conversation.addstr(1, 1, "1 - buy item")
+			conversation.addstr(2, 1, "2 - leave trade")
+			inv = self.trade_inventory
+		else:
+			conversation.addstr(1, 1, "1 - sell item")
+			conversation.addstr(2, 1, "2 - leave trade")
+			inv = player.inventory[0]
+		for item in inv:
+			journal.insertln()
+		option = 0
 		while input_key is not ord("2"):
-			self.refresh_trade_menu(journal)
-			selection = [0] * len(self.trade_inventory)
+			self.refresh_trade_menu(journal, inv)
+			journal.clear()
+			selection = [0] * len(inv)
 			selection[option] = curses.A_REVERSE
-			for item in self.trade_inventory:
+			for item in inv:
 				journal.insertln()
-				journal.addstr(1, 1, item.name, selection[self.trade_inventory.index(item)])
+				journal.addstr(1, 1, item.name, selection[inv.index(item)])
 				journal.addstr(1, 20, "value: " + str(item.value))
 			journal.border()
 			journal.refresh()
@@ -488,15 +530,25 @@ class NPC(Character):
 			elif input_key == curses.KEY_DOWN:
 				option -= 1
 			if option < 0:
-				option = len(self.trade_inventory) - 1
-			elif option >= len(self.trade_inventory):
+				option = len(inv) - 1
+			elif option >= len(inv):
 				option = 0
 			if input_key == ord("1"):
-				if player.inventory["Coins"] >= self.trade_inventory[option].value:
-					player.inventory["Coins"] -= self.trade_inventory[option].value
-					player.add_inventory_item(self.trade_inventory[option])
+				if buy:
+					if player.coins >= inv[option].value:
+						player.coins -= inv[option].value
+						player.add_inventory_item(inv[option])
+				else:
+					player.coins += inv[option].value
+					player.remove_inventory_item(inv[option])
+					option -= 1
+					if option <= 0:
+						option = 0
+					if len(inv) == 0:
+						break
+				player.update_player_status()
 		else:
-			for item in self.trade_inventory:
+			for item in inv:
 				journal.deleteln()
 				journal.border()
 				journal.refresh()
@@ -649,4 +701,4 @@ class Enemy(Character):
 		super().death()
 		player.increase_exp(self.increase_exp_by)
 		if self.race is Races.Wolf:
-			player.add_inventory_item("Wolf Pelt", 1)
+			player.add_inventory_item(WolfPelt, 1)
