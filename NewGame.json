@@ -70,7 +70,8 @@
             "total_exp": 0,
             "trade_inventory": [
                 "Leather Helmet",
-                "Leather Gloves"
+                "Leather Gloves",
+	            "Iron Sword"
             ]
         },
         {
@@ -160,7 +161,8 @@
             "total_exp": 0,
             "trade_inventory": [
                 "Leather Armour",
-                "Leather Pants"
+                "Leather Pants",
+	            "Iron Dagger"
             ]
         },
         {
@@ -233,7 +235,8 @@
             "total_exp": 0,
             "trade_inventory": [
                 "Leather Shoes",
-                "Leather Belt"
+                "Leather Belt",
+                "Iron Club"
             ]
         }
     ],

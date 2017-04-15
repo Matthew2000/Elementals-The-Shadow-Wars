@@ -78,7 +78,6 @@ try:
 		load_player_equipment(player1, save)
 		load_enemies(save, all_enemies, DebugLog)
 		load_npcs(save, all_NPCs, DebugLog)
-		load_npc_dialogue(all_NPCs, DebugLog)
 	else:
 		new_game(save, all_enemies, all_NPCs, DebugLog)
 
@@ -185,7 +184,6 @@ try:
 	update_enemy_locations(all_enemies, MAP)
 	update_npc_locations(all_NPCs, MAP)
 	save_player(player1, save, DebugLog)
-	save_npc_dialogue(all_NPCs, DebugLog)
 	save_npcs(save, all_NPCs, DebugLog)
 	save_enemies(save, all_enemies, DebugLog)
 except:

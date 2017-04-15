@@ -466,6 +466,10 @@ class NPC(Character):
 		for item in self.trade_inventory:
 			journal.insertln()
 		conversation.keypad(True)
+		conversation.clear()
+		conversation.border()
+		conversation.addstr(1, 1, "1 - buy item")
+		conversation.addstr(2, 1, "2 - leave trade")
 		option = 0
 		input_key = -1
 		while input_key is not ord("2"):

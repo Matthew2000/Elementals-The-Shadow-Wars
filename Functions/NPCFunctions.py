@@ -76,6 +76,7 @@ def load_npcs(save, npcs, log):
 		temp_npc.spawn_location = npc["spawn_location"]
 		temp_npc.endurance = npc["endurance"]
 		temp_npc.defense = npc["defense"]
+		temp_npc.dialogue = npc["dialogue"]
 		# load equipped npc items
 		if temp_npc.race is not Races.Wolf:
 			equipped_item = npc["equipped"]
@@ -144,7 +145,7 @@ def npc_at_location(location, npcs):
 		return {"result": False}
 
 
-def load_npc_dialogue(npcs, log):
+def load_npc_dialogue(npcs, log):  # for NEW game only
 	for npc in npcs:
 		filename = 'Dialogue/' + sanitize_filename(npc.name) + '.json'
 		if os.path.exists(filename):
@@ -152,11 +153,3 @@ def load_npc_dialogue(npcs, log):
 				npc.dialogue = json.load(a)
 				a.close()
 	log.write("load npc dialogue" + "\r\n")
-
-
-def save_npc_dialogue(npcs, log):
-	for npc in npcs:
-		with open('Dialogue/' + sanitize_filename(npc.name) + '.json', 'w') as a:
-			json.dump(npc.dialogue, a, sort_keys=True, indent=4)
-			a.close()
-	log.write("dialogue save" + "\r\n")
