@@ -127,6 +127,8 @@ def update_enemy_locations(enemies, map):
 				map.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
 			else:
 				enemy.location = enemy.prevlocation[:]  # keeps the Enemy at its current location
+		if map.inch(enemy.location[0], enemy.location[1]) == ord(" "):
+			map.addch(enemy.location[0], enemy.location[1], ord(enemy.character))
 
 
 def spawn_character(map, character, y, x):

@@ -100,19 +100,6 @@ def save_player(player, save, log):
 	log.write("player saved" + "\r\n")
 
 
-def update_player_status(player, player_stat_win):
-	player_stat_win.clear()
-	player_stat_win.border()
-	player_stat_win.addstr(0, 1, "Player Stats")
-	player_stat_win.addstr(1, 1, "Health: " + str(player.health))
-	player_stat_win.addstr(2, 1, "Strength: " + str(player.strength))
-	player_stat_win.addstr(3, 1, "Defense: " + str(player.defense))
-	player_stat_win.addstr(4, 1, "Race: " + str(player.race)[6:])
-	player_stat_win.addstr(5, 1, "Level: " + str(player.level))
-	player_stat_win.addstr(6, 1, "exp needed: " + str(player.exp_to_next_level - player.exp_for_next_level)[:len(str(player.exp_to_next_level - player.exp_for_next_level)) - 2])
-	player_stat_win.refresh()
-
-
 def update_journal(journal):
 	journal.border()
 	journal.refresh()
@@ -133,6 +120,8 @@ def update_player_location(player, map):
 			map.addch(player.prevlocation[0], player.prevlocation[1], " ")
 		else:
 			player.location = player.prevlocation[:]  # keeps the Enemy at its current location
+	if map.inch(player.location[0], player.location[1]) == ord(" "):
+		map.addch(player.location[0], player.location[1], ord(player.character))
 
 
 def print_to_journal(journal, message):
