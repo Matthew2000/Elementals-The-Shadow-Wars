@@ -174,6 +174,9 @@ class Player(Character):
 		self.inventory_win = curses.newwin(50, 65, 2, 110)
 		self.player_status = curses.newwin(10, 20, 38, 3)
 
+	def make_player_stat_win(self):
+		self.player_status = curses.newwin(10, 20, 38, 3)
+
 	def move(self, input_key, area):
 		self.prevlocation = self.location[:]
 		if input_key == curses.KEY_UP or input_key == ord("w"):

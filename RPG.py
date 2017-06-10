@@ -69,6 +69,7 @@ try:
 
 	# gets the dimensions of the map
 	dims = MAP.getmaxyx()
+	screen_dims = screen.getmaxyx()
 
 	player1 = create_player("Matthew", "@", Races.Human, dims)
 
@@ -113,6 +114,22 @@ try:
 			player1.level_up()
 
 		Key = MAP.getch()  # gets the player input
+
+		if Key == curses.KEY_RESIZE:
+			DebugLog.write(str(screen.getmaxyx()))
+			screen_dims = screen.getmaxyx()
+			screen.erase()
+			curses.doupdate()
+			update_player_location(player1, MAP)
+			update_enemy_locations(all_enemies, MAP)
+			update_npc_locations(all_NPCs, MAP)
+			player1.update_player_status()
+			journal.resize(50, 65)
+			MAP.resize(35, 100)
+			journal.refresh()
+			conversation = curses.newwin(10, 20, 38, 84)
+			player1.make_player_stat_win()
+			continue
 
 		number_of_turns += 1
 
