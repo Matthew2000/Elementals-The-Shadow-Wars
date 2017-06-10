@@ -8,6 +8,8 @@ from Functions.MainFunctions import *
 
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
+
+# initiates some required variables
 save = {"all_NPCs": [], "all_enemies": [], "player": {}}
 DebugLog = open('RPGLog.txt', 'w')
 error = open('RPGErrorLog.txt', 'w')
@@ -49,6 +51,7 @@ def start_combat(player, enemy):
 		print_to_journal(journal, "You have left combat")
 
 try:
+	# creates the screens and windows that are used in the game
 	screen = curses.initscr()
 	MAP = curses.newwin(35, 100, 2, 3)
 	trade_win = curses.newwin(50, 65, 2, 110)
@@ -56,21 +59,25 @@ try:
 	journal = curses.newwin(50, 65, 2, 110)
 	conversation = curses.newwin(10, 20, 38, 84)
 
+	# hides the cursor
 	curses.curs_set(0)
 	curses.noecho()
+
 	MAP.border()
 	MAP.keypad(True)
 	journal.keypad(True)
 
+	# gets the dimensions of the map
 	dims = MAP.getmaxyx()
 
 	player1 = create_player("Matthew", "@", Races.Human, dims)
 
+	# loads the save if it exits.
+	# if there is no save it makes a new game
 	if os.path.exists('save.json'):
 		with open('save.json', 'r') as f:
 			save = json.load(f)
 			f.close()
-
 
 		load_player(player1, save, DebugLog)
 		load_player_inventory(player1, save)
@@ -78,7 +85,7 @@ try:
 		load_enemies(save, all_enemies, DebugLog)
 		load_npcs(save, all_NPCs, DebugLog)
 	else:
-		new_game(save, all_enemies, all_NPCs, DebugLog)
+		new_game(all_enemies, all_NPCs, DebugLog)
 
 	spawn_character(MAP, player1, player1.location[0], player1.location[1])
 	place_enemies(all_enemies, MAP)
@@ -105,10 +112,11 @@ try:
 		if player1.exp_is_enough():
 			player1.level_up()
 
-		Key = MAP.getch()
+		Key = MAP.getch()  # gets the player input
 
 		number_of_turns += 1
 
+		# opens the player inventory
 		if Key is ord("i"):
 			conversation.border()
 			conversation.addstr(1, 1, "1 - equip")
@@ -127,6 +135,10 @@ try:
 			player1.update_quests(all_enemies, all_NPCs, journal)
 			if not player1.is_dead():
 				player1.move(Key, dims)
+
+				# checks to see if the player moves unto an enemy
+				# if so it starts combat
+				# if not the player regenerates health and updates its status
 				result = enemy_at_location(all_enemies, player1.location, enemy_status)
 				if result["result"] is True:
 					enemy1 = result["enemy"]
@@ -134,6 +146,9 @@ try:
 				else:
 					player1.regenerate_health()
 					player1.update_player_status()
+
+				# checks to see if the player moves unto an NPC
+				# if so it starts interacting with it
 				result = npc_at_location(player1.location, all_NPCs)
 				if result["result"] is True:
 					NPC = result["npc"]
@@ -149,11 +164,15 @@ try:
 						conversation.clear()
 						conversation.refresh()
 				update_player_location(player1, MAP)
+
+			# updates the quests that the player has then ends the player's turn
 			player1.update_quests(all_enemies, all_NPCs, journal)
 			player_turn = False
 
 		player_dead(player1, MAP, journal)
 
+		# moves the enemies and regenerates their health
+		# if the enemy moves unto the player, combat starts
 		if not player_turn:
 			for enemy in all_enemies:
 				if not enemy.is_dead():
@@ -180,6 +199,7 @@ try:
 		screen.refresh()
 		MAP.refresh()
 		update_game(player1, journal)
+
 	update_enemy_locations(all_enemies, MAP)
 	update_npc_locations(all_NPCs, MAP)
 	save_player(player1, save, DebugLog)
@@ -189,8 +209,12 @@ except:
 	DebugLog.write(str(sys.exc_info()))
 finally:
 	if os.path.exists('save.json.bak') and os.path.exists('save.json'):
-		os.remove('save.json.bak')
-		os.rename('save.json', 'save.json.bak')
+		temp = open("save.json", "r")
+		temp_save = json.load(temp)
+		if "total_exp" in temp_save["player"]:
+			os.remove('save.json.bak')
+			os.rename('save.json', 'save.json.bak')
+		temp.close()
 	with open('save.json', 'w') as f:
 		json.dump(save, f, sort_keys=True, indent=4)
 	f.close()

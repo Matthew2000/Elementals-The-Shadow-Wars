@@ -2,13 +2,16 @@ from Functions.EnemyFunctions import *
 from Functions.NPCFunctions import *
 import string
 
+
 def create_player(name: str, character: chr, race: Races, area):
+	"""creates a player object"""
 	temp_player = Player(name, character, race)
 	temp_player.location = [int(area[0]/2), int(area[1]/2)]
 	return temp_player
 
 
 def load_player(player, save, log):
+	"""loads all player stats from the save file"""
 	player.name = save["player"]["name"]
 	log.write(player.name + " ")
 	player.location = save["player"]["location"]
@@ -31,6 +34,7 @@ def load_player(player, save, log):
 
 
 def load_player_equipment(player, save):
+	"""loads the player's equipped items from the save file"""
 	equipped_item = save["player"]["equipped"]
 	for weapon in all_weapons:
 		if equipped_item["weapon"] is not None:
@@ -61,6 +65,7 @@ def load_player_equipment(player, save):
 
 
 def load_player_inventory(player, save):
+	"""loads the player inventory from the save file"""
 	player.inventory = save["player"]["inventory"]
 	for inv_item in player.inventory[0]:
 		index = player.inventory[0].index(inv_item)
@@ -70,6 +75,9 @@ def load_player_inventory(player, save):
 
 
 def save_player(player, save, log):
+	"""converts the player object into a dictionary
+	and then saves it in the save file
+	"""
 	del player.inventory_win
 	del player.player_status
 	save["player"] = player.__dict__
@@ -118,13 +126,12 @@ def update_player_status(player, player_stat_win):
 
 def update_journal(journal):
 	journal.border()
+	#journal.addstr(0, 1, "Journal")
 	journal.refresh()
 
 
 def update_game(player, journal):
 	player.update_player_status()
-	#update_player_status(player, player_stat_win)
-	#player.update_inventory()
 	update_journal(journal)
 
 
@@ -172,7 +179,7 @@ def set_all_stats(npcs, enemies):
 		enemy.increase_exp_by = int((enemy.level**2)/.4) + 5
 
 
-def new_game(save, enemies, npcs, log):
+def new_game(enemies, npcs, log):
 	with open('NewGame.json', 'r') as f:
 		save = json.load(f)
 		f.close()

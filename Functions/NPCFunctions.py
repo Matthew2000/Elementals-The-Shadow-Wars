@@ -4,6 +4,7 @@ from Functions.Func import *
 import curses
 import json
 
+
 def create_npc(name, character, race: Races, npcs, log):  # this function must be assigned to an object
 	var = False
 	for x in npcs:

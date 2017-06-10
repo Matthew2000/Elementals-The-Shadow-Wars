@@ -4,21 +4,13 @@ from random import randint
 from Items import *
 
 
-class AutoNumber(Enum):
-	def __new__(cls):
-		value = len(cls.__members__) + 1
-		obj = object.__new__(cls)
-		obj._value_ = value
-		return obj
-
-
-class Races(AutoNumber):
-	Human = ()     # 1
-	Avaker = ()    # 2
-	Elf = ()       # 3
-	Dragon = ()    # 4
-	Valkyrie = ()  # 5
-	Wolf = ()      # 6
+class Races(Enum):
+	Human = 1
+	Avaker = 2
+	Elf = 3
+	Dragon = 4
+	Valkyrie = 5
+	Wolf = 6
 
 
 class Character:
@@ -29,9 +21,9 @@ class Character:
 		self.max_health = 100
 		self.coins = 100
 		self.inventory = [
-							[WolfPelt],
-							[1]
-						]
+					[WolfPelt],
+					[1]
+					]
 		self.equipped = {"helmet": None, "chest": None, "gloves": None, "belt": None, "pants": None, "shoes": None, "weapon": None}
 		self.name = name
 		self.character = character
@@ -264,6 +256,7 @@ class Player(Character):
 		input_key = -1
 		while input_key is not ord("i"):
 			self.refresh_inventory_menu()
+			self.inventory_win.clear()
 			selection = [0] * len(self.inventory[0])
 			selection[option] = curses.A_REVERSE
 			equipped_items = list(self.equipped.values())

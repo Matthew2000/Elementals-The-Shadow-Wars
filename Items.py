@@ -1,18 +1,10 @@
 from enum import Enum
 
 
-class AutoNumber(Enum):
-	def __new__(cls):
-		value = len(cls.__members__) + 1
-		obj = object.__new__(cls)
-		obj._value_ = value
-		return obj
-
-
-class Weapons(AutoNumber):
-	Sword = ()   # 1
-	Dagger = ()  # 2
-	Club = ()    # 3
+class Weapons(Enum):
+	Sword = 1
+	Dagger = 2
+	Club = 3
 
 
 class Armours(Enum):
@@ -24,26 +16,36 @@ class Armours(Enum):
 	Shoes = "shoes"
 
 
+all_weapons = []
+
+all_armours = []
+
+all_items = []
+
+
 class Item:
 	def __init__(self, name, value, description, equipable):
 		self.name = name
 		self.value = value
 		self.description = description
 		self.equipable = equipable
+		all_items.append(self)
 
 
 class Weapon(Item):
 	def __init__(self, name, value, description, damage, weapon_type: Weapons):
-		super().__init__(name, value, description, True)
 		self.damage = damage
 		self.weapon_type = weapon_type
+		super().__init__(name, value, description, True)
+		all_weapons.append(self)
 
 
 class Armour(Item):
 	def __init__(self, name, value, description, protection, armour_type: Armours):
-		super().__init__(name, value, description, True)
 		self.protection = protection
 		self.armour_type = armour_type
+		super().__init__(name, value, description, True)
+		all_armours.append(self)
 
 WolfPelt = Item("Wolf Pelt", 10, "The hide of a wolf", False)
 
@@ -58,31 +60,3 @@ LeatherGloves = Armour("Leather Gloves", 10, "gloves made out of leather", 5, Ar
 LeatherBelt = Armour("Leather Belt", 10, "a belt made out of leather", 5, Armours.Belt)
 LeatherPants = Armour("Leather Pants", 10, "pants made out of leather", 15, Armours.Pants)
 LeatherShoes = Armour("Leather Shoes", 10, "shoes made out of leather", 5, Armours.Shoes)
-
-all_weapons = [
-	IronSword,
-	IronDagger,
-	IronClub
-]
-
-all_armours = [
-	LeatherHelmet,
-	LeatherArmour,
-	LeatherGloves,
-	LeatherBelt,
-	LeatherPants,
-	LeatherShoes
-]
-
-all_items = [
-	LeatherHelmet,
-	LeatherArmour,
-	LeatherGloves,
-	LeatherBelt,
-	LeatherPants,
-	LeatherShoes,
-	IronSword,
-	IronDagger,
-	IronClub,
-	WolfPelt
-]
