@@ -233,7 +233,7 @@ finally:
 			os.rename('save.json', 'save.json.bak')
 		temp.close()
 	with open('save.json', 'w') as f:
-		json.dump(save, f, sort_keys=True, indent=4)
+		json.dump(save, f, sort_keys=True)
 	f.close()
 	DebugLog.close()
 	error.close()
