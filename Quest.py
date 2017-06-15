@@ -21,6 +21,7 @@ class Quest:
 		self.exp_reward = exp_reward
 		self.object_reward = object_reward
 		self.description = description
+		self.completed = False
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -33,6 +34,9 @@ class Quest:
 		description = quest["description"]
 		new_quest = Quest(name, type, giver, coin_reward, exp_reward, object_reward, description)
 		return new_quest
+
+	def update_quest(self, player):
+		pass
 
 
 class CollectQuest(Quest):
@@ -52,6 +56,12 @@ class CollectQuest(Quest):
 													temp.object_reward, temp.description, item_to_collect, amount)
 		return new_quest
 
+	def update_quest(self, player):
+		if self.item_to_collect in player.inventory[0]:
+			index = player.inventory[0].index(self.item_to_collect)
+			if player.inventory[1][index] == self.amount:
+				self.completed = True
+
 
 class AssassinateQuest(Quest):
 	def __init__(self, name: str, giver: str,
@@ -67,6 +77,10 @@ class AssassinateQuest(Quest):
 		new_quest = AssassinateQuest(temp.name, temp.giver, temp.coin_reward, temp.exp_reward,
 													temp.object_reward, temp.description, target)
 		return new_quest
+
+	def update_quest(self, player):
+		if self.target.is_dead():
+			self.completed = True
 
 
 class KillQuest(Quest):
@@ -103,6 +117,12 @@ class CraftQuest(Quest):
 		new_quest = CraftQuest(temp.name, temp.giver, temp.coin_reward, temp.exp_reward,
 													temp.object_reward, temp.description, item, amount)
 		return new_quest
+
+	def update_quest(self, player):
+		if self.item in player.inventory[0]:
+			index = player.inventory[0].index(self.item)
+			if player.inventory[1][index] == self.amount:
+				self.completed = True
 
 
 class TalkQuest(Quest):

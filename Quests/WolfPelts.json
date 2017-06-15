@@ -1,0 +1,12 @@
+{
+  "description": "I will pay you for every five wolf pelts that you bring to me",
+  "completed": false,
+  "giver": "Darius",
+  "name": "Wolf Pelts",
+  "type": 1,
+  "coin_reward": 10,
+  "exp_reward": 10,
+  "object_reward": "reward object",
+  "item_to_collect": "Wolf Pelt",
+  "amount": 5
+}

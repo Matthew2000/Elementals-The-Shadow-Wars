@@ -1,40 +1,8 @@
 {
     "intro": "Hi my name is Darius.",
     "quest": [
-        {
-            "description": "If you kill Alice I will give you 100 coins.",
-            "objective": {
-                "amount": 0,
-                "object": "Alice",
-                "requirement": "kill"
-            },
-            "quest completed": false,
-            "quest giver": "Darius",
-            "quest name": "Slay the Elf",
-            "quest type": "unique",
-            "reward": {
-                "amount": 100,
-                "exp": 200,
-                "object": "Coins"
-            }
-        },
-        {
-            "description": "for every wolf pelt you me i will give you 10 coins.",
-            "objective": {
-                "amount": 1,
-                "object": "Wolf Pelt",
-                "requirement": "collect"
-            },
-            "quest completed": false,
-            "quest giver": "Darius",
-            "quest name": "Wolf Pelts",
-            "quest type": "repeat",
-            "reward": {
-                "amount": 10,
-                "exp": 10,
-                "object": "Coins"
-            }
-        }
+        "Slay The Elf",
+        "Wolf Pelts"
     ],
     "talk": "I am an NPC.",
     "trade": "Here is what I have to trade."

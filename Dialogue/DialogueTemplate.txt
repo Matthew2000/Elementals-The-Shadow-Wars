@@ -2,21 +2,14 @@
     "intro": "Hi my name is _____.",
     "quest": [
         {
-            "description": "quest description.",
-            "objective": {
-                "amount": 0,
-                "object": "object",
-                "requirement": "quest requirement"
-            },
-            "quest completed": false,
-            "quest giver": "_____",
-            "quest name": "name",
-	        "quest type": "unique",
-            "reward": {
-                "amount": 0,
-                "exp": 0,
-                "object": "reward object"
-            }
+            "description": "quest description.",\
+            "completed": false,
+            "giver": "_____",
+            "name": "name",
+	        "type": 1,
+            "coin_reward": 0,
+            "exp_reward": 0,
+            "object_reward": "reward object"
         }
     ],
     "talk": "I an NPC.",

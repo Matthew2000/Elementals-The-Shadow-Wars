@@ -1,24 +1,6 @@
 {
     "intro": "Hi my name is Rainbow Tooth.",
-    "quest": [
-        {
-            "description": "quest description.",
-            "objective": {
-                "amount": 0,
-                "object": "object",
-                "requirement": "quest requirement"
-            },
-            "quest completed": false,
-            "quest giver": "Rainbow Tooth",
-            "quest name": "name",
-            "quest type": "unique",
-            "reward": {
-                "amount": "reward amount",
-                "exp": 0,
-                "object": "reward object"
-            }
-        }
-    ],
+    "quest": [],
     "talk": "I am the tribe leader in the Avaker district",
     "trade": "Here is what I have to trade."
 }

@@ -1,0 +1,11 @@
+{
+  "description": "quest_description.",
+  "completed": false,
+  "giver": "_____",
+  "name": "name",
+  "type": 2,
+  "coin_reward": 0,
+  "exp_reward": 0,
+  "object_reward": "reward_object",
+  "target": "enemy_name"
+}

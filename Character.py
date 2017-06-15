@@ -68,7 +68,7 @@ class Character:
 				self.damage = 0
 			opponent.health -= self.damage
 
-	def death(self):  # kills the Character
+	def on_death(self):  # kills the Character
 		if self.health <= 0:
 			self.prevlocation = self.location[:]
 			self.location = [0, 0]
@@ -174,6 +174,7 @@ class Player(Character):
 		self.equipped = {"helmet": None, "chest": None, "gloves": None, "belt": None, "pants": None, "shoes": None, "weapon": IronDagger}
 		self.add_inventory_item(IronDagger, 1)
 		self.inventory_win = curses.newwin(50, 65, 2, 110)
+		self.quest_log_win = curses.newwin(50, 65, 2, 110)
 		self.player_status = curses.newwin(10, 20, 38, 3)
 
 	def make_player_stat_win(self):
@@ -303,6 +304,43 @@ class Player(Character):
 					self.set_stats_by_level_and_race()
 					self.update_player_status()
 
+	def update_quest_log(self):
+		self.quest_log_win.clear()
+		self.quest_log_win.border()
+		self.quest_log_win.addstr(0, 1, "Quest Log")
+
+	def refresh_quest_log(self):
+		for item in self.quests:
+			self.quest_log_win.deleteln()
+		self.quest_log_win.refresh()
+
+	def open_quest_log(self):
+		self.update_quest_log()
+		self.quest_log_win.keypad(True)
+		option = len(self.inventory[0]) - 1
+		input_key = -1
+		if len(self.quests) == 0:
+			self.quest_log_win.addstr(1, 1, "You have no quests right now.")
+			self.quest_log_win.refresh()
+		while input_key is not ord("l"):
+			input_key = self.quest_log_win.getch()
+			if len(self.quests) == 0:
+				self.quest_log_win.addstr(1, 1, "You have no quests right now.")
+				self.quest_log_win.refresh()
+				continue
+			self.refresh_quest_log()
+			self.quest_log_win.clear()
+			selection = [0] * len(self.quests)
+			selection[option] = curses.A_REVERSE
+			for quest in self.quests:
+				self.quest_log_win.insertln()
+				index = self.quests.index(quest)
+				self.inventory_win.addstr(1, 1, quest.name, selection[index])
+				#self.inventory_win.addstr(1, 20, "amount: " + str(self.inventory[1][index]))
+
+	def on_death(self):
+		self.respawn(self.location[0], self.location[1])
+
 
 
 class NPC(Character):
@@ -312,9 +350,11 @@ class NPC(Character):
 		self.talking = False
 		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": [{"quest name": "name", "quest type": "unique", "description": "quest description.", "objective": {"amount": 0, "requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount", "exp": 0}, "quest completed": False, "quest giver": self.name}], "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 		self.has_quest = False
+		self.quests = []
+		self.spawn_location = []
 		self.respawn_counter = 0
 		self.respawnable = False
-		self.trade_inventory = [LeatherArmour, LeatherHelmet, LeatherShoes, LeatherPants, LeatherBelt, LeatherGloves]
+		self.trade_inventory = []
 
 	def move(self, area):
 		if self.allow_movement:
@@ -693,8 +733,8 @@ class Enemy(Character):
 				else:
 					self.move_left()
 
-	def death(self, player):
-		super().death()
+	def on_death(self, player):
+		super().on_death()
 		player.increase_exp(self.increase_exp_by)
 		if self.race is Races.Wolf:
 			player.add_inventory_item(WolfPelt, 1)

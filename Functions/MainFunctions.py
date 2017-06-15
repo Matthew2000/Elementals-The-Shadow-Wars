@@ -80,6 +80,7 @@ def save_player(player, save, log):
 	"""
 	del player.inventory_win
 	del player.player_status
+	del player.quest_log_win
 	save["player"] = player.__dict__
 	save["player"]["race"] = save["player"]["race"].value
 	equipped_item = save["player"]["equipped"]
@@ -163,7 +164,7 @@ def player_at_location(player, location):
 def player_dead(player, map, journal):
 	if player.is_dead():
 		if map.inch(player.location[0], player.location[1]) == ord(player.character):
-			player.death()
+			player.on_death()
 			map.addch(player.prevlocation[0], player.prevlocation[1], " ")
 			print_to_journal(journal, player.name + " is dead")
 
@@ -196,7 +197,7 @@ def new_game(enemies, npcs, log):
 def is_enemy_dead(enemy, player, map, journal):
 	if enemy.is_dead():
 		if map.inch(enemy.location[0], enemy.location[1]) == ord(enemy.character):
-			enemy.death(player)
+			enemy.on_death(player)
 			map.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
 			print_to_journal(journal, enemy.name + " is dead")
 			enemy.prevlocation = enemy.location[:]

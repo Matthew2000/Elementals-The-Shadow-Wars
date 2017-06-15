@@ -150,6 +150,9 @@ try:
 			conversation.clear()
 			conversation.refresh()
 
+		if Key is ord("l"):
+			player1.open_quest_log()
+
 		if Key is ord("r"):
 			if player1.is_dead():
 				player1.respawn(30, 50)
@@ -241,7 +244,7 @@ finally:
 			os.rename('save.json', 'save.json.bak')
 		temp.close()
 	with open('save.json', 'w') as f:
-		json.dump(save, f, sort_keys=True, indent=4)
+		json.dump(save, f, sort_keys=True, indent=2)
 	f.close()
 	DebugLog.close()
 	error.close()
