@@ -37,6 +37,7 @@ class Character:
 		self.exp_for_next_level = 0
 		self.exp_to_next_level = float(25)
 		self.health_regen = 5
+		self.spawn_location = [10, 10]
 
 	def move_up(self):
 		if self.location[0] > 1:
@@ -166,8 +167,9 @@ class Character:
 
 
 class Player(Character):
-	def __init__(self, name: str, character: chr, race: Races):
+	def __init__(self, name: str, character: chr, race: Races, spawn_point):
 		super().__init__(name, character, race)
+		self.spawn_location = spawn_point[:]
 		self.quests = {}
 		self.equipped = {"helmet": None, "chest": None, "gloves": None, "belt": None, "pants": None, "shoes": None, "weapon": IronDagger}
 		self.add_inventory_item(IronDagger, 1)
@@ -310,7 +312,6 @@ class NPC(Character):
 		self.talking = False
 		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": [{"quest name": "name", "quest type": "unique", "description": "quest description.", "objective": {"amount": 0, "requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount", "exp": 0}, "quest completed": False, "quest giver": self.name}], "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 		self.has_quest = False
-		self.spawn_location = [10, 10]
 		self.respawn_counter = 0
 		self.respawnable = False
 		self.trade_inventory = [LeatherArmour, LeatherHelmet, LeatherShoes, LeatherPants, LeatherBelt, LeatherGloves]
@@ -601,7 +602,6 @@ class Enemy(Character):
 		self.increase_exp_by = int((self.level**2)/.4) + 5
 		self.ID = ID
 		self.health_regen = 15
-		self.spawn_location = [10, 10]
 		self.respawn_counter = 0
 		self.respawnable = False
 		self.allow_movement = True

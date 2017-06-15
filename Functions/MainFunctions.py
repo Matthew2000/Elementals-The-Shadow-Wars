@@ -1,12 +1,12 @@
 from Functions.EnemyFunctions import *
 from Functions.NPCFunctions import *
+from Maps.Environment import *
 import string
 
 
-def create_player(name: str, character: chr, race: Races, area):
-	"""creates a player object"""
-	temp_player = Player(name, character, race)
-	temp_player.location = [int(area[0]/2), int(area[1]/2)]
+def create_player(name: str, character: chr, race: Races, spawn_point):
+	temp_player = Player(name, character, race, spawn_point)
+	temp_player.location = temp_player.spawn_location
 	return temp_player
 
 
@@ -122,13 +122,27 @@ def update_game(player, journal):
 	update_journal(journal)
 
 
-def update_player_location(player, map):
+def update_player_location(player, map, log):
 	if player.prevlocation.__ne__(player.location):  # moves the Enemy
 		if map.inch(player.location[0], player.location[1]) == ord(
 				" "):  # stops Enemy from moving if there's a enemy there
 			map.addch(player.location[0], player.location[1], ord(player.character))
 			map.addch(player.prevlocation[0], player.prevlocation[1], " ")
+			player.prevlocation = player.location[:]
 		else:
+			global current_map
+			if map.inch(player.location[0], player.location[1]) == ord("∨"):
+				current_map = current_map.go_to_map("north", log)
+				current_map.show_map(map)
+			if map.inch(player.location[0], player.location[1]) == ord("^"):
+				current_map = current_map.go_to_map("south", log)
+				current_map.show_map(map)
+			if map.inch(player.location[0], player.location[1]) == ord(">"):
+				current_map = current_map.go_to_map("west", log)
+				current_map.show_map(map)
+			if map.inch(player.location[0], player.location[1]) == ord("<"):
+				current_map = current_map.go_to_map("east", log)
+				current_map.show_map(map)
 			player.location = player.prevlocation[:]  # keeps the Enemy at its current location
 	if map.inch(player.location[0], player.location[1]) == ord(" "):
 		map.addch(player.location[0], player.location[1], ord(player.character))

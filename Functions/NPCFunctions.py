@@ -121,6 +121,7 @@ def update_npc_locations(npcs, map):
 					" "):  # stops NPC from moving if there's a character there
 				map.addch(npc.location[0], npc.location[1], ord(npc.character))
 				map.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
+				npc.prevlocation = npc.location[:]
 			else:
 				npc.location = npc.prevlocation[:]  # keeps the NPC at its current location
 		if map.inch(npc.location[0], npc.location[1]) == ord(" "):

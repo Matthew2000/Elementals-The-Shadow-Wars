@@ -125,6 +125,7 @@ def update_enemy_locations(enemies, map):
 					" "):  # stops Enemy from moving if there's a enemy there
 				map.addch(enemy.location[0], enemy.location[1], ord(enemy.character))
 				map.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
+				enemy.prevlocation = enemy.location[:]
 			else:
 				enemy.location = enemy.prevlocation[:]  # keeps the Enemy at its current location
 		if map.inch(enemy.location[0], enemy.location[1]) == ord(" "):

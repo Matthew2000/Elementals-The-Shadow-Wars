@@ -4,6 +4,7 @@ import locale
 from Character import *
 import curses
 from Functions.MainFunctions import *
+from Maps.Environment import *
 
 
 locale.setlocale(locale.LC_ALL, '')
@@ -71,7 +72,9 @@ try:
 	dims = MAP.getmaxyx()
 	screen_dims = screen.getmaxyx()
 
-	player1 = create_player("Matthew", "@", Races.Human, dims)
+	player1 = create_player("Matthew", "@", Races.Human, [23, 71])
+
+	map1.show_map(MAP)
 
 	# loads the save if it exits.
 	# if there is no save it makes a new game
@@ -102,6 +105,11 @@ try:
 
 	while Key != ord("q"):
 
+		#current_map.show_map(MAP)
+		update_npc_locations(all_NPCs, MAP)
+		update_enemy_locations(all_NPCs, MAP)
+		update_player_location(player1, MAP, DebugLog)
+
 		screen.refresh()
 		MAP.refresh()
 		MAP.border()
@@ -116,11 +124,10 @@ try:
 		Key = MAP.getch()  # gets the player input
 
 		if Key == curses.KEY_RESIZE:
-			DebugLog.write(str(screen.getmaxyx()))
 			screen_dims = screen.getmaxyx()
 			screen.erase()
 			curses.doupdate()
-			update_player_location(player1, MAP)
+			update_player_location(player1, MAP, DebugLog)
 			update_enemy_locations(all_enemies, MAP)
 			update_npc_locations(all_NPCs, MAP)
 			player1.update_player_status()
@@ -180,9 +187,10 @@ try:
 						NPC.talking = False
 						conversation.clear()
 						conversation.refresh()
-				update_player_location(player1, MAP)
 
-			# updates the quests that the player has then ends the player's turn
+				# updates the quests that the player has then ends the player's turn
+				update_player_location(player1, MAP, DebugLog)
+
 			player1.update_quests(all_enemies, all_NPCs, journal)
 			player_turn = False
 
