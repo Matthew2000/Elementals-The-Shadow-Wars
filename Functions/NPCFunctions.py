@@ -1,9 +1,8 @@
+import json
 import os.path
-from Character import *
+
 from Functions.Func import *
 from Quest import *
-import curses
-import json
 
 
 def create_npc(name, character, race: Races, npcs, log):  # this function must be assigned to an object
@@ -21,7 +20,8 @@ def save_npcs(save, npcs, log):
 	all_NPCs = npcs[:]
 	npcs.clear()
 	for npc in all_NPCs:
-		temp_npc = npc.__dict__
+		temp_npc = npc.save_character(log)
+		"""temp_npc = npc.__dict__
 		temp_npc["race"] = temp_npc["race"].value
 		equipped_item = temp_npc["equipped"]
 		if equipped_item["helmet"] is not None:
@@ -51,7 +51,7 @@ def save_npcs(save, npcs, log):
 			for item in temp_npc["trade_inventory"]:
 				item = item.__dict__
 				temp_npc["trade_inventory"][x] = item["name"]
-				x += 1
+				x += 1"""
 		npcs.append(temp_npc)
 	save["all_NPCs"].clear()
 	save["all_NPCs"] = npcs[:]
@@ -79,7 +79,7 @@ def load_npcs(save, npcs, log):
 		temp_npc.endurance = npc["endurance"]
 		temp_npc.defense = npc["defense"]
 		temp_npc.dialogue = npc["dialogue"]
-		temp_npc.quests = load_npc_quests(temp_npc.dialogue["quest"], log)
+		temp_npc.quests = load_quests(temp_npc.dialogue["quest"], log)
 		log.write("working\n")
 		# load equipped npc items
 		if temp_npc.race is not Races.Wolf:
@@ -161,7 +161,8 @@ def load_npc_dialogue(npcs, log):  # for NEW game only
 	log.write("load npc dialogue" + "\r\n")
 
 
-def load_npc_quests(npc_quests, log):
+def load_quests(npc_quests, log):
+	quests = []
 	for quest in npc_quests:
 			filename = 'Quests/' + sanitize_filename(quest) + '.json'
 			if os.path.exists(filename):
@@ -169,12 +170,13 @@ def load_npc_quests(npc_quests, log):
 					quest_dictionary = json.load(a)
 					a.close()
 				if quest_dictionary["type"] == 1:
-					return CollectQuest.dictionary(quest_dictionary)
+					quests.append(CollectQuest.dictionary(quest_dictionary))
 				if quest_dictionary["type"] == 2:
-					return AssassinateQuest.dictionary(quest_dictionary)
+					quests.append(AssassinateQuest.dictionary(quest_dictionary))
 				if quest_dictionary["type"] == 3:
-					return KillQuest.dictionary(quest_dictionary)
+					quests.append(KillQuest.dictionary(quest_dictionary))
 				if quest_dictionary["type"] == 4:
-					return CraftQuest.dictionary(quest_dictionary)
+					quests.append(CraftQuest.dictionary(quest_dictionary))
 				if quest_dictionary["type"] == 5:
-					return TalkQuest.dictionary(quest_dictionary)
+					quests.append(TalkQuest.dictionary(quest_dictionary))
+	return quests

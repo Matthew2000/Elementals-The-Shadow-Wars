@@ -1,7 +1,4 @@
-import os.path
-from Character import *
-import curses
-import json
+from BaseClasses.Character import *
 
 
 def create_enemy(ID, name, character, race: Races, enemies, log):  # this function must be assigned to an object

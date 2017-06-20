@@ -1,11 +1,9 @@
 #!/usr/bin/python3
-import sys
 import locale
-from Character import *
-import curses
+import sys
+
 from Functions.MainFunctions import *
 from Maps.Environment import *
-
 
 locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"

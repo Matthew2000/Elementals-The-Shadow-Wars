@@ -1,5 +1,6 @@
 from Functions.EnemyFunctions import *
 from Functions.NPCFunctions import *
+from BaseClasses.Player import *
 from Maps.Environment import *
 import string
 
@@ -15,11 +16,11 @@ def load_player(player, save, log):
 	player.name = save["player"]["name"]
 	log.write(player.name + " ")
 	player.location = save["player"]["location"]
-	player.prevlocation = save["player"]["prevlocation"]
+	player.prevlocation = player.location[:]
 	player.health = save["player"]["health"]
 	player.character = save["player"]["character"]
 	player.max_health = save["player"]["max_health"]
-	player.quests = save["player"]["quests"]
+	player.quests = load_quests(save["player"]["quests"], log)
 	player.race = Races(save["player"]["race"])
 	player.level = save["player"]["level"]
 	player.total_exp = save["player"]["total_exp"]
@@ -78,7 +79,8 @@ def save_player(player, save, log):
 	"""converts the player object into a dictionary
 	and then saves it in the save file
 	"""
-	del player.inventory_win
+	save["player"] = player.save_character(log)
+	"""del player.inventory_win
 	del player.player_status
 	del player.quest_log_win
 	save["player"] = player.__dict__
@@ -108,7 +110,7 @@ def save_player(player, save, log):
 	for item in save["player"]["inventory"][0]:
 		index = save["player"]["inventory"][0].index(item)
 		if isinstance(save["player"]["inventory"][0][index], Item):
-			save["player"]["inventory"][0][index] = save["player"]["inventory"][0][index].name
+			save["player"]["inventory"][0][index] = save["player"]["inventory"][0][index].name"""
 	log.write("player saved" + "\r\n")
 
 

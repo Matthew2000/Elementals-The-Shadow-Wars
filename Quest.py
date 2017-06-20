@@ -1,6 +1,8 @@
 from enum import Enum
+
 import Items
-import Character
+from BaseClasses.Character import Enemy
+from BaseClasses.NPC import *
 
 
 class QuestType(Enum):
@@ -65,8 +67,8 @@ class CollectQuest(Quest):
 
 class AssassinateQuest(Quest):
 	def __init__(self, name: str, giver: str,
-											coin_reward: int, exp_reward: float, object_reward: Items.Item,
-											description: str, target: Character.Enemy):
+	             coin_reward: int, exp_reward: float, object_reward: Items.Item,
+	             description: str, target: Enemy):
 		super().__init__(name, QuestType.Assassinate, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
 
@@ -85,8 +87,8 @@ class AssassinateQuest(Quest):
 
 class KillQuest(Quest):
 	def __init__(self, name: str, giver: str,
-											coin_reward: int, exp_reward: float, object_reward: Items.Item,
-											description: str, target: Character.Enemy, amount: int):
+	             coin_reward: int, exp_reward: float, object_reward: Items.Item,
+	             description: str, target: Enemy, amount: int):
 		super().__init__(name, QuestType.Kill, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
 		self.amount = amount
@@ -127,8 +129,8 @@ class CraftQuest(Quest):
 
 class TalkQuest(Quest):
 	def __init__(self, name: str, giver: str,
-											coin_reward: int, exp_reward: float, object_reward: Items.Item,
-											description: str, person: Character.NPC):
+	             coin_reward: int, exp_reward: float, object_reward: Items.Item,
+	             description: str, person: NPC):
 		super().__init__(name, QuestType.Talk, giver, coin_reward, exp_reward, object_reward, description)
 		self.person = person
 
