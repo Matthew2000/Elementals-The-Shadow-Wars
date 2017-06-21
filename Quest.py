@@ -1,8 +1,10 @@
 from enum import Enum
+import json
+import os
 
+import Functions.Func as Func
+from BaseClasses import NPC
 import Items
-from BaseClasses.Character import Enemy
-from BaseClasses.NPC import *
 
 
 class QuestType(Enum):
@@ -68,7 +70,7 @@ class CollectQuest(Quest):
 class AssassinateQuest(Quest):
 	def __init__(self, name: str, giver: str,
 	             coin_reward: int, exp_reward: float, object_reward: Items.Item,
-	             description: str, target: Enemy):
+	             description: str, target: NPC.Enemy):
 		super().__init__(name, QuestType.Assassinate, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
 
@@ -88,7 +90,7 @@ class AssassinateQuest(Quest):
 class KillQuest(Quest):
 	def __init__(self, name: str, giver: str,
 	             coin_reward: int, exp_reward: float, object_reward: Items.Item,
-	             description: str, target: Enemy, amount: int):
+	             description: str, target: NPC.Enemy, amount: int):
 		super().__init__(name, QuestType.Kill, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
 		self.amount = amount
@@ -141,3 +143,24 @@ class TalkQuest(Quest):
 		new_quest = TalkQuest(temp.name, temp.giver, temp.coin_reward, temp.exp_reward,
 													temp.object_reward, temp.description, person)
 		return new_quest
+
+
+def load_quests(npc_quests, log):
+	quests = []
+	for quest in npc_quests:
+			filename = 'Quests/' + Func.sanitize_filename(quest) + '.json'
+			if os.path.exists(filename):
+				with open(filename, 'r') as a:
+					quest_dictionary = json.load(a)
+					a.close()
+				if quest_dictionary["type"] == 1:
+					quests.append(CollectQuest.dictionary(quest_dictionary))
+				if quest_dictionary["type"] == 2:
+					quests.append(AssassinateQuest.dictionary(quest_dictionary))
+				if quest_dictionary["type"] == 3:
+					quests.append(KillQuest.dictionary(quest_dictionary))
+				if quest_dictionary["type"] == 4:
+					quests.append(CraftQuest.dictionary(quest_dictionary))
+				if quest_dictionary["type"] == 5:
+					quests.append(TalkQuest.dictionary(quest_dictionary))
+	return quests

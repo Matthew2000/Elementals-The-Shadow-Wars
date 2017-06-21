@@ -1,4 +1,16 @@
+import curses
+import json
+import os
+
 from BaseClasses.Character import *
+from Functions import Func
+import Quest
+
+
+class Relationship(Enum):
+	Friend = 0
+	Neutral = 1
+	Enemy = 2
 
 
 class NPC(Character):
@@ -13,6 +25,70 @@ class NPC(Character):
 		self.respawn_counter = 0
 		self.respawnable = False
 		self.trade_inventory = []
+		self.relationship = Relationship.Neutral
+
+	@classmethod
+	def dictionary(cls, npc_data: dict, log):
+		name = npc_data["name"]
+		character = npc_data["character"]
+		race = npc_data["race"]
+		temp_npc = NPC(name, character, Races(race))
+
+		filename = 'NPCs/' + Func.sanitize_filename(name) + '.json'
+		file = open(filename, "r")
+		npc_data = json.load(file)
+		temp_npc.location = npc_data["location"]
+		temp_npc.prevlocation = temp_npc.location[:]
+		temp_npc.health = npc_data["health"]
+		temp_npc.max_health = npc_data["max_health"]
+		temp_npc.character = npc_data["character"]
+		log.write("working\n")
+		temp_npc.inventory = Func.load_inventory(npc_data["inventory"])
+		temp_npc.has_quest = npc_data["has_quest"]
+		temp_npc.level = npc_data["level"]
+		temp_npc.total_exp = npc_data["total_exp"]
+		temp_npc.exp_for_next_level = npc_data["exp_for_next_level"]
+		temp_npc.exp_to_next_level = npc_data["exp_to_next_level"]
+		temp_npc.strength = npc_data["strength"]
+		temp_npc.respawnable = npc_data["respawnable"]
+		temp_npc.spawn_location = npc_data["spawn_location"]
+		temp_npc.endurance = npc_data["endurance"]
+		temp_npc.defense = npc_data["defense"]
+		temp_npc.dialogue = npc_data["dialogue"]
+		temp_npc.quests = Quest.load_quests(npc_data["quests"], log)
+		temp_npc.relationship = Relationship(npc_data["relationship"])
+		# load equipped npc items
+		if temp_npc.race is not Races.Wolf:
+			equipped_item = npc_data["equipped"]
+			for weapon in Items.all_weapons:
+				if equipped_item["weapon"] is not None:
+					if equipped_item["weapon"] == weapon.name:
+						temp_npc.equipped["weapon"] = weapon
+			for armour in Items.all_armours:
+				if equipped_item["helmet"] is not None:
+					if equipped_item["helmet"] == armour.name:
+						temp_npc.equipped["helmet"] = armour
+				if equipped_item["chest"] is not None:
+					if equipped_item["chest"] == armour.name:
+						temp_npc.equipped["chest"] = armour
+				if equipped_item["gloves"] is not None:
+					if equipped_item["gloves"] == armour.name:
+						temp_npc.equipped["gloves"] = armour
+				if equipped_item["belt"] is not None:
+					if equipped_item["belt"] == armour.name:
+						temp_npc.equipped["belt"] = armour
+				if equipped_item["pants"] is not None:
+					if equipped_item["pants"] == armour.name:
+						temp_npc.equipped["pants"] = armour
+				if equipped_item["shoes"] is not None:
+					if equipped_item["shoes"] == armour.name:
+						temp_npc.equipped["shoes"] = armour
+		# load items to trade
+		for trade_item in npc_data["trade_inventory"]:
+			for item in Items.all_items:
+				if trade_item == item.name:
+					temp_npc.trade_inventory.append(item)
+		return temp_npc
 
 	def move(self, area):
 		if self.allow_movement:
@@ -296,4 +372,95 @@ class NPC(Character):
 	def save_character(self, log):
 		character = super().save_character(log)
 		character["allow_movement"] = self.allow_movement
+		character["relationship"] = self.relationship.value
 		return character
+
+
+def create_npc(name, character, race: Races, npcs, log):  # this function must be assigned to an object
+	var = False
+	for x in npcs:
+		if name == x.name:  # name must be the same as the object name
+			var = True
+			log.write(x.name + " is already there" + "\r\n")
+	if not var:
+		npcs.append(NPC(name, character, race))
+	return npcs[len(npcs) - 1]
+
+
+def save_npcs(save, npcs, log):
+	all_NPCs = npcs[:]
+	npcs.clear()
+	for npc in all_NPCs:
+		temp_npc = npc.save_character(log)
+		"""temp_npc = npc.__dict__
+		temp_npc["race"] = temp_npc["race"].value
+		equipped_item = temp_npc["equipped"]
+		if equipped_item["helmet"] is not None:
+			equipped_item["helmet"] = equipped_item["helmet"].__dict__
+			equipped_item["helmet"] = equipped_item["helmet"]["name"]
+			log.write(str(equipped_item["helmet"]) + "\r\n")
+		if equipped_item["chest"] is not None:
+			equipped_item["chest"] = equipped_item["chest"].__dict__
+			equipped_item["chest"] = equipped_item["chest"]["name"]
+		if equipped_item["gloves"] is not None:
+			equipped_item["gloves"] = equipped_item["gloves"].__dict__
+			equipped_item["gloves"] = equipped_item["gloves"]["name"]
+		if equipped_item["belt"] is not None:
+			equipped_item["belt"] = equipped_item["belt"].__dict__
+			equipped_item["belt"] = equipped_item["belt"]["name"]
+		if equipped_item["pants"] is not None:
+			equipped_item["pants"] = equipped_item["pants"].__dict__
+			equipped_item["pants"] = equipped_item["pants"]["name"]
+		if equipped_item["shoes"] is not None:
+			equipped_item["shoes"] = equipped_item["shoes"].__dict__
+			equipped_item["shoes"] = equipped_item["shoes"]["name"]
+		if equipped_item["weapon"] is not None:
+			equipped_item["weapon"] = equipped_item["weapon"].__dict__
+			equipped_item["weapon"] = equipped_item["weapon"]["name"]
+		if temp_npc["trade_inventory"] is not []:
+			x = 0
+			for item in temp_npc["trade_inventory"]:
+				item = item.__dict__
+				temp_npc["trade_inventory"][x] = item["name"]
+				x += 1"""
+		npcs.append(temp_npc)
+	save["all_NPCs"].clear()
+	save["all_NPCs"] = npcs[:]
+	log.write("save NPCs" + "\r\n")
+
+
+def npc_at_location(location, npcs):
+	for npc in npcs:
+		if npc.location[0] is location[0] and npc.location[1] is location[1]:
+			return {"result": True, "npc": npc}
+	else:
+		return {"result": False}
+
+
+def load_npc_dialogue(npcs, log):  # for NEW game only
+	for npc in npcs:
+		filename = 'Dialogue/' + Func.sanitize_filename(npc.name) + '.json'
+		if os.path.exists(filename):
+			with open(filename, 'r') as a:
+				npc.dialogue = json.load(a)
+				a.close()
+	log.write("load npc dialogue" + "\r\n")
+
+
+def update_npc_locations(npcs, map):
+	for npc in npcs:
+		if npc.prevlocation.__ne__(npc.location):  # moves the NPC
+			if map.inch(npc.location[0], npc.location[1]) == ord(
+					" "):  # stops NPC from moving if there's a character there
+				map.addch(npc.location[0], npc.location[1], ord(npc.character))
+				map.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
+				npc.prevlocation = npc.location[:]
+			else:
+				npc.location = npc.prevlocation[:]  # keeps the NPC at its current location
+		if map.inch(npc.location[0], npc.location[1]) == ord(" "):
+			map.addch(npc.location[0], npc.location[1], ord(npc.character))
+
+
+def place_npcs(npcs, map):
+	for npc in npcs:
+		spawn_character(map, npc, npc.location[0], npc.location[1])
