@@ -11,7 +11,7 @@ locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
 
 # initiates some required variables
-save = {"all_NPCs": [], "all_enemies": [], "player": {}}
+save = {"all_NPCs": [], "player": {}}
 DebugLog = open('RPGLog.txt', 'w')
 error = open('RPGErrorLog.txt', 'w')
 sys.stderr = error
@@ -22,21 +22,8 @@ all_NPCs = []
 
 
 def new_game(enemies, npcs, log):
-	with open('NewGame.json', 'r') as f:
-		save = json.load(f)
-		f.close()
-	load_enemies(save, enemies, log)
-	for file in os.listdir("./NPCs"):
-		if file.endswith(".json"):
-			filename = "NPCs/" + file
-			log.write(filename + "\n")
-			with open(filename, 'r') as f:
-				data = json.load(f)
-				f.close()
-				temp_npc = NPC.dictionary(data, log)
-				npcs.append(temp_npc)
-	#load_npcs(save, npcs, log)
-		Func.set_all_stats(enemies, npcs)
+	Load.load_npcs_for_new_game(npcs, log)
+	Func.set_all_stats(enemies, npcs)
 	load_npc_dialogue(npcs, log)
 	log.write('len: ' + str(len(npcs)) + "\r\n")
 
@@ -106,13 +93,11 @@ try:
 		load_player(player1, save, DebugLog)
 		player1.inventory = Func.load_inventory(save["player"]["inventory"])
 		load_player_equipment(player1, save)
-		load_enemies(save, all_enemies, DebugLog)
 		Load.load_npcs(save, all_NPCs, DebugLog)
 	else:
 		new_game(all_enemies, all_NPCs, DebugLog)
 
 	spawn_character(MAP, player1, player1.location[0], player1.location[1])
-	place_enemies(all_enemies, MAP)
 	place_npcs(all_NPCs, MAP)
 
 	screen.refresh()
@@ -199,9 +184,12 @@ try:
 				result = npc_at_location(player1.location, all_NPCs)
 				if result["result"] is True:
 					NPC = result["npc"]
-					NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs, trade_win)
-					Func.update_journal(journal)
-					player1.update_player_status()
+					if NPC.is_enemy():
+						start_combat(player1, NPC)
+					else:
+						NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs, trade_win)
+						Func.update_journal(journal)
+						player1.update_player_status()
 					while Key is not ord("4"):
 						Key = MAP.getch()
 						NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs, trade_win)
@@ -222,14 +210,15 @@ try:
 		# moves the enemies and regenerates their health
 		# if the enemy moves unto the player, combat starts
 		if not player_turn:
-			for enemy in all_enemies:
-				if not enemy.is_dead():
-					enemy.move(dims, player1)
-					enemy.regenerate_health()
-					if Func.player_at_location(player1, enemy.location):
-						enemy.location= enemy.prevlocation[:]
-						enemy.allow_movement = False
-						start_combat(player1, enemy)
+			for npc in all_NPCs:
+				if not npc.is_dead():
+					npc.move(dims, player1)
+					npc.regenerate_health()
+					if Func.player_at_location(player1, npc.location):
+						if npc.is_enemy():
+							npc.location = npc.prevlocation[:]
+							npc.allow_movement = False
+							start_combat(player1, npc)
 			player_turn = True
 
 		DebugLog.flush()
@@ -252,15 +241,13 @@ try:
 	update_npc_locations(all_NPCs, MAP)
 	save_player(player1, save, DebugLog)
 	save_npcs(save, all_NPCs, DebugLog)
-	save_enemies(save, all_enemies, DebugLog)
 except:
 	DebugLog.write(str(sys.exc_info()))
 finally:
-	if os.path.exists('save.json.bak') and os.path.exists('save.json'):
+	if os.path.exists('save.json'):
 		temp = open("save.json", "r")
 		temp_save = json.load(temp)
 		if "total_exp" in temp_save["player"]:
-			os.remove('save.json.bak')
 			os.rename('save.json', 'save.json.bak')
 		temp.close()
 	with open('save.json', 'w') as f:

@@ -1,7 +1,6 @@
 import curses
 
 from BaseClasses.Character import *
-import Functions.Func as Func
 import Quest
 
 

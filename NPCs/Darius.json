@@ -1,5 +1,5 @@
 {
-  "allow_movement": true,
+  "allow_movement": false,
   "character": "D",
   "coins": 100,
   "damage": 0,
@@ -26,7 +26,7 @@
   "exp_for_next_level": 0,
   "exp_to_next_level": 25,
   "has_quest": true,
-  "health": 400,
+  "health": 100,
   "health_regen": 5,
   "inventory": [[], []],
   "level": 3,
@@ -41,6 +41,7 @@
 	98
   ],
   "race": 2,
+  "relationship": 0,
   "respawn_counter": 0,
   "respawnable": false,
   "spawn_location": [

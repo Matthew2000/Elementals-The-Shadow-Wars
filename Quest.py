@@ -70,7 +70,7 @@ class CollectQuest(Quest):
 class AssassinateQuest(Quest):
 	def __init__(self, name: str, giver: str,
 	             coin_reward: int, exp_reward: float, object_reward: Items.Item,
-	             description: str, target: NPC.Enemy):
+	             description: str, target: NPC):
 		super().__init__(name, QuestType.Assassinate, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
 
@@ -90,7 +90,7 @@ class AssassinateQuest(Quest):
 class KillQuest(Quest):
 	def __init__(self, name: str, giver: str,
 	             coin_reward: int, exp_reward: float, object_reward: Items.Item,
-	             description: str, target: NPC.Enemy, amount: int):
+	             description: str, target: NPC, amount: int):
 		super().__init__(name, QuestType.Kill, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
 		self.amount = amount

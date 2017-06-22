@@ -4,7 +4,6 @@ import os
 
 from BaseClasses.Character import *
 from Functions import Func
-import Quest
 
 
 class Relationship(Enum):
@@ -16,94 +15,16 @@ class Relationship(Enum):
 class NPC(Character):
 	def __init__(self, name: str, character: chr, race: Races):
 		super().__init__(name, character, race)
-		self.allow_movement = True
+		self.allow_movement = False
 		self.talking = False
 		self.dialogue = {"intro": "Hi my name is %s." % self.name, "quest": [{"quest name": "name", "quest type": "unique", "description": "quest description.", "objective": {"amount": 0, "requirement": "quest requirement", "object": "object"}, "reward": {"object": "reward object", "amount": "reward amount", "exp": 0}, "quest completed": False, "quest giver": self.name}], "trade": "I have nothing to trade.", "talk": "I am an NPC."}
 		self.has_quest = False
 		self.quests = []
 		self.spawn_location = []
 		self.respawn_counter = 0
-		self.respawnable = False
+		self.respawnable = True
 		self.trade_inventory = []
 		self.relationship = Relationship.Neutral
-
-	@classmethod
-	def dictionary(cls, npc_data: dict, log):
-		name = npc_data["name"]
-		character = npc_data["character"]
-		race = npc_data["race"]
-		temp_npc = NPC(name, character, Races(race))
-
-		filename = 'NPCs/' + Func.sanitize_filename(name) + '.json'
-		file = open(filename, "r")
-		npc_data = json.load(file)
-		temp_npc.location = npc_data["location"]
-		temp_npc.prevlocation = temp_npc.location[:]
-		temp_npc.health = npc_data["health"]
-		temp_npc.max_health = npc_data["max_health"]
-		temp_npc.character = npc_data["character"]
-		log.write("working\n")
-		temp_npc.inventory = Func.load_inventory(npc_data["inventory"])
-		temp_npc.has_quest = npc_data["has_quest"]
-		temp_npc.level = npc_data["level"]
-		temp_npc.total_exp = npc_data["total_exp"]
-		temp_npc.exp_for_next_level = npc_data["exp_for_next_level"]
-		temp_npc.exp_to_next_level = npc_data["exp_to_next_level"]
-		temp_npc.strength = npc_data["strength"]
-		temp_npc.respawnable = npc_data["respawnable"]
-		temp_npc.spawn_location = npc_data["spawn_location"]
-		temp_npc.endurance = npc_data["endurance"]
-		temp_npc.defense = npc_data["defense"]
-		temp_npc.dialogue = npc_data["dialogue"]
-		temp_npc.quests = Quest.load_quests(npc_data["quests"], log)
-		temp_npc.relationship = Relationship(npc_data["relationship"])
-		# load equipped npc items
-		if temp_npc.race is not Races.Wolf:
-			equipped_item = npc_data["equipped"]
-			for weapon in Items.all_weapons:
-				if equipped_item["weapon"] is not None:
-					if equipped_item["weapon"] == weapon.name:
-						temp_npc.equipped["weapon"] = weapon
-			for armour in Items.all_armours:
-				if equipped_item["helmet"] is not None:
-					if equipped_item["helmet"] == armour.name:
-						temp_npc.equipped["helmet"] = armour
-				if equipped_item["chest"] is not None:
-					if equipped_item["chest"] == armour.name:
-						temp_npc.equipped["chest"] = armour
-				if equipped_item["gloves"] is not None:
-					if equipped_item["gloves"] == armour.name:
-						temp_npc.equipped["gloves"] = armour
-				if equipped_item["belt"] is not None:
-					if equipped_item["belt"] == armour.name:
-						temp_npc.equipped["belt"] = armour
-				if equipped_item["pants"] is not None:
-					if equipped_item["pants"] == armour.name:
-						temp_npc.equipped["pants"] = armour
-				if equipped_item["shoes"] is not None:
-					if equipped_item["shoes"] == armour.name:
-						temp_npc.equipped["shoes"] = armour
-		# load items to trade
-		for trade_item in npc_data["trade_inventory"]:
-			for item in Items.all_items:
-				if trade_item == item.name:
-					temp_npc.trade_inventory.append(item)
-		return temp_npc
-
-	def move(self, area):
-		if self.allow_movement:
-			self.prevlocation = self.location[:]
-			direction = randint(0, 4)
-			if direction is 0:
-				pass
-			elif direction is 1:
-				self.move_up()
-			elif direction is 2:
-				self.move_down(area)
-			elif direction is 3:
-				self.move_right(area)
-			else:
-				self.move_left()
 
 	def conversation_start(self, conversation):
 		conversation.clear()
@@ -369,11 +290,59 @@ class NPC(Character):
 		self.health = self.max_health
 		self.location = self.spawn_location[:]
 
+	def attack(self, player):
+		if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[0] == self.location[0]:
+			if player.location[1] == self.location[1] + 1 or player.location[1] == self.location[1] - 1 or player.location[1] == self.location[1]:
+				super().attack(player)
+
+	def follow_player(self, player):
+		if self.is_near_player(player, 5):
+			self.move_to(player.location[0], player.location[1])
+
+	def move(self, area, player):
+		if self.allow_movement:
+			if self.relationship == Relationship.Enemy:
+				if self.is_near_player(player, 5):
+					if ((player.level - self.level) >= 9) is False:
+						self.follow_player(player)
+				else:
+					self.prevlocation = self.location[:]
+					direction = randint(0, 4)
+					if direction is 0:
+						pass
+					elif direction is 1:
+						self.move_up()
+					elif direction is 2:
+						self.move_down(area)
+					elif direction is 3:
+						self.move_right(area)
+					else:
+						self.move_left()
+			else:
+				self.prevlocation = self.location[:]
+				direction = randint(0, 4)
+				if direction is 0:
+					pass
+				elif direction is 1:
+					self.move_up()
+				elif direction is 2:
+					self.move_down(area)
+				elif direction is 3:
+					self.move_right(area)
+				else:
+					self.move_left()
+
 	def save_character(self, log):
 		character = super().save_character(log)
 		character["allow_movement"] = self.allow_movement
 		character["relationship"] = self.relationship.value
 		return character
+
+	def is_enemy(self):
+		if self.relationship == Relationship.Enemy:
+			return True
+		else:
+			return False
 
 
 def create_npc(name, character, race: Races, npcs, log):  # this function must be assigned to an object

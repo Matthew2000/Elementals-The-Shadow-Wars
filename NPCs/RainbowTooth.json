@@ -1,5 +1,5 @@
 {
-  "allow_movement": true,
+  "allow_movement": false,
   "character": "R",
   "coins": 100,
   "damage": 0,
@@ -38,6 +38,7 @@
 	98
   ],
   "race": 2,
+  "relationship": 0,
   "respawn_counter": 0,
   "respawnable": false,
   "spawn_location": [
