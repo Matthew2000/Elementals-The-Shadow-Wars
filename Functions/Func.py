@@ -99,7 +99,7 @@ def set_all_stats(npcs, enemies):
 def is_enemy_dead(enemy, player, map, journal):
 	if enemy.is_dead():
 		if map.inch(enemy.location[0], enemy.location[1]) == ord(enemy.character):
-			enemy.on_death()
+			enemy.on_death(player)
 			map.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
 			print_to_journal(journal, enemy.name + " is dead")
 			enemy.prevlocation = enemy.location[:]

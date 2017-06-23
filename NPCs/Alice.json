@@ -40,7 +40,7 @@
   "race": 3,
   "relationship": 2,
   "respawn_counter": 0,
-  "respawnable": false,
+  "respawnable": true,
   "spawn_location": [
 	10,
 	10

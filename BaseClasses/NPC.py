@@ -25,6 +25,7 @@ class NPC(Character):
 		self.respawnable = True
 		self.trade_inventory = []
 		self.relationship = Relationship.Neutral
+		self.increase_exp_by = int((self.level**2)/.4) + 5
 
 	def conversation_start(self, conversation):
 		conversation.clear()
@@ -343,6 +344,17 @@ class NPC(Character):
 			return True
 		else:
 			return False
+
+	def is_friend(self):
+		if self.relationship == Relationship.Friend:
+			return True
+		else:
+			return False
+
+	def on_death(self, player):
+		super().on_death()
+		if self.is_enemy():
+			player.increase_exp(self.increase_exp_by)
 
 
 def create_npc(name, character, race: Races, npcs, log):  # this function must be assigned to an object

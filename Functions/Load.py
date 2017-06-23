@@ -34,6 +34,7 @@ def load_npcs(save, npcs, log):
 		temp_npc.dialogue = npc_data["dialogue"]
 		temp_npc.quests = Quest.load_quests(npc_data["quests"], log)
 		temp_npc.relationship = NPC.Relationship(npc["relationship"])
+		temp_npc.allow_movement = npc["allow_movement"]
 		# load equipped npc items
 		if temp_npc.race is not NPC.Races.Wolf:
 			equipped_item = npc_data["equipped"]

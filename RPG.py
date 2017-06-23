@@ -185,19 +185,20 @@ try:
 				if result["result"] is True:
 					NPC = result["npc"]
 					if NPC.is_enemy():
+						NPC.allow_movement = False
 						start_combat(player1, NPC)
 					else:
 						NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs, trade_win)
 						Func.update_journal(journal)
 						player1.update_player_status()
-					while Key is not ord("4"):
-						Key = MAP.getch()
-						NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs, trade_win)
-						Func.update_journal(journal)
-					else:
-						NPC.talking = False
-						conversation.clear()
-						conversation.refresh()
+						while Key is not ord("4"):
+							Key = MAP.getch()
+							NPC.interact(journal, conversation, Key, player1, DebugLog, all_enemies, all_NPCs, trade_win)
+							Func.update_journal(journal)
+						else:
+							NPC.talking = False
+							conversation.clear()
+							conversation.refresh()
 
 				# updates the quests that the player has then ends the player's turn
 						Func.update_player_location(player1, MAP, DebugLog)
@@ -226,11 +227,11 @@ try:
 		if player1.exp_is_enough():
 			player1.level_up()
 
-			Func.respawn_enemies(all_enemies)
+		Func.respawn_enemies(all_NPCs)
 
-			Func.update_game(player1, journal)
+		Func.update_game(player1, journal)
 
-			Func.update_enemy_locations(all_enemies, MAP)
+		Func.update_enemy_locations(all_NPCs, MAP)
 		update_npc_locations(all_NPCs, MAP)
 
 		screen.refresh()
