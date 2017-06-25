@@ -19,6 +19,7 @@ Key = -1
 player_name = "Matthew"
 all_enemies = []
 all_NPCs = []
+Quest.load_all_quests(DebugLog)
 
 
 def new_game(enemies, npcs, log):
@@ -90,6 +91,7 @@ try:
 			save = json.load(f)
 			f.close()
 
+		#Quest.load_all_quests()
 		load_player(player1, save, DebugLog)
 		player1.inventory = Func.load_inventory(save["player"]["inventory"])
 		load_player_equipment(player1, save)

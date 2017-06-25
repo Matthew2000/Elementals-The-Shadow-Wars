@@ -13,6 +13,8 @@ class Relationship(Enum):
 
 
 class NPC(Character):
+	all = []
+
 	def __init__(self, name: str, character: chr, race: Races):
 		super().__init__(name, character, race)
 		self.allow_movement = False
@@ -26,6 +28,7 @@ class NPC(Character):
 		self.trade_inventory = []
 		self.relationship = Relationship.Neutral
 		self.increase_exp_by = int((self.level**2)/.4) + 5
+		NPC.all.append(self)
 
 	def conversation_start(self, conversation):
 		conversation.clear()
@@ -71,10 +74,10 @@ class NPC(Character):
 			pass
 		else:
 			quest = quest_list[int(chr(int(key) - 1))]
-			index = int(chr(int(key) - 1))
-			if quest["quest name"] not in player.quests:
+			npc_quest_index = self.quests.index(quest)
+			if quest not in player.quests:
 				journal.insertln()
-				journal.addstr(1, 1, quest["description"])
+				journal.addstr(1, 1, quest.description)
 				log.write("not fail" + "\r\n")
 				journal.border()
 				journal.refresh()
@@ -86,45 +89,46 @@ class NPC(Character):
 						journal.insertln()
 						journal.addstr(1, 1, "You have accepted the quest")
 						journal.refresh()
-						player.add_quest(quest_list[list_key])
+						player.add_quest(quest_list[list_key], log)
 						self.conversation_start(conversation)
 						break
 					elif key is ord("2"):
 						break
-			elif player.quests[quest["quest name"]]["quest completed"] == True:
-				journal.insertln()
-				journal.addstr(1, 1, "You have completed my quest, here is your reward.")
-				journal.border()
-				journal.refresh()
-				self.show_options(conversation, log, "1 - Accept")
-				key = conversation.getch()
-				if key is ord("1"):
-					if quest["reward"]["object"] == "Coins":
-						player.coins += quest["reward"]["amount"]
-					else:
-						player.add_inventory_item(quest["reward"]["object"], quest["reward"]["amount"])
-					player.increase_exp(quest["reward"]["exp"])
-					if quest["objective"]["requirement"] == "collect":
-						item = quest["objective"]["object"]
-						amount = quest["objective"]["amount"]
-						for inv_item in player.inventory[0]:
-							if inv_item.name == item:
-								index = player.inventory[0].index(inv_item)
-						player.inventory[1][index] -= amount
-						log.write("working\n")
-					del player.quests[quest["quest name"]]
-					if quest["quest type"] == "unique":
-						del self.dialogue["quest"][index]
-					self.conversation_start(conversation)
-					player.update_inventory()
 			else:
-				journal.insertln()
-				journal.addstr(1, 1, "You have already accepted that quest.")
-				journal.border()
-				journal.refresh()
+				player_quest_index = player.quests.index(quest)
+				if player.quests[player_quest_index].completed:
+
+					journal.insertln()
+					journal.addstr(1, 1, "You have completed my quest, here is your reward.")
+					journal.border()
+					journal.refresh()
+					self.show_options(conversation, log, "1 - Accept")
+					key = conversation.getch()
+					if key is ord("1"):
+						player.coins += quest.coin_reward
+						player.add_inventory_item(quest.object_reward)
+						player.increase_exp(quest.exp_reward)
+						if quest.type.value == 1:
+							item = quest.item_to_collect
+							amount = quest.amount
+							for inv_item in player.inventory[0]:
+								if inv_item.name == item:
+									index = player.inventory[0].index(inv_item)
+							player.inventory[1][index] -= amount
+							log.write("working\n")
+						del player.quests[player_quest_index]
+						if quest.type == 2:
+							del self.quests[npc_quest_index]
+						self.conversation_start(conversation)
+						player.update_inventory()
+				else:
+					journal.insertln()
+					journal.addstr(1, 1, "You have already accepted that quest.")
+					journal.border()
+					journal.refresh()
 
 	def interact(self, journal, conversation, input_key, player, log, enemies, npcs, trade_window):
-		if not self.dialogue["quest"]:
+		if not self.quests:
 			self.has_quest = False
 		if self.talking is False:
 			journal.insertln()
@@ -142,16 +146,16 @@ class NPC(Character):
 					journal.border()
 					journal.refresh()
 					quest_list = []
-					for quest in self.dialogue["quest"]:
-						log.write(quest["quest name"] + "\r\n")
-						quest_list.append(quest["quest name"])
+					for quest in self.quests:
+						log.write(quest.name + "\r\n")
+						quest_list.append(quest.name)
 					self.show_options(conversation, log, quest_list)
 
-					quest_number = []
-					for quest in self.dialogue["quest"]:
-						quest_number.append(quest)
+					quests = []
+					for quest in self.quests:
+						quests.append(quest)
 					input_key = conversation.getch()
-					self.choose_quest(input_key, quest_number, enemies, npcs, player, journal, conversation, log)
+					self.choose_quest(input_key, quests, enemies, npcs, player, journal, conversation, log)
 					self.conversation_start(conversation)
 					break
 			else:

@@ -16,6 +16,8 @@ class QuestType(Enum):
 
 
 class Quest:
+	all = []
+
 	def __init__(self, name: str, type: QuestType, giver: str, coin_reward: int, exp_reward: float,
 														object_reward: Items.Item, description: str):
 		self.name = name
@@ -50,6 +52,7 @@ class CollectQuest(Quest):
 		super().__init__(name, QuestType.Collect, giver, coin_reward, exp_reward, object_reward, description)
 		self.item_to_collect = item_to_collect
 		self.amount = amount
+		Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -73,6 +76,7 @@ class AssassinateQuest(Quest):
 	             description: str, target: NPC):
 		super().__init__(name, QuestType.Assassinate, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
+		Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -83,8 +87,10 @@ class AssassinateQuest(Quest):
 		return new_quest
 
 	def update_quest(self, player):
-		if self.target.is_dead():
-			self.completed = True
+		for npc in NPC.NPC.all:
+			if npc.name == self.target:
+				if npc.is_dead():
+					self.completed = True
 
 
 class KillQuest(Quest):
@@ -94,6 +100,7 @@ class KillQuest(Quest):
 		super().__init__(name, QuestType.Kill, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
 		self.amount = amount
+		Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -112,6 +119,7 @@ class CraftQuest(Quest):
 		super().__init__(name, QuestType.Craft, giver, coin_reward, exp_reward, object_reward, description)
 		self.item = item
 		self.amount = amount
+		Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -135,6 +143,7 @@ class TalkQuest(Quest):
 	             description: str, person: NPC):
 		super().__init__(name, QuestType.Talk, giver, coin_reward, exp_reward, object_reward, description)
 		self.person = person
+		Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -145,9 +154,37 @@ class TalkQuest(Quest):
 		return new_quest
 
 
+def load_all_quests(log):
+	for file in os.listdir("./Quests"):
+		if file.endswith(".json"):
+			filename = "Quests/" + file
+			log.write(filename + "\n")
+			with open(filename, 'r') as f:
+				quest_data = json.load(f)
+				f.close()
+				if quest_data["type"] == 1:
+					Quest.all.append(CollectQuest.dictionary(quest_data))
+				if quest_data["type"] == 2:
+					Quest.all.append(AssassinateQuest.dictionary(quest_data))
+				if quest_data["type"] == 3:
+					Quest.all.append(KillQuest.dictionary(quest_data))
+				if quest_data["type"] == 4:
+					Quest.all.append(CraftQuest.dictionary(quest_data))
+				if quest_data["type"] == 5:
+					Quest.all.append(TalkQuest.dictionary(quest_data))
+
+
 def load_quests(npc_quests, log):
 	quests = []
-	for quest in npc_quests:
+	for quest in Quest.all:
+		if quest.name in npc_quests:
+			log.write(quest.name + "\n")
+			quests.append(quest)
+	'''for quest_name in npc_quests:
+		for quest in Quest.all:
+			if quest.name == quest_name:
+				log.write(quest_name + "\n")
+				quests.append(quest)
 			filename = 'Quests/' + Func.sanitize_filename(quest) + '.json'
 			if os.path.exists(filename):
 				with open(filename, 'r') as a:
@@ -162,5 +199,6 @@ def load_quests(npc_quests, log):
 				if quest_dictionary["type"] == 4:
 					quests.append(CraftQuest.dictionary(quest_dictionary))
 				if quest_dictionary["type"] == 5:
-					quests.append(TalkQuest.dictionary(quest_dictionary))
+					quests.append(TalkQuest.dictionary(quest_dictionary))'''
+	log.write("quests loaded\n")
 	return quests

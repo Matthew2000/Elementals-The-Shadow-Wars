@@ -34,13 +34,14 @@ class Player(Character):
 			if enemy.location[1] == self.location[1] + 1 or enemy.location[1] == self.location[1] - 1 or enemy.location[1] == self.location[1]:
 				super().attack(enemy)
 
-	def add_quest(self, quest):
-		self.quests[quest["quest name"]] = quest
+	def add_quest(self, quest, log):
+		self.quests.append(quest)
 
 	def update_quests(self, enemies, npcs, journal):
 		# TODO make function for updating each type of quest
 		for quest in self.quests:
-			requirement = self.quests[quest]["objective"]["requirement"]
+			quest.update_quest(self)
+			"""requirement = self.quests[quest]["objective"]["requirement"]
 			if requirement == "kill":
 				for enemy in enemies:
 					if enemy.name == self.quests[quest]["objective"]["object"]:
@@ -59,7 +60,7 @@ class Player(Character):
 						if self.inventory[1][self.inventory[0].index(inv_item)] >= amount:
 							self.quests[quest]["quest completed"] = True
 						else:
-							self.quests[quest]["quest completed"] = False
+							self.quests[quest]["quest completed"] = False"""
 
 	def level_up(self):
 		self.exp_for_next_level -= self.exp_to_next_level
@@ -247,7 +248,6 @@ def load_player(player, save, log):
 	player.health = save["player"]["health"]
 	player.character = save["player"]["character"]
 	player.max_health = save["player"]["max_health"]
-	player.quests = Quest.load_quests(save["player"]["quests"], log)
 	player.race = Races(save["player"]["race"])
 	player.level = save["player"]["level"]
 	player.total_exp = save["player"]["total_exp"]
