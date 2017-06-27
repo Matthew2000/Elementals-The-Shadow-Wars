@@ -17,6 +17,7 @@ class QuestType(Enum):
 
 class Quest:
 	all = []
+	names = []
 
 	def __init__(self, name: str, type: QuestType, giver: str, coin_reward: int, exp_reward: float,
 														object_reward: Items.Item, description: str):
@@ -52,7 +53,9 @@ class CollectQuest(Quest):
 		super().__init__(name, QuestType.Collect, giver, coin_reward, exp_reward, object_reward, description)
 		self.item_to_collect = item_to_collect
 		self.amount = amount
-		Quest.all.append(self)
+		if self.name not in Quest.names:
+			Quest.names.append(self.name)
+			Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -76,7 +79,9 @@ class AssassinateQuest(Quest):
 	             description: str, target: NPC):
 		super().__init__(name, QuestType.Assassinate, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
-		Quest.all.append(self)
+		if self.name not in Quest.names:
+			Quest.names.append(self.name)
+			Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -100,7 +105,9 @@ class KillQuest(Quest):
 		super().__init__(name, QuestType.Kill, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
 		self.amount = amount
-		Quest.all.append(self)
+		if self.name not in Quest.names:
+			Quest.names.append(self.name)
+			Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -119,7 +126,9 @@ class CraftQuest(Quest):
 		super().__init__(name, QuestType.Craft, giver, coin_reward, exp_reward, object_reward, description)
 		self.item = item
 		self.amount = amount
-		Quest.all.append(self)
+		if self.name not in Quest.names:
+			Quest.names.append(self.name)
+			Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -143,7 +152,9 @@ class TalkQuest(Quest):
 	             description: str, person: NPC):
 		super().__init__(name, QuestType.Talk, giver, coin_reward, exp_reward, object_reward, description)
 		self.person = person
-		Quest.all.append(self)
+		if self.name not in Quest.names:
+			Quest.names.append(self.name)
+			Quest.all.append(self)
 
 	@classmethod
 	def dictionary(cls, quest: dict):
@@ -163,42 +174,28 @@ def load_all_quests(log):
 				quest_data = json.load(f)
 				f.close()
 				if quest_data["type"] == 1:
-					Quest.all.append(CollectQuest.dictionary(quest_data))
+					CollectQuest.dictionary(quest_data)
+					continue
 				if quest_data["type"] == 2:
-					Quest.all.append(AssassinateQuest.dictionary(quest_data))
+					AssassinateQuest.dictionary(quest_data)
+					continue
 				if quest_data["type"] == 3:
-					Quest.all.append(KillQuest.dictionary(quest_data))
+					KillQuest.dictionary(quest_data)
+					continue
 				if quest_data["type"] == 4:
-					Quest.all.append(CraftQuest.dictionary(quest_data))
+					CraftQuest.dictionary(quest_data)
+					continue
 				if quest_data["type"] == 5:
-					Quest.all.append(TalkQuest.dictionary(quest_data))
+					TalkQuest.dictionary(quest_data)
+					continue
 
 
 def load_quests(npc_quests, log):
 	quests = []
 	for quest in Quest.all:
 		if quest.name in npc_quests:
-			log.write(quest.name + "\n")
-			quests.append(quest)
-	'''for quest_name in npc_quests:
-		for quest in Quest.all:
-			if quest.name == quest_name:
-				log.write(quest_name + "\n")
+			if quest not in quests:
+				log.write(quest.name + " added\n")
 				quests.append(quest)
-			filename = 'Quests/' + Func.sanitize_filename(quest) + '.json'
-			if os.path.exists(filename):
-				with open(filename, 'r') as a:
-					quest_dictionary = json.load(a)
-					a.close()
-				if quest_dictionary["type"] == 1:
-					quests.append(CollectQuest.dictionary(quest_dictionary))
-				if quest_dictionary["type"] == 2:
-					quests.append(AssassinateQuest.dictionary(quest_dictionary))
-				if quest_dictionary["type"] == 3:
-					quests.append(KillQuest.dictionary(quest_dictionary))
-				if quest_dictionary["type"] == 4:
-					quests.append(CraftQuest.dictionary(quest_dictionary))
-				if quest_dictionary["type"] == 5:
-					quests.append(TalkQuest.dictionary(quest_dictionary))'''
 	log.write("quests loaded\n")
 	return quests
