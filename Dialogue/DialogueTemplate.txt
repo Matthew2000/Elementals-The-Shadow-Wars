@@ -1,17 +1,5 @@
 {
     "intro": "Hi my name is _____.",
-    "quest": [
-        {
-            "description": "quest description.",\
-            "completed": false,
-            "giver": "_____",
-            "name": "name",
-	        "type": 1,
-            "coin_reward": 0,
-            "exp_reward": 0,
-            "object_reward": "reward object"
-        }
-    ],
     "talk": "I an NPC.",
     "trade": "I have nothing to trade."
 }

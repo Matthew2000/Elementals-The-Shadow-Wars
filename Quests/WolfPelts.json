@@ -6,7 +6,7 @@
   "type": 1,
   "coin_reward": 10,
   "exp_reward": 10,
-  "object_reward": "reward object",
+  "object_reward": null,
   "item_to_collect": "Wolf Pelt",
   "amount": 5
 }

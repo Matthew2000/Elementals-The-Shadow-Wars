@@ -1,5 +1,6 @@
 import string
 
+from Globals import *
 import Items
 
 #modified from https://gist.github.com/seanh/93666
@@ -33,7 +34,7 @@ def update_game(player, journal):
 	update_journal(journal)
 
 
-def update_player_location(player, map, log):
+def update_player_location(player, map):
 	if player.prevlocation.__ne__(player.location):  # moves the Enemy
 		if map.inch(player.location[0], player.location[1]) == ord(
 				" "):  # stops Enemy from moving if there's a enemy there
@@ -43,16 +44,16 @@ def update_player_location(player, map, log):
 		else:
 			global current_map
 			if map.inch(player.location[0], player.location[1]) == ord("∨"):
-				current_map = current_map.go_to_map("north", log)
+				current_map = current_map.go_to_map("north", DebugLog)
 				current_map.show_map(map)
 			if map.inch(player.location[0], player.location[1]) == ord("^"):
-				current_map = current_map.go_to_map("south", log)
+				current_map = current_map.go_to_map("south", DebugLog)
 				current_map.show_map(map)
 			if map.inch(player.location[0], player.location[1]) == ord(">"):
-				current_map = current_map.go_to_map("west", log)
+				current_map = current_map.go_to_map("west", DebugLog)
 				current_map.show_map(map)
 			if map.inch(player.location[0], player.location[1]) == ord("<"):
-				current_map = current_map.go_to_map("east", log)
+				current_map = current_map.go_to_map("east", DebugLog)
 				current_map.show_map(map)
 			player.location = player.prevlocation[:]  # keeps the Enemy at its current location
 	if map.inch(player.location[0], player.location[1]) == ord(" "):
@@ -93,6 +94,44 @@ def set_all_stats(npcs, enemies):
 		enemy.increase_exp_by = int((enemy.level**2)/.4) + 5
 
 
+def npc_at_location(location, npcs):
+	for npc in npcs:
+		if npc.location[0] is location[0] and npc.location[1] is location[1]:
+			return {"result": True, "npc": npc}
+	else:
+		return {"result": False}
+
+
+def start_combat(player, enemy, input):
+	print_combat_intro_text(journal)
+	update_enemy_status(enemy, enemy_status)
+	player.update_player_status()
+	while input is not ord("2"):
+		update_enemy_status(enemy, enemy_status)
+		player.update_player_status()
+		if enemy.health <= 0:
+			is_enemy_dead(enemy, player, MAP, journal)
+			enemy.allow_movement = True
+			update_enemy_status(enemy, enemy_status)
+			break
+		if player.health <= 0:
+			if player.is_dead():
+				player_dead(player, MAP, journal)
+				update_player_location(player, MAP, DebugLog)
+			enemy.allow_movement = True
+			update_enemy_status(enemy, enemy_status)
+			break
+		input = MAP.getch()
+		if ord("1") <= input >= ord("2"):
+			continue
+		if input is ord("1"):
+			player.attack(enemy)
+		enemy.attack(player)
+	else:
+		enemy.allow_movement = True
+		print_to_journal(journal, "You have left combat")
+
+
 ##############################################################
 
 
@@ -120,9 +159,11 @@ def update_enemy_status(enemy, enemy_stat_win):
 	enemy_stat_win.refresh()
 
 
-def update_enemy_locations(enemies, map):
+def update_npc_locations(enemies, map):
 	for enemy in enemies:
 		if enemy.prevlocation.__ne__(enemy.location):  # moves the Enemy
+			if map.inch(enemy.prevlocation[0], enemy.prevlocation[1]) != ord(" "):
+				map.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
 			if map.inch(enemy.location[0], enemy.location[1]) == ord(
 					" "):  # stops Enemy from moving if there's a enemy there
 				map.addch(enemy.location[0], enemy.location[1], ord(enemy.character))

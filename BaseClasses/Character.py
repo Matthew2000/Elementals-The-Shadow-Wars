@@ -15,6 +15,9 @@ class Races(Enum):
 
 
 class Character:
+	all_NPCs = []
+	all_enemies = []
+
 	def __init__(self, name: str, character: chr, race: Races):
 		self.location = [1, 1]
 		self.prevlocation = [1, 1]
@@ -39,6 +42,12 @@ class Character:
 		self.exp_to_next_level = float(25)
 		self.health_regen = 5
 		self.spawn_location = [10, 10]
+
+	def begin_play(self):
+		pass
+
+	def tick(self, input_key):
+		pass
 
 	def move_up(self):
 		if self.location[0] > 1:
@@ -166,7 +175,7 @@ class Character:
 				if self.health >= self.max_health:
 					self.health = self.max_health
 
-	def save_character(self, log):
+	def save_character(self):
 		character = {}
 		character["location"] = self.location
 		character["health"] = self.health

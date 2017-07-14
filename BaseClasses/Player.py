@@ -1,6 +1,8 @@
 import curses
 
 from BaseClasses.Character import *
+from Functions import Func
+from Globals import *
 import Quest
 
 
@@ -14,6 +16,77 @@ class Player(Character):
 		self.inventory_win = curses.newwin(50, 65, 2, 110)
 		self.quest_log_win = curses.newwin(50, 65, 2, 110)
 		self.player_status = curses.newwin(10, 20, 38, 3)
+
+	def begin_play(self):
+		pass
+
+	def tick(self, input_key):
+		global player_turn
+
+		if self.exp_is_enough():
+			self.level_up()
+
+		# opens the player inventory
+		if input_key is ord("i"):
+			conversation.border()
+			conversation.addstr(1, 1, "1 - equip")
+			conversation.addstr(2, 1, "2 - unequip")
+			conversation.refresh()
+			self.open_inventory()
+			conversation.clear()
+			conversation.refresh()
+
+		if input_key is ord("l"):
+			self.open_quest_log()
+
+		if input_key is ord("r"):
+			if self.is_dead():
+				self.respawn(30, 50)
+				spawn_character(MAP, self, self.location[0], self.location[1])
+
+		self.update_quests()
+		if not self.is_dead():
+			self.move(input_key, dims)
+
+			# checks to see if the player moves unto an enemy
+			# if so it starts combat
+			# if not the player regenerates health and updates its status
+			result = Func.enemy_at_location(Character.all_enemies, self.location, enemy_status)
+			if result["result"] is True:
+				enemy1 = result["enemy"]
+				Func.start_combat(self, enemy1, input_key)
+			else:
+				self.regenerate_health()
+				self.update_player_status()
+
+			# checks to see if the player moves onto an NPC
+			# if so it starts interacting with it
+			result = Func.npc_at_location(self.location, Character.all_NPCs)
+			if result["result"] is True:
+				NPC = result["npc"]
+				if NPC.is_enemy():
+					NPC.allow_movement = False
+					Func.start_combat(self, NPC, input_key)
+				else:
+					NPC.interact(input_key, self, Character.all_enemies, Character.all_NPCs, trade_win)
+					Func.update_journal(journal)
+					self.update_player_status()
+					while input_key is not ord("4"):
+						input_key = MAP.getch()
+						NPC.interact(input_key, self, Character.all_enemies, Character.all_NPCs, trade_win)
+						Func.update_journal(journal)
+					else:
+						NPC.talking = False
+						conversation.clear()
+						conversation.refresh()
+
+			# updates the quests that the player has then ends the player's turn
+					Func.update_player_location(self, MAP)
+
+		self.update_quests()
+		player_turn = False
+
+		Func.player_dead(self, MAP, journal)
 
 	def make_player_stat_win(self):
 		self.player_status = curses.newwin(10, 20, 38, 3)
@@ -34,33 +107,13 @@ class Player(Character):
 			if enemy.location[1] == self.location[1] + 1 or enemy.location[1] == self.location[1] - 1 or enemy.location[1] == self.location[1]:
 				super().attack(enemy)
 
-	def add_quest(self, quest, log):
+	def add_quest(self, quest):
 		self.quests.append(quest)
 
-	def update_quests(self, enemies, npcs, journal):
+	def update_quests(self):
 		# TODO make function for updating each type of quest
 		for quest in self.quests:
 			quest.update_quest(self)
-			"""requirement = self.quests[quest]["objective"]["requirement"]
-			if requirement == "kill":
-				for enemy in enemies:
-					if enemy.name == self.quests[quest]["objective"]["object"]:
-						if enemy.is_dead():
-							if not self.quests[quest]["quest completed"]:
-								journal.insertln()
-								journal.addstr(1, 1, "You have completed the quest go to %s to claim your reward" % self.quests[quest]["quest giver"])
-							self.quests[quest]["quest completed"] = True
-						else:
-							self.quests[quest]["quest completed"] = False
-			if requirement.lower() == "collect":
-				item_name = self.quests[quest]["objective"]["object"]
-				amount = self.quests[quest]["objective"]["amount"]
-				for inv_item in self.inventory[0]:
-					if item_name == inv_item.name:
-						if self.inventory[1][self.inventory[0].index(inv_item)] >= amount:
-							self.quests[quest]["quest completed"] = True
-						else:
-							self.quests[quest]["quest completed"] = False"""
 
 	def level_up(self):
 		self.exp_for_next_level -= self.exp_to_next_level
@@ -92,7 +145,7 @@ class Player(Character):
 			self.inventory_win.deleteln()
 		self.inventory_win.refresh()
 
-	def open_inventory(self, log):
+	def open_inventory(self):
 		if not self.inventory[0]:
 			return
 		self.update_inventory()
@@ -180,12 +233,11 @@ class Player(Character):
 	def on_death(self):
 		self.respawn(self.location[0], self.location[1])
 
-	def save_character(self, log):
-		character = super().save_character(log)
+	def save_character(self):
+		character = super().save_character()
 		character["inventory"] = [[], []]
 		items = []
 		for item in self.inventory[0]:
-			log.write("working\n")
 			items.append(item.name)
 			character["inventory"][0] = items
 		for amount in self.inventory[1]:
@@ -239,24 +291,24 @@ def create_player(name: str, character: chr, race: Races, spawn_point):
 	return temp_player
 
 
-def load_player(player, save, log):
+def load_player(player, save):
 	"""loads all player stats from the save file"""
 	player.name = save["player"]["name"]
-	log.write(player.name + " ")
+	DebugLog.write("player" + " ")
 	player.location = save["player"]["location"]
 	player.prevlocation = player.location[:]
 	player.health = save["player"]["health"]
 	player.character = save["player"]["character"]
 	player.max_health = save["player"]["max_health"]
 	player.race = Races(save["player"]["race"])
+	DebugLog.write("Race: " + str(player.race)[6:] + "\r\n")
 	player.level = save["player"]["level"]
 	player.total_exp = save["player"]["total_exp"]
 	player.exp_for_next_level = save["player"]["exp_for_next_level"]
 	player.exp_to_next_level = save["player"]["exp_to_next_level"]
 	player.coins = save["player"]["coins"]
-	player.quests = Quest.load_quests(save["player"]["quests"], log)
-	log.write("Race: " + str(player.race)[6:] + "\r\n")
-	log.write("load player" + "\r\n")
+	player.quests = Quest.load_quests(save["player"]["quests"])
+	DebugLog.write("player loaded" + "\n\n")
 
 
 def load_player_equipment(player, save):
@@ -290,40 +342,9 @@ def load_player_equipment(player, save):
 				player.equipped["shoes"] = armour
 
 
-def save_player(player, save, log):
+def save_player(player, save):
 	"""converts the player object into a dictionary
 	and then saves it in the save file
 	"""
-	save["player"] = player.save_character(log)
-	"""del player.inventory_win
-	del player.player_status
-	del player.quest_log_win
-	save["player"] = player.__dict__
-	save["player"]["race"] = save["player"]["race"].value
-	equipped_item = save["player"]["equipped"]
-	if equipped_item["helmet"] is not None:
-		equipped_item["helmet"] = equipped_item["helmet"].__dict__
-		equipped_item["helmet"] = equipped_item["helmet"]["name"]
-	if equipped_item["chest"] is not None:
-		equipped_item["chest"] = equipped_item["chest"].__dict__
-		equipped_item["chest"] = equipped_item["chest"]["name"]
-	if equipped_item["gloves"] is not None:
-		equipped_item["gloves"] = equipped_item["gloves"].__dict__
-		equipped_item["gloves"] = equipped_item["gloves"]["name"]
-	if equipped_item["belt"] is not None:
-		equipped_item["belt"] = equipped_item["belt"].__dict__
-		equipped_item["belt"] = equipped_item["belt"]["name"]
-	if equipped_item["pants"] is not None:
-		equipped_item["pants"] = equipped_item["pants"].__dict__
-		equipped_item["pants"] = equipped_item["pants"]["name"]
-	if equipped_item["shoes"] is not None:
-		equipped_item["shoes"] = equipped_item["shoes"].__dict__
-		equipped_item["shoes"] = equipped_item["shoes"]["name"]
-	if equipped_item["weapon"] is not None:
-		equipped_item["weapon"] = equipped_item["weapon"].__dict__
-		equipped_item["weapon"] = equipped_item["weapon"]["name"]
-	for item in save["player"]["inventory"][0]:
-		index = save["player"]["inventory"][0].index(item)
-		if isinstance(save["player"]["inventory"][0][index], Item):
-			save["player"]["inventory"][0][index] = save["player"]["inventory"][0][index].name"""
-	log.write("player saved" + "\r\n")
+	save["player"] = player.save_character()
+	DebugLog.write("player saved" + "\n")

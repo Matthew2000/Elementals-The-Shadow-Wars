@@ -3,6 +3,7 @@ import json
 import os
 
 from BaseClasses.Character import *
+from Globals import *
 from Functions import Func
 
 
@@ -28,7 +29,21 @@ class NPC(Character):
 		self.trade_inventory = []
 		self.relationship = Relationship.Neutral
 		self.increase_exp_by = int((self.level**2)/.4) + 5
-		NPC.all.append(self)
+		Character.all_NPCs.append(self)
+
+	def begin_play(self):
+		pass
+
+	def tick(self, input_key, player):
+
+		if not self.is_dead():
+			self.move(dims, player)
+			self.regenerate_health()
+			if Func.player_at_location(player, self.location):
+				if self.is_enemy():
+					self.location = self.prevlocation[:]
+					self.allow_movement = False
+					Func.start_combat(player, self, input_key)
 
 	def conversation_start(self, conversation):
 		conversation.clear()
@@ -40,7 +55,7 @@ class NPC(Character):
 		conversation.addstr(5, 1, "4 - Leave")
 		conversation.refresh()
 
-	def show_options(self, conversation, log, *options):
+	def show_options(self, conversation, *options):
 		x = 2
 		y = 1
 		conversation.clear()
@@ -64,11 +79,11 @@ class NPC(Character):
 		journal.addstr(1, 1, self.dialogue["talk"])
 		self.conversation_start(conversation)
 
-	def choose_quest(self, key, quests, enemies, npcs, player, journal, conversation, log):
+	def choose_quest(self, key, quests, enemies, npcs, player, journal, conversation):
 		# TODO check to see if the quest is already completed when choosing quests
 		# TODO make a new type of quest to talk to another npc
-		player.update_quests(enemies, npcs, journal)
-		log.write(str(int(chr(int(key) - 1))) + "\r\n")
+		player.update_quests()
+		DebugLog.write(str(int(chr(int(key) - 1))) + "\r\n")
 		quest_list = quests
 		if int(chr(key)) - 1 >= len(quest_list):
 			pass
@@ -78,18 +93,17 @@ class NPC(Character):
 			if quest not in player.quests:
 				journal.insertln()
 				journal.addstr(1, 1, quest.description)
-				log.write("not fail" + "\r\n")
 				journal.border()
 				journal.refresh()
 				list_key = int(chr(int(key) - 1))
 				while 1:
-					self.show_options(conversation, log, "Yes", "No")
+					self.show_options(conversation, "Yes", "No")
 					key = conversation.getch()
 					if key is ord("1"):
 						journal.insertln()
 						journal.addstr(1, 1, "You have accepted the quest")
 						journal.refresh()
-						player.add_quest(quest_list[list_key], log)
+						player.add_quest(quest_list[list_key])
 						self.conversation_start(conversation)
 						break
 					elif key is ord("2"):
@@ -102,11 +116,13 @@ class NPC(Character):
 					journal.addstr(1, 1, "You have completed my quest, here is your reward.")
 					journal.border()
 					journal.refresh()
-					self.show_options(conversation, log, "1 - Accept")
+					self.show_options(conversation, "1 - Accept")
 					key = conversation.getch()
 					if key is ord("1"):
+						quest.completed = False
 						player.coins += quest.coin_reward
-						player.add_inventory_item(quest.object_reward)
+						if quest.object_reward is not None:
+							player.add_inventory_item(quest.object_reward)
 						player.increase_exp(quest.exp_reward)
 						if quest.type.value == 1:
 							item = quest.item_to_collect
@@ -115,7 +131,7 @@ class NPC(Character):
 								if inv_item.name == item:
 									index = player.inventory[0].index(inv_item)
 							player.inventory[1][index] -= amount
-							log.write("working\n")
+							DebugLog.write("working\n")
 						del player.quests[player_quest_index]
 						if quest.type == 2:
 							del self.quests[npc_quest_index]
@@ -127,7 +143,7 @@ class NPC(Character):
 					journal.border()
 					journal.refresh()
 
-	def interact(self, journal, conversation, input_key, player, log, enemies, npcs, trade_window):
+	def interact(self, input_key, player, enemies, npcs, trade_window):
 		if not self.quests:
 			self.has_quest = False
 		if self.talking is False:
@@ -147,15 +163,16 @@ class NPC(Character):
 					journal.refresh()
 					quest_list = []
 					for quest in self.quests:
-						log.write(quest.name + "\r\n")
+						DebugLog.write(quest.name + "\r\n")
 						quest_list.append(quest.name)
-					self.show_options(conversation, log, quest_list)
+
+					self.show_options(conversation, quest_list)
 
 					quests = []
 					for quest in self.quests:
 						quests.append(quest)
 					input_key = conversation.getch()
-					self.choose_quest(input_key, quests, enemies, npcs, player, journal, conversation, log)
+					self.choose_quest(input_key, quests, enemies, npcs, player, journal, conversation)
 					self.conversation_start(conversation)
 					break
 			else:
@@ -166,7 +183,7 @@ class NPC(Character):
 			journal.insertln()
 			journal.addstr(1, 1, self.dialogue["trade"])
 			if self.trade_inventory is not []:
-				self.trade(player, trade_window, conversation, log)
+				self.trade(player, trade_window, conversation)
 			self.conversation_start(conversation)
 
 	def refresh_trade_menu(self, journal, inv):
@@ -175,7 +192,7 @@ class NPC(Character):
 			journal.refresh()
 
 	# TODO improve the trade system
-	def trade(self, player, journal, conversation, log):
+	def trade(self, player, journal, conversation):
 		input_key = -1
 		conversation.keypad(True)
 		conversation.clear()
@@ -337,8 +354,8 @@ class NPC(Character):
 				else:
 					self.move_left()
 
-	def save_character(self, log):
-		character = super().save_character(log)
+	def save_character(self):
+		character = super().save_character()
 		character["allow_movement"] = self.allow_movement
 		character["relationship"] = self.relationship.value
 		return character
@@ -361,29 +378,29 @@ class NPC(Character):
 			player.increase_exp(self.increase_exp_by)
 
 
-def create_npc(name, character, race: Races, npcs, log):  # this function must be assigned to an object
+def create_npc(name, character, race: Races, npcs):  # this function must be assigned to an object
 	var = False
 	for x in npcs:
 		if name == x.name:  # name must be the same as the object name
 			var = True
-			log.write(x.name + " is already there" + "\r\n")
+			DebugLog.write(x.name + " is already there" + "\r\n")
 	if not var:
 		npcs.append(NPC(name, character, race))
 	return npcs[len(npcs) - 1]
 
 
-def save_npcs(save, npcs, log):
+def save_npcs(save, npcs):
 	all_NPCs = npcs[:]
 	npcs.clear()
 	for npc in all_NPCs:
-		temp_npc = npc.save_character(log)
+		temp_npc = npc.save_character()
 		"""temp_npc = npc.__dict__
 		temp_npc["race"] = temp_npc["race"].value
 		equipped_item = temp_npc["equipped"]
 		if equipped_item["helmet"] is not None:
 			equipped_item["helmet"] = equipped_item["helmet"].__dict__
 			equipped_item["helmet"] = equipped_item["helmet"]["name"]
-			log.write(str(equipped_item["helmet"]) + "\r\n")
+			DebugLog.write(str(equipped_item["helmet"]) + "\n")
 		if equipped_item["chest"] is not None:
 			equipped_item["chest"] = equipped_item["chest"].__dict__
 			equipped_item["chest"] = equipped_item["chest"]["name"]
@@ -411,39 +428,19 @@ def save_npcs(save, npcs, log):
 		npcs.append(temp_npc)
 	save["all_NPCs"].clear()
 	save["all_NPCs"] = npcs[:]
-	log.write("save NPCs" + "\r\n")
+	DebugLog.write("NPCs saved" + "\n")
 
 
-def npc_at_location(location, npcs):
-	for npc in npcs:
-		if npc.location[0] is location[0] and npc.location[1] is location[1]:
-			return {"result": True, "npc": npc}
+def load_npc_dialogue(name):  # for NEW game only
+	filename = 'Dialogue/' + Func.sanitize_filename(name) + '.json'
+	if os.path.exists(filename):
+		with open(filename, 'r') as a:
+			dialogue = json.load(a)
+			a.close()
+		DebugLog.write("dialogue loaded" + "\n")
+		return dialogue
 	else:
-		return {"result": False}
-
-
-def load_npc_dialogue(npcs, log):  # for NEW game only
-	for npc in npcs:
-		filename = 'Dialogue/' + Func.sanitize_filename(npc.name) + '.json'
-		if os.path.exists(filename):
-			with open(filename, 'r') as a:
-				npc.dialogue = json.load(a)
-				a.close()
-	log.write("load npc dialogue" + "\r\n")
-
-
-def update_npc_locations(npcs, map):
-	for npc in npcs:
-		if npc.prevlocation.__ne__(npc.location):  # moves the NPC
-			if map.inch(npc.location[0], npc.location[1]) == ord(
-					" "):  # stops NPC from moving if there's a character there
-				map.addch(npc.location[0], npc.location[1], ord(npc.character))
-				map.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
-				npc.prevlocation = npc.location[:]
-			else:
-				npc.location = npc.prevlocation[:]  # keeps the NPC at its current location
-		if map.inch(npc.location[0], npc.location[1]) == ord(" "):
-			map.addch(npc.location[0], npc.location[1], ord(npc.character))
+		DebugLog.write("no dialogue\n")
 
 
 def place_npcs(npcs, map):

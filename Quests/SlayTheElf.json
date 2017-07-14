@@ -6,6 +6,6 @@
   "type": 2,
   "coin_reward": 100,
   "exp_reward": 200,
-  "object_reward": "reward object",
+  "object_reward": null,
   "target": "Alice"
 }

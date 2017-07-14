@@ -2,19 +2,21 @@ import json
 import os
 
 from BaseClasses import NPC
+from Globals import *
 from Functions import Func
 import Quest
 import Items
 
 
-def load_npcs(save, npcs, log):
+def load_npcs(save, npcs):
 	npcs.clear()
 	for npc in save["all_NPCs"]:
-		temp_npc = NPC.create_npc(npc["name"], "?", NPC.Races(0), npcs, log)
+		temp_npc = NPC.NPC(npc["name"], "?", NPC.Races(0))
 		filename = 'NPCs/' + Func.sanitize_filename(npc["name"]) + '.json'
 		file = open(filename, "r")
 		npc_data = json.load(file)
 		temp_npc.race = NPC.Races(npc_data["race"])
+		DebugLog.write(temp_npc.name + " Race: " + str(temp_npc.race)[6:] + "\r\n")
 		temp_npc.location = npc["location"]
 		temp_npc.prevlocation = temp_npc.location[:]
 		temp_npc.health = npc["health"]
@@ -31,8 +33,8 @@ def load_npcs(save, npcs, log):
 		temp_npc.spawn_location = npc_data["spawn_location"]
 		temp_npc.endurance = npc_data["endurance"]
 		temp_npc.defense = npc_data["defense"]
-		temp_npc.dialogue = npc_data["dialogue"]
-		temp_npc.quests = Quest.load_quests(npc_data["quests"], log)
+		temp_npc.dialogue = NPC.load_npc_dialogue(npc["name"])
+		temp_npc.quests = Quest.load_quests(npc_data["quests"])
 		temp_npc.relationship = NPC.Relationship(npc["relationship"])
 		temp_npc.allow_movement = npc["allow_movement"]
 		# load equipped npc items
@@ -66,15 +68,14 @@ def load_npcs(save, npcs, log):
 			for item in Items.all_items:
 				if trade_item == item.name:
 					temp_npc.trade_inventory.append(item)
-		log.write(temp_npc.name + " Race: " + str(temp_npc.race)[6:] + "\r\n")
-	log.write("load NPCs: " + str(len(npcs)) + "\r\n")
+	DebugLog.write("NPCs loaded: " + str(len(npcs)) + "\n\n")
 
 
-def load_npcs_for_new_game(npcs, log):
+def load_npcs_for_new_game(npcs):
 	for file in os.listdir("./NPCs"):
 		if file.endswith(".json"):
 			filename = "NPCs/" + file
-			log.write(filename + "\n")
+			DebugLog.write(filename + "\n")
 			with open(filename, 'r') as f:
 				npc_data = json.load(f)
 				f.close()
@@ -100,8 +101,8 @@ def load_npcs_for_new_game(npcs, log):
 				temp_npc.spawn_location = npc_data["spawn_location"]
 				temp_npc.endurance = npc_data["endurance"]
 				temp_npc.defense = npc_data["defense"]
-				temp_npc.dialogue = npc_data["dialogue"]
-				temp_npc.quests = Quest.load_quests(npc_data["quests"], log)
+				temp_npc.dialogue = NPC.load_npc_dialogue(name)
+				temp_npc.quests = Quest.load_quests(npc_data["quests"])
 				temp_npc.relationship = NPC.Relationship(npc_data["relationship"])
 				temp_npc.allow_movement = npc_data["allow_movement"]
 				# load equipped npc items
@@ -135,5 +136,3 @@ def load_npcs_for_new_game(npcs, log):
 					for item in Items.all_items:
 						if trade_item == item.name:
 							temp_npc.trade_inventory.append(item)
-
-				npcs.append(temp_npc)

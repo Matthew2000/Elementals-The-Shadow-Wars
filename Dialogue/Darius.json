@@ -1,9 +1,5 @@
 {
     "intro": "Hi my name is Darius.",
-    "quest": [
-        "Slay The Elf",
-        "Wolf Pelts"
-    ],
     "talk": "I am an NPC.",
     "trade": "Here is what I have to trade."
 }

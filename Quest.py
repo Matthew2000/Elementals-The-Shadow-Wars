@@ -2,8 +2,8 @@ from enum import Enum
 import json
 import os
 
-import Functions.Func as Func
 from BaseClasses import NPC
+from Globals import *
 import Items
 
 
@@ -92,7 +92,7 @@ class AssassinateQuest(Quest):
 		return new_quest
 
 	def update_quest(self, player):
-		for npc in NPC.NPC.all:
+		for npc in NPC.Character.all_NPCs:
 			if npc.name == self.target:
 				if npc.is_dead():
 					self.completed = True
@@ -165,11 +165,12 @@ class TalkQuest(Quest):
 		return new_quest
 
 
-def load_all_quests(log):
+def load_all_quests():
+	DebugLog.write("Quests:\n")
 	for file in os.listdir("./Quests"):
 		if file.endswith(".json"):
 			filename = "Quests/" + file
-			log.write(filename + "\n")
+			DebugLog.write("    " + filename + "\n")
 			with open(filename, 'r') as f:
 				quest_data = json.load(f)
 				f.close()
@@ -188,14 +189,15 @@ def load_all_quests(log):
 				if quest_data["type"] == 5:
 					TalkQuest.dictionary(quest_data)
 					continue
+	DebugLog.write("\n")
 
 
-def load_quests(npc_quests, log):
+def load_quests(npc_quests):
 	quests = []
 	for quest in Quest.all:
 		if quest.name in npc_quests:
 			if quest not in quests:
-				log.write(quest.name + " added\n")
+				DebugLog.write("Quest added: " + quest.name + "\n")
 				quests.append(quest)
-	log.write("quests loaded\n")
+	DebugLog.write("quests loaded\n\n")
 	return quests
