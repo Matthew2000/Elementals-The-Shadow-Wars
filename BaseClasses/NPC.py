@@ -16,7 +16,7 @@ class Relationship(Enum):
 class NPC(Character):
 	all = []
 
-	def __init__(self, name: str, character: chr, race: Races):
+	def __init__(self, name: str, character: chr, race: Race, id):
 		super().__init__(name, character, race)
 		self.allow_movement = False
 		self.talking = False
@@ -29,10 +29,15 @@ class NPC(Character):
 		self.trade_inventory = []
 		self.relationship = Relationship.Neutral
 		self.increase_exp_by = int((self.level**2)/.4) + 5
+		self.id = id
 		Character.all_NPCs.append(self)
+		Character.NPC_ids.append(self.id)
 
 	def begin_play(self):
-		pass
+		if not self.quests:
+			self.has_quest = False
+		else:
+			self.has_quest = True
 
 	def tick(self, input_key, player):
 
@@ -82,7 +87,7 @@ class NPC(Character):
 	def choose_quest(self, key, quests, enemies, npcs, player, journal, conversation):
 		# TODO check to see if the quest is already completed when choosing quests
 		# TODO make a new type of quest to talk to another npc
-		player.update_quests()
+		player.update_quests(self)
 		DebugLog.write(str(int(chr(int(key) - 1))) + "\r\n")
 		quest_list = quests
 		if int(chr(key)) - 1 >= len(quest_list):
@@ -119,7 +124,7 @@ class NPC(Character):
 					self.show_options(conversation, "1 - Accept")
 					key = conversation.getch()
 					if key is ord("1"):
-						quest.completed = False
+						quest.reset()
 						player.coins += quest.coin_reward
 						if quest.object_reward is not None:
 							player.add_inventory_item(quest.object_reward)
@@ -377,55 +382,22 @@ class NPC(Character):
 		if self.is_enemy():
 			player.increase_exp(self.increase_exp_by)
 
-
-def create_npc(name, character, race: Races, npcs):  # this function must be assigned to an object
-	var = False
-	for x in npcs:
-		if name == x.name:  # name must be the same as the object name
-			var = True
-			DebugLog.write(x.name + " is already there" + "\r\n")
-	if not var:
-		npcs.append(NPC(name, character, race))
-	return npcs[len(npcs) - 1]
+	def on_map(self, map):
+		if self.name in map.MAP["unique_NPCs"]:
+			return True
+		for npc in map.MAP["common_NPCs"]:
+			if self.id == npc["id"]:
+				return True
+		return False
 
 
 def save_npcs(save, npcs):
 	all_NPCs = npcs[:]
 	npcs.clear()
 	for npc in all_NPCs:
-		temp_npc = npc.save_character()
-		"""temp_npc = npc.__dict__
-		temp_npc["race"] = temp_npc["race"].value
-		equipped_item = temp_npc["equipped"]
-		if equipped_item["helmet"] is not None:
-			equipped_item["helmet"] = equipped_item["helmet"].__dict__
-			equipped_item["helmet"] = equipped_item["helmet"]["name"]
-			DebugLog.write(str(equipped_item["helmet"]) + "\n")
-		if equipped_item["chest"] is not None:
-			equipped_item["chest"] = equipped_item["chest"].__dict__
-			equipped_item["chest"] = equipped_item["chest"]["name"]
-		if equipped_item["gloves"] is not None:
-			equipped_item["gloves"] = equipped_item["gloves"].__dict__
-			equipped_item["gloves"] = equipped_item["gloves"]["name"]
-		if equipped_item["belt"] is not None:
-			equipped_item["belt"] = equipped_item["belt"].__dict__
-			equipped_item["belt"] = equipped_item["belt"]["name"]
-		if equipped_item["pants"] is not None:
-			equipped_item["pants"] = equipped_item["pants"].__dict__
-			equipped_item["pants"] = equipped_item["pants"]["name"]
-		if equipped_item["shoes"] is not None:
-			equipped_item["shoes"] = equipped_item["shoes"].__dict__
-			equipped_item["shoes"] = equipped_item["shoes"]["name"]
-		if equipped_item["weapon"] is not None:
-			equipped_item["weapon"] = equipped_item["weapon"].__dict__
-			equipped_item["weapon"] = equipped_item["weapon"]["name"]
-		if temp_npc["trade_inventory"] is not []:
-			x = 0
-			for item in temp_npc["trade_inventory"]:
-				item = item.__dict__
-				temp_npc["trade_inventory"][x] = item["name"]
-				x += 1"""
-		npcs.append(temp_npc)
+		if npc.race is not Race.Wolf:
+			temp_npc = npc.save_character()
+			npcs.append(temp_npc)
 	save["all_NPCs"].clear()
 	save["all_NPCs"] = npcs[:]
 	DebugLog.write("NPCs saved" + "\n")

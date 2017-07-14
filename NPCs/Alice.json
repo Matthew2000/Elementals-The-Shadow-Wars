@@ -25,6 +25,7 @@
   "has_quest": false,
   "health": 100,
   "health_regen": 5,
+  "id": "Alice",
   "inventory": [[], []],
   "level": 1,
   "location": [

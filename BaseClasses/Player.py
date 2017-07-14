@@ -7,7 +7,7 @@ import Quest
 
 
 class Player(Character):
-	def __init__(self, name: str, character: chr, race: Races, spawn_point):
+	def __init__(self, name: str, character: chr, race: Race, spawn_point):
 		super().__init__(name, character, race)
 		self.spawn_location = spawn_point[:]
 		self.quests = []
@@ -20,7 +20,7 @@ class Player(Character):
 	def begin_play(self):
 		pass
 
-	def tick(self, input_key):
+	def tick(self, input_key, environment):
 		global player_turn
 
 		if self.exp_is_enough():
@@ -44,7 +44,6 @@ class Player(Character):
 				self.respawn(30, 50)
 				spawn_character(MAP, self, self.location[0], self.location[1])
 
-		self.update_quests()
 		if not self.is_dead():
 			self.move(input_key, dims)
 
@@ -53,8 +52,9 @@ class Player(Character):
 			# if not the player regenerates health and updates its status
 			result = Func.enemy_at_location(Character.all_enemies, self.location, enemy_status)
 			if result["result"] is True:
-				enemy1 = result["enemy"]
-				Func.start_combat(self, enemy1, input_key)
+				enemy = result["enemy"]
+				Func.start_combat(self, enemy, input_key)
+				self.update_quests(enemy)
 			else:
 				self.regenerate_health()
 				self.update_player_status()
@@ -67,8 +67,10 @@ class Player(Character):
 				if NPC.is_enemy():
 					NPC.allow_movement = False
 					Func.start_combat(self, NPC, input_key)
+					self.update_quests(NPC)
 				else:
 					NPC.interact(input_key, self, Character.all_enemies, Character.all_NPCs, trade_win)
+					self.update_quests(NPC)
 					Func.update_journal(journal)
 					self.update_player_status()
 					while input_key is not ord("4"):
@@ -79,11 +81,11 @@ class Player(Character):
 						NPC.talking = False
 						conversation.clear()
 						conversation.refresh()
+						self.update_quests(NPC)
 
 			# updates the quests that the player has then ends the player's turn
-					Func.update_player_location(self, MAP)
+					Func.update_player_location(self, MAP, environment)
 
-		self.update_quests()
 		player_turn = False
 
 		Func.player_dead(self, MAP, journal)
@@ -110,10 +112,10 @@ class Player(Character):
 	def add_quest(self, quest):
 		self.quests.append(quest)
 
-	def update_quests(self):
+	def update_quests(self, npc):
 		# TODO make function for updating each type of quest
 		for quest in self.quests:
-			quest.update_quest(self)
+			quest.update_quest(self, npc)
 
 	def level_up(self):
 		self.exp_for_next_level -= self.exp_to_next_level
@@ -285,7 +287,7 @@ class Player(Character):
 		return character
 
 
-def create_player(name: str, character: chr, race: Races, spawn_point):
+def create_player(name: str, character: chr, race: Race, spawn_point):
 	temp_player = Player(name, character, race, spawn_point)
 	temp_player.location = temp_player.spawn_location
 	return temp_player
@@ -300,8 +302,8 @@ def load_player(player, save):
 	player.health = save["player"]["health"]
 	player.character = save["player"]["character"]
 	player.max_health = save["player"]["max_health"]
-	player.race = Races(save["player"]["race"])
-	DebugLog.write("Race: " + str(player.race)[6:] + "\r\n")
+	player.race = Race(save["player"]["race"])
+	DebugLog.write("Race: " + str(player.race)[5:] + "\r\n")
 	player.level = save["player"]["level"]
 	player.total_exp = save["player"]["total_exp"]
 	player.exp_for_next_level = save["player"]["exp_for_next_level"]

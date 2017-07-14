@@ -11,12 +11,12 @@ import Items
 def load_npcs(save, npcs):
 	npcs.clear()
 	for npc in save["all_NPCs"]:
-		temp_npc = NPC.NPC(npc["name"], "?", NPC.Races(0))
 		filename = 'NPCs/' + Func.sanitize_filename(npc["name"]) + '.json'
 		file = open(filename, "r")
 		npc_data = json.load(file)
-		temp_npc.race = NPC.Races(npc_data["race"])
-		DebugLog.write(temp_npc.name + " Race: " + str(temp_npc.race)[6:] + "\r\n")
+		temp_npc = NPC.NPC(npc["name"], "?", NPC.Race(0), npc_data["id"])
+		temp_npc.race = NPC.Race(npc_data["race"])
+		DebugLog.write(temp_npc.name + " Race: " + str(temp_npc.race)[5:] + "\r\n")
 		temp_npc.location = npc["location"]
 		temp_npc.prevlocation = temp_npc.location[:]
 		temp_npc.health = npc["health"]
@@ -38,7 +38,7 @@ def load_npcs(save, npcs):
 		temp_npc.relationship = NPC.Relationship(npc["relationship"])
 		temp_npc.allow_movement = npc["allow_movement"]
 		# load equipped npc items
-		if temp_npc.race is not NPC.Races.Wolf:
+		if temp_npc.race is not NPC.Race.Wolf:
 			equipped_item = npc_data["equipped"]
 			for weapon in Items.all_weapons:
 				if equipped_item["weapon"] is not None:
@@ -83,7 +83,7 @@ def load_npcs_for_new_game(npcs):
 				name = npc_data["name"]
 				character = npc_data["character"]
 				race = npc_data["race"]
-				temp_npc = NPC.NPC(name, character, NPC.Races(race))
+				temp_npc = NPC.NPC(name, character, NPC.Race(race), npc_data["id"])
 
 				temp_npc.location = npc_data["location"]
 				temp_npc.prevlocation = temp_npc.location[:]
@@ -106,7 +106,7 @@ def load_npcs_for_new_game(npcs):
 				temp_npc.relationship = NPC.Relationship(npc_data["relationship"])
 				temp_npc.allow_movement = npc_data["allow_movement"]
 				# load equipped npc items
-				if temp_npc.race is not NPC.Races.Wolf:
+				if temp_npc.race is not NPC.Race.Wolf:
 					equipped_item = npc_data["equipped"]
 					for weapon in Items.all_weapons:
 						if equipped_item["weapon"] is not None:

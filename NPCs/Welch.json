@@ -25,6 +25,7 @@
   "has_quest": false,
   "health": 100,
   "health_regen": 5,
+  "id": "Welch",
   "inventory": [[], []],
   "level": 1,
   "location": [

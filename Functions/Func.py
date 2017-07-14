@@ -34,28 +34,39 @@ def update_game(player, journal):
 	update_journal(journal)
 
 
-def update_player_location(player, map):
-	if player.prevlocation.__ne__(player.location):  # moves the Enemy
+def update_player_location(player, map , environment):
+	if player.prevlocation.__ne__(player.location):
 		if map.inch(player.location[0], player.location[1]) == ord(
-				" "):  # stops Enemy from moving if there's a enemy there
+				" "):
 			map.addch(player.location[0], player.location[1], ord(player.character))
 			map.addch(player.prevlocation[0], player.prevlocation[1], " ")
 			player.prevlocation = player.location[:]
 		else:
-			global current_map
-			if map.inch(player.location[0], player.location[1]) == ord("∨"):
-				current_map = current_map.go_to_map("north", DebugLog)
-				current_map.show_map(map)
+			if map.inch(player.location[0], player.location[1]) == ord("v"):
+				if environment.MAP["adjacent_maps"]["north"] is not None:
+					environment.go_to_map("north")
+					environment.show_map()
+					player.location = [32, player.location[1]]
+					player.prevlocation = player.location[:]
 			if map.inch(player.location[0], player.location[1]) == ord("^"):
-				current_map = current_map.go_to_map("south", DebugLog)
-				current_map.show_map(map)
+				if environment.MAP["adjacent_maps"]["south"] is not None:
+					environment.go_to_map("south")
+					environment.show_map()
+					player.location = [2, player.location[1]]
+					player.prevlocation = player.location[:]
 			if map.inch(player.location[0], player.location[1]) == ord(">"):
-				current_map = current_map.go_to_map("west", DebugLog)
-				current_map.show_map(map)
+				if environment.MAP["adjacent_maps"]["west"] is not None:
+					environment.go_to_map("west")
+					environment.show_map()
+					player.location = [player.location[0], 97]
+					player.prevlocation = player.location[:]
 			if map.inch(player.location[0], player.location[1]) == ord("<"):
-				current_map = current_map.go_to_map("east", DebugLog)
-				current_map.show_map(map)
-			player.location = player.prevlocation[:]  # keeps the Enemy at its current location
+				if environment.MAP["adjacent_maps"]["east"] is not None:
+					environment.go_to_map("east")
+					environment.show_map()
+					player.location = [player.location[0], 2]
+					player.prevlocation = player.location[:]
+			player.location = player.prevlocation[:]
 	if map.inch(player.location[0], player.location[1]) == ord(" "):
 		map.addch(player.location[0], player.location[1], ord(player.character))
 
@@ -111,6 +122,7 @@ def start_combat(player, enemy, input):
 		player.update_player_status()
 		if enemy.health <= 0:
 			is_enemy_dead(enemy, player, MAP, journal)
+			player.update_quests(enemy)
 			enemy.allow_movement = True
 			update_enemy_status(enemy, enemy_status)
 			break
@@ -151,7 +163,7 @@ def update_enemy_status(enemy, enemy_stat_win):
 	if enemy.allow_movement is False:
 		enemy_stat_win.border()
 		enemy_stat_win.addstr(0, 1, enemy.name + "'s Stats")
-		enemy_stat_win.addstr(1, 1, "Race: " + str(enemy.race)[6:])
+		enemy_stat_win.addstr(1, 1, "Race: " + str(enemy.race)[5:])
 		enemy_stat_win.addstr(2, 1, "Health: " + str(enemy.health))
 		enemy_stat_win.addstr(3, 1, "Level: " + str(enemy.level))
 		enemy_stat_win.addstr(4, 1, "Strength: " + str(enemy.strength))
@@ -159,20 +171,21 @@ def update_enemy_status(enemy, enemy_stat_win):
 	enemy_stat_win.refresh()
 
 
-def update_npc_locations(enemies, map):
-	for enemy in enemies:
-		if enemy.prevlocation.__ne__(enemy.location):  # moves the Enemy
-			if map.inch(enemy.prevlocation[0], enemy.prevlocation[1]) != ord(" "):
-				map.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
-			if map.inch(enemy.location[0], enemy.location[1]) == ord(
-					" "):  # stops Enemy from moving if there's a enemy there
-				map.addch(enemy.location[0], enemy.location[1], ord(enemy.character))
-				map.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
-				enemy.prevlocation = enemy.location[:]
-			else:
-				enemy.location = enemy.prevlocation[:]  # keeps the Enemy at its current location
-		if map.inch(enemy.location[0], enemy.location[1]) == ord(" "):
-			map.addch(enemy.location[0], enemy.location[1], ord(enemy.character))
+def update_npc_locations(npcs, environment):
+	for npc in npcs:
+		if npc.on_map(environment):
+			if npc.prevlocation.__ne__(npc.location):  # moves the Enemy
+				if MAP.inch(npc.prevlocation[0], npc.prevlocation[1]) != ord(" "):
+					MAP.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
+				if MAP.inch(npc.location[0], npc.location[1]) == ord(
+						" "):  # stops Enemy from moving if there's a enemy there
+					MAP.addch(npc.location[0], npc.location[1], ord(npc.character))
+					MAP.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
+					npc.prevlocation = npc.location[:]
+				else:
+					npc.location = npc.prevlocation[:]  # keeps the Enemy at its current location
+			if MAP.inch(npc.location[0], npc.location[1]) == ord(" "):
+				MAP.addch(npc.location[0], npc.location[1], ord(npc.character))
 
 
 def enemy_at_location(enemies, location, enemy_stat_win):

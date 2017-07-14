@@ -4,7 +4,7 @@ from enum import Enum
 import Items
 
 
-class Races(Enum):
+class Race(Enum):
 	Unknown = 0
 	Human = 1
 	Avaker = 2
@@ -17,8 +17,9 @@ class Races(Enum):
 class Character:
 	all_NPCs = []
 	all_enemies = []
+	NPC_ids = []
 
-	def __init__(self, name: str, character: chr, race: Races):
+	def __init__(self, name: str, character: chr, race: Race):
 		self.location = [1, 1]
 		self.prevlocation = [1, 1]
 		self.health = 100
@@ -71,7 +72,7 @@ class Character:
 			pass
 		else:
 			self.damage = int((randint(5, 11) + (self.strength * .2)) - ((randint(5, 11) + (self.strength * .1)) * opponent.defense / 100))
-			if self.race is not Races.Wolf:
+			if self.race is not Race.Wolf:
 				if self.equipped["weapon"] is not None:
 					self.damage = int(((randint(5, 11) + (self.strength * .2)) * self.equipped["weapon"].damage) - ((randint(5, 11) + (self.strength * .1)) * opponent.defense / 100))
 			if self.damage <= 0:
@@ -118,19 +119,19 @@ class Character:
 
 	def set_stats_by_level_and_race(self):
 		armour_defense = self.get_defense_from_armour()
-		if self.race is Races.Wolf:
+		if self.race is Race.Wolf:
 			self.endurance = int(5 * (self.level - 1)) + 2
 			self.defense = self.endurance
 			self.strength = int(10 + (5 * (self.level-1))) + 10
 			self.max_health = int((100 + (100 * (self.endurance * .3))))
 			self.health = int(self.max_health)
-		elif self.race is Races.Elf:
+		elif self.race is Race.Elf:
 			self.endurance = int(5 * (self.level - 1)) + 5
 			self.defense = self.endurance + armour_defense
 			self.strength = int(10 + (5 * (self.level - 1))) + 5
 			self.max_health = int((100 + (100 * (self.endurance * .3)))) + 50
 			self.health = int(self.max_health)
-		elif self.race is Races.Human:
+		elif self.race is Race.Human:
 			self.endurance = int(5 * (self.level - 1))
 			self.defense = self.endurance + armour_defense
 			self.strength = int(10 + (5 * (self.level - 1)))

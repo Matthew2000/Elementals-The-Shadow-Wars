@@ -28,6 +28,7 @@
   "has_quest": true,
   "health": 100,
   "health_regen": 5,
+  "id": "Darius",
   "inventory": [[], []],
   "level": 3,
   "location": [

@@ -1,0 +1,12 @@
+{
+  "description": "A group of wolves have been attacking the town.",
+  "completed": false,
+  "giver": "Rainbow Tooth",
+  "name": "Wolves",
+  "type": 3,
+  "coin_reward": 20,
+  "exp_reward": 20,
+  "object_reward": null,
+  "target": "Wolf",
+  "amount": 5
+}

@@ -1,40 +1,47 @@
 import json
 
+from Globals import *
+from NPCs.Classes.Wolf import Wolf
+
 
 class Environment:
-
-	all_maps = []
-
-	def __init__(self, map_directory: str, west_map="", east_map="", north_map="", south_map=""):
+	def __init__(self, map_directory: str):
 		self.directory = map_directory
 		temp = open(map_directory, "r")
-		MAP = json.load(temp)
-		self.environment = MAP["data"]
-		self.west_map = west_map
-		self.east_map = east_map
-		self.north_map = north_map
-		self.south_map = south_map
-		self.all_maps.append(self)
+		self.MAP = json.load(temp)
+		self.environment = self.MAP["data"]
 
-	def show_map(self, map):
+	def load_common_npcs(self):
+		for npc in self.MAP["common_NPCs"]:
+			if npc["id"] not in Wolf.NPC_ids:
+				if npc["race"] == "Wolf":
+					Wolf(npc["id"], npc["spawn_location"], npc["location"], npc["health"], npc["level"])
+
+	def show_map(self):
 		for y in range(34):
-			map.addstr(y, 0, self.environment[y])
+			MAP.addstr(y, 0, self.environment[y])
 
-	def go_to_map(self, direction, log):
-		if direction == "west" and self. west_map != "":
-			return Environment(self.west_map, east_map=self.directory)
-		elif direction == "east" and self. east_map != "":
-			log.write("test")
-			return Environment(self.east_map, west_map=self.directory)
-		elif direction == "north" and self. north_map != "":
-			return Environment(self.north_map, south_map=self.directory)
-		elif direction == "south" and self.south_map != "":
-			return Environment(self.south_map, north_map=self.directory)
-		else:
-			return self
+	def change_map(self, map_directory):
+		for npc_data in self.MAP["common_NPCs"]:
+			for npc in Wolf.all_NPCs:
+				if npc_data["id"] == npc.id:
+					Wolf.NPC_ids.remove(npc_data["id"])
+					Wolf.all_NPCs.remove(npc)
+		self.directory = map_directory
+		temp = open(map_directory, "r")
+		self.MAP = json.load(temp)
+		self.environment = self.MAP["data"]
+		self.load_common_npcs()
+
+	def go_to_map(self, direction):
+		if direction == "west" and self.MAP["adjacent_maps"]["west"] is not None:
+			self.change_map("Maps/" + self.MAP["adjacent_maps"][direction] + ".json")
+		elif direction == "east" and self.MAP["adjacent_maps"]["east"] is not None:
+			self.change_map("Maps/" + self.MAP["adjacent_maps"][direction] + ".json")
+		elif direction == "north" and self.MAP["adjacent_maps"]["north"] is not None:
+			self.change_map("Maps/" + self.MAP["adjacent_maps"][direction] + ".json")
+		elif direction == "south" and self.MAP["adjacent_maps"]["south"] is not None:
+			self.change_map("Maps/" + self.MAP["adjacent_maps"][direction] + ".json")
 
 
-map1 = Environment("Maps/map1.json", "Maps/map2.json", "Maps/map3.json", "Maps/map4.json", "Maps/map5.json")
-map2 = Environment("Maps/map2.json", east_map="Maps/map1.json")
-
-current_map = map1
+map1 = Environment(current_map)

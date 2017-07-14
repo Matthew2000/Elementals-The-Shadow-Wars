@@ -42,7 +42,10 @@ class Quest:
 		new_quest = Quest(name, type, giver, coin_reward, exp_reward, object_reward, description)
 		return new_quest
 
-	def update_quest(self, player):
+	def update_quest(self, player, npc):
+		pass
+
+	def reset(self):
 		pass
 
 
@@ -66,11 +69,14 @@ class CollectQuest(Quest):
 													temp.object_reward, temp.description, item_to_collect, amount)
 		return new_quest
 
-	def update_quest(self, player):
+	def update_quest(self, player, npc):
 		if self.item_to_collect in player.inventory[0]:
 			index = player.inventory[0].index(self.item_to_collect)
 			if player.inventory[1][index] == self.amount:
 				self.completed = True
+
+	def reset(self):
+		self.completed = False
 
 
 class AssassinateQuest(Quest):
@@ -91,11 +97,13 @@ class AssassinateQuest(Quest):
 													temp.object_reward, temp.description, target)
 		return new_quest
 
-	def update_quest(self, player):
-		for npc in NPC.Character.all_NPCs:
-			if npc.name == self.target:
-				if npc.is_dead():
-					self.completed = True
+	def update_quest(self, player, npc):
+		if npc.name == self.target:
+			if npc.is_dead():
+				self.completed = True
+
+	def reset(self):
+		self.completed = False
 
 
 class KillQuest(Quest):
@@ -105,6 +113,7 @@ class KillQuest(Quest):
 		super().__init__(name, QuestType.Kill, giver, coin_reward, exp_reward, object_reward, description)
 		self.target = target
 		self.amount = amount
+		self.amount_killed = 0
 		if self.name not in Quest.names:
 			Quest.names.append(self.name)
 			Quest.all.append(self)
@@ -117,6 +126,18 @@ class KillQuest(Quest):
 		new_quest = KillQuest(temp.name, temp.giver, temp.coin_reward, temp.exp_reward,
 													temp.object_reward, temp.description, target, amount)
 		return new_quest
+
+	def update_quest(self, player, npc):
+		if npc.name == self.target:
+			self.amount_killed += 1
+		if self.amount_killed >= self.amount:
+			if not self.completed:
+				DebugLog.write("\n####################\n" + self.name + " completed\n####################\n\n")
+			self.completed = True
+
+	def reset(self):
+		self.completed = False
+		self.amount_killed = 0
 
 
 class CraftQuest(Quest):
@@ -139,11 +160,14 @@ class CraftQuest(Quest):
 													temp.object_reward, temp.description, item, amount)
 		return new_quest
 
-	def update_quest(self, player):
+	def update_quest(self, player, npc):
 		if self.item in player.inventory[0]:
 			index = player.inventory[0].index(self.item)
 			if player.inventory[1][index] == self.amount:
 				self.completed = True
+
+	def reset(self):
+		self.completed = False
 
 
 class TalkQuest(Quest):
@@ -163,6 +187,12 @@ class TalkQuest(Quest):
 		new_quest = TalkQuest(temp.name, temp.giver, temp.coin_reward, temp.exp_reward,
 													temp.object_reward, temp.description, person)
 		return new_quest
+
+	def update_quest(self, player, npc):
+		pass
+
+	def reset(self):
+		self.completed = False
 
 
 def load_all_quests():

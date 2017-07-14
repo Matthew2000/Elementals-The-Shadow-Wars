@@ -1,7 +1,9 @@
 import curses
 
+
 DebugLog = open('RPGLog.txt', 'w')
 player_turn = True
+current_map = "Maps/map1.json"
 
 # creates the screens and windows that are used in the game
 screen = curses.initscr()

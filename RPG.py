@@ -12,7 +12,7 @@ locale.setlocale(locale.LC_ALL, '')
 code = "utf-8"
 
 # initiates some required variables
-save = {"all_NPCs": [], "player": {}}
+save = {"all_NPCs": [], "player": {}, "current_map": "Maps/map1.json"}
 error = open('RPGErrorLog.txt', 'w')
 sys.stderr = error
 Key = -1
@@ -39,9 +39,7 @@ try:
 	# gets the dimensions of the map
 	screen_dims = screen.getmaxyx()
 
-	player1 = create_player("Matthew", "@", Races.Human, [23, 71])
-
-	map1.show_map(MAP)
+	player1 = create_player("Matthew", "@", Race.Human, [23, 71])
 
 	# loads the save if it exits.
 	# if there is no save it makes a new game
@@ -50,14 +48,18 @@ try:
 			save = json.load(f)
 			f.close()
 
-		#Quest.load_all_quests()
 		load_player(player1, save)
 		player1.inventory = Func.load_inventory(save["player"]["inventory"])
 		load_player_equipment(player1, save)
 		Load.load_npcs(save, Character.all_NPCs)
+		current_map = save["current_map"]
 		DebugLog.write("############\nGame loaded\n############\n\n")
 	else:
 		new_game(Character.all_enemies, Character.all_NPCs)
+
+	map1.change_map(current_map)
+	map1.show_map()
+	map1.load_common_npcs()
 
 	spawn_character(MAP, player1, player1.location[0], player1.location[1])
 	place_npcs(Character.all_NPCs, MAP)
@@ -67,10 +69,17 @@ try:
 
 	journal.addstr(1, 1, "game start")
 
+	player1.begin_play()
+
+	for npc in Character.all_NPCs:
+		npc.begin_play()
+
 	while Key != ord("q"):
 
-		#current_map.show_map(MAP)
-		Func.update_player_location(player1, MAP)
+		#map1.show_map()
+		Func.update_player_location(player1, MAP, map1)
+		current_map = map1.directory
+		Func.update_npc_locations(Character.all_NPCs, map1)
 
 		screen.refresh()
 		MAP.refresh()
@@ -80,14 +89,16 @@ try:
 
 		Func.player_dead(player1, MAP, journal)
 
+		DebugLog.flush()
+
 		Key = MAP.getch()  # gets the player input
 
 		if Key == curses.KEY_RESIZE:
 			screen_dims = screen.getmaxyx()
 			screen.erase()
 			curses.doupdate()
-			Func.update_player_location(player1, MAP)
-			Func.update_npc_locations(Character.all_NPCs, MAP)
+			Func.update_player_location(player1, MAP, map1)
+			Func.update_npc_locations(Character.all_NPCs, map1)
 			player1.update_player_status()
 			journal.resize(50, 65)
 			MAP.resize(35, 100)
@@ -96,10 +107,11 @@ try:
 			player1.make_player_stat_win()
 			continue
 
-		player1.tick(Key)
+		player1.tick(Key, map1)
 
 		for npc in Character.all_NPCs:
-			npc.tick(Key, player1)
+			if npc.on_map(map1):
+				npc.tick(Key, player1)
 
 		DebugLog.flush()
 
@@ -107,16 +119,17 @@ try:
 
 		Func.update_game(player1, journal)
 
-		Func.update_npc_locations(Character.all_NPCs, MAP)
+		Func.update_npc_locations(Character.all_NPCs, map1)
 
 		screen.refresh()
 		MAP.refresh()
 		Func.update_game(player1, journal)
 
-	Func.update_npc_locations(Character.all_NPCs, MAP)
+	Func.update_npc_locations(Character.all_NPCs, map1)
 	DebugLog.write("\n############\nSave start\n############\n\n")
 	save_player(player1, save)
 	save_npcs(save, Character.all_NPCs)
+	save["current_map"] = current_map
 	DebugLog.write("\n############\nGame saved\n############")
 except:
 	DebugLog.write(str(sys.exc_info()))
