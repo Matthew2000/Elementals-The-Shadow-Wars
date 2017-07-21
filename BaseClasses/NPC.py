@@ -329,9 +329,22 @@ class NPC(Character):
 	def move(self, area, player):
 		if self.allow_movement:
 			if self.relationship == Relationship.Enemy:
-				if self.is_near_player(player, 5):
-					if ((player.level - self.level) >= 9) is False:
+				if ((player.level - self.level) >= 9) is False:
+					if self.is_near_player(player, 5):
 						self.follow_player(player)
+					else:
+						self.prevlocation = self.location[:]
+						direction = randint(0, 4)
+						if direction is 0:
+							pass
+						elif direction is 1:
+							self.move_up()
+						elif direction is 2:
+							self.move_down(area)
+						elif direction is 3:
+							self.move_right(area)
+						else:
+							self.move_left()
 				else:
 					self.prevlocation = self.location[:]
 					direction = randint(0, 4)

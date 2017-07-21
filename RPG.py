@@ -13,6 +13,7 @@ code = "utf-8"
 
 # initiates some required variables
 save = {"all_NPCs": [], "player": {}, "current_map": "Maps/map1.json"}
+map_save = {}
 error = open('RPGErrorLog.txt', 'w')
 sys.stderr = error
 Key = -1
@@ -76,7 +77,6 @@ try:
 
 	while Key != ord("q"):
 
-		#map1.show_map()
 		Func.update_player_location(player1, MAP, map1)
 		current_map = map1.directory
 		Func.update_npc_locations(Character.all_NPCs, map1)
@@ -124,6 +124,8 @@ try:
 		screen.refresh()
 		MAP.refresh()
 		Func.update_game(player1, journal)
+	else:
+		DebugLog.write("\n############\nGame Closed\n############\n\n")
 
 	Func.update_npc_locations(Character.all_NPCs, map1)
 	DebugLog.write("\n############\nSave start\n############\n\n")
