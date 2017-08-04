@@ -23,15 +23,14 @@ def load_inventory(inventory):
 	return new_inv
 
 
-def update_journal(journal):
+def update_journal():
 	journal.border()
-	#journal.addstr(0, 1, "Journal")
 	journal.refresh()
 
 
 def update_game(player, journal):
 	player.update_player_status()
-	update_journal(journal)
+	update_journal()
 
 
 def update_player_location(player, map , environment):
@@ -73,7 +72,27 @@ def update_player_location(player, map , environment):
 
 def print_to_journal(journal, message):
 	journal.insertln()
-	journal.addstr(1, 1, message)
+	message = message.split()
+	message_list = [""]
+	x = 0
+	for word in message:
+		message_list[x] += word + " "
+		if len(message_list[x]) >= 50:
+			message_list.append("")
+			x += 1
+			journal.insertln()
+	if len(message_list) > 1:
+		#journal.deleteln()
+		new_message = ""
+		for words in message_list:
+			new_message += words + "\n "
+	else:
+		new_message = ""
+		for words in message_list:
+			new_message += words
+	journal.addstr(1, 1, new_message)
+	journal.addstr(1, 1, "")
+	update_journal()
 
 
 def player_at_location(player, location):
@@ -94,7 +113,7 @@ def player_dead(player, map, journal):
 def print_combat_intro_text(journal):
 	print_to_journal(journal, 'Press "1" to attack or "2" to leave')
 	print_to_journal(journal, "Battle has started")
-	update_journal(journal)
+	update_journal()
 
 
 def set_all_stats(npcs, enemies):

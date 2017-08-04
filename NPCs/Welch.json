@@ -9,7 +9,9 @@
 	"talk": "I am an NPC.",
 	"trade": "I have nothing to trade."
   },
-  "quests": [],
+  "quests": [
+	"Wolves"
+  ],
   "endurance": 0,
   "equipped": {
 	"belt": null,
@@ -38,8 +40,8 @@
 	1,
 	1
   ],
-  "race": 1,
-  "relationship": 0,
+  "race": "Human",
+  "relationship": "Friend",
   "respawn_counter": 0,
   "respawnable": false,
   "spawn_location": [

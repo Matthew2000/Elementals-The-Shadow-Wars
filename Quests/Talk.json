@@ -1,11 +1,11 @@
 {
   "description": "quest_description.",
   "completed": false,
-  "giver": "_____",
-  "name": "name",
+  "giver": "Darius",
+  "name": "Talk",
   "type": 5,
   "coin_reward": 0,
   "exp_reward": 0,
-  "object_reward": "reward_object",
-  "person": "name"
+  "object_reward": null,
+  "person": "Harold"
 }

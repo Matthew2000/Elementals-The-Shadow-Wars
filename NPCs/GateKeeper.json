@@ -1,0 +1,57 @@
+{
+  "allow_movement": false,
+  "character": "G",
+  "coins": 50,
+  "damage": 0,
+  "defense": 10,
+  "dialogue": {
+    "intro": "Hi my name is Gate Keeper.",
+    "talk": "I am an NPC.",
+    "trade": "I am not a trader."
+  },
+  "quests": [],
+  "endurance": 10,
+  "equipped": {
+    "belt": null,
+    "chest": null,
+    "gloves": null,
+    "helmet": null,
+    "pants": null,
+    "shoes": null,
+    "weapon": null
+  },
+  "exp_for_next_level": 0,
+  "exp_to_next_level": 25,
+  "has_quest": true,
+  "health": 100,
+  "health_regen": 50,
+  "id": "Gate Keeper",
+  "inventory": [[], []],
+  "level": 51,
+  "location": [
+    15,
+    20
+  ],
+  "max_health": 100,
+  "name": "Gate Keeper",
+  "prevlocation": [
+    15,
+    20
+  ],
+  "race": "Unknown",
+  "relationship": "Friend",
+  "respawn_counter": 1,
+  "respawnable": true,
+  "spawn_location": [
+    15,
+    20
+  ],
+  "strength": 20,
+  "talking": false,
+  "total_exp": 0,
+  "trade_inventory": [
+    "Leather Armour",
+    "Leather Pants",
+    "Iron Dagger"
+  ]
+}

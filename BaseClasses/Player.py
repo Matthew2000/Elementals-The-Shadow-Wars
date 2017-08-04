@@ -69,19 +69,14 @@ class Player(Character):
 					Func.start_combat(self, NPC, input_key)
 					self.update_quests(NPC)
 				else:
-					NPC.interact(input_key, self, Character.all_enemies, Character.all_NPCs, trade_win)
 					self.update_quests(NPC)
-					Func.update_journal(journal)
 					self.update_player_status()
-					while input_key is not ord("4"):
-						input_key = MAP.getch()
-						NPC.interact(input_key, self, Character.all_enemies, Character.all_NPCs, trade_win)
-						Func.update_journal(journal)
-					else:
-						NPC.talking = False
-						conversation.clear()
-						conversation.refresh()
-						self.update_quests(NPC)
+					NPC.interact(self, Character.all_enemies, Character.all_NPCs, trade_win)
+					Func.update_journal()
+					NPC.talking = False
+					conversation.clear()
+					conversation.refresh()
+					self.update_quests(NPC)
 
 			# updates the quests that the player has then ends the player's turn
 					Func.update_player_location(self, MAP, environment)

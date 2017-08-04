@@ -1,12 +1,12 @@
 {
-  "description": "quest description.",
+  "description": "quest_description.",
   "completed": false,
   "giver": "_____",
   "name": "name",
   "type": 4,
   "coin_reward": 0,
   "exp_reward": 0,
-  "object_reward": "reward object",
+  "object_reward": "reward_object",
   "item": "item name",
   "amount": 0
 }

@@ -11,7 +11,8 @@
   },
   "quests": [
 	"Slay The Elf",
-	"Wolf Pelts"
+	"Wolf Pelts",
+	"Talk"
   ],
   "endurance": 10,
   "equipped": {
@@ -41,8 +42,8 @@
 	33,
 	98
   ],
-  "race": 2,
-  "relationship": 0,
+  "race": "Avaker",
+  "relationship": "Friend",
   "respawn_counter": 0,
   "respawnable": false,
   "spawn_location": [

@@ -5,13 +5,13 @@ import Items
 
 
 class Race(Enum):
-	Unknown = 0
-	Human = 1
-	Avaker = 2
-	Elf = 3
-	Dragon = 4
-	Valkyrie = 5
-	Wolf = 6
+	Unknown = "Unknown"
+	Human = "Human"
+	Avaker = "Avaker"
+	Elf = "Elf"
+	Dragon = "Dragon"
+	Valkyrie = "Valkyrie"
+	Wolf = "Wolf"
 
 
 class Character:

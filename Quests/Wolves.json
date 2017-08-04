@@ -1,7 +1,7 @@
 {
   "description": "A group of wolves have been attacking the town.",
   "completed": false,
-  "giver": "Rainbow Tooth",
+  "giver": "Welch",
   "name": "Wolves",
   "type": 3,
   "coin_reward": 20,

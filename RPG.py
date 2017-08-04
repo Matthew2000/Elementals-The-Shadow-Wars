@@ -63,7 +63,6 @@ try:
 	map1.load_common_npcs()
 
 	spawn_character(MAP, player1, player1.location[0], player1.location[1])
-	place_npcs(Character.all_NPCs, MAP)
 
 	screen.refresh()
 	MAP.refresh()

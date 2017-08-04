@@ -14,7 +14,7 @@ def load_npcs(save, npcs):
 		filename = 'NPCs/' + Func.sanitize_filename(npc["name"]) + '.json'
 		file = open(filename, "r")
 		npc_data = json.load(file)
-		temp_npc = NPC.NPC(npc["name"], "?", NPC.Race(0), npc_data["id"])
+		temp_npc = NPC.NPC(npc["name"], "?", NPC.Race.Unknown, npc_data["id"])
 		temp_npc.race = NPC.Race(npc_data["race"])
 		DebugLog.write(temp_npc.name + " Race: " + str(temp_npc.race)[5:] + "\r\n")
 		temp_npc.location = npc["location"]

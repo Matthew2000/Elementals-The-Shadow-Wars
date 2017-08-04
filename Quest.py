@@ -189,7 +189,8 @@ class TalkQuest(Quest):
 		return new_quest
 
 	def update_quest(self, player, npc):
-		pass
+		if npc.name == self.person:
+			self.completed = True
 
 	def reset(self):
 		self.completed = False

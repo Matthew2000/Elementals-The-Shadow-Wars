@@ -8,9 +8,9 @@ from Functions import Func
 
 
 class Relationship(Enum):
-	Friend = 0
-	Neutral = 1
-	Enemy = 2
+	Friend = "Friend"
+	Neutral = "Neutral"
+	Enemy = "Enemy"
 
 
 class NPC(Character):
@@ -78,15 +78,45 @@ class NPC(Character):
 					y += 1
 		conversation.refresh()
 
-	def talk(self, journal, conversation):
-		# TODO make more complex conversations
-		journal.insertln()
-		journal.addstr(1, 1, self.dialogue["talk"])
-		self.conversation_start(conversation)
+	def talk(self, conversation, input_key):
+		topic_list = []
+		for topic in self.dialogue["talk"]:
+			if topic["base_topic"]:
+				topic_list.append(topic["topic"])
+		topic_list.append("Back")
+
+		topics = []
+		for topic in self.dialogue["talk"]:
+			if topic["base_topic"]:
+				topics.append(topic)
+
+		Func.print_to_journal(journal, "Hello")
+
+		while 1:
+			self.show_options(conversation, topic_list)
+
+			input_key = conversation.getch()
+			if not chr(input_key).isnumeric():
+				continue
+
+			if int(chr(input_key)) - 1 >= len(topic_list):
+				continue
+
+			if topic_list[int(chr(input_key))-1] == "Back":
+				break
+
+			chosen_topic = topics[int(chr(input_key))-1]
+
+			topic_list = []
+			for topic in chosen_topic["choices"]:
+				topic_list.append(topic)
+			topics = []
+			for topic in self.dialogue["talk"]:
+				if topic["topic"] in chosen_topic["responses"]:
+					topics.append(topic)
+			Func.print_to_journal(journal, chosen_topic["content"])
 
 	def choose_quest(self, key, quests, enemies, npcs, player, journal, conversation):
-		# TODO check to see if the quest is already completed when choosing quests
-		# TODO make a new type of quest to talk to another npc
 		player.update_quests(self)
 		DebugLog.write(str(int(chr(int(key) - 1))) + "\r\n")
 		quest_list = quests
@@ -148,48 +178,55 @@ class NPC(Character):
 					journal.border()
 					journal.refresh()
 
-	def interact(self, input_key, player, enemies, npcs, trade_window):
-		if not self.quests:
-			self.has_quest = False
-		if self.talking is False:
-			journal.insertln()
-			journal.addstr(1, 1, self.dialogue["intro"])
-			self.conversation_start(conversation)
-		self.talking = True
-		if input_key is ord("1"):
-			self.talk(journal, conversation)
-		elif input_key is ord("2"):
-
-			if self.has_quest is True:
-				while 1:
-					journal.insertln()
-					journal.addstr(1, 1, "These are the quests that I have")
-					journal.border()
-					journal.refresh()
-					quest_list = []
-					for quest in self.quests:
-						DebugLog.write(quest.name + "\r\n")
-						quest_list.append(quest.name)
-
-					self.show_options(conversation, quest_list)
-
-					quests = []
-					for quest in self.quests:
-						quests.append(quest)
-					input_key = conversation.getch()
-					self.choose_quest(input_key, quests, enemies, npcs, player, journal, conversation)
-					self.conversation_start(conversation)
-					break
-			else:
+	def interact(self, player, enemies, npcs, trade_window):
+		input_key = -1
+		while input_key is  not ord("4"):
+			if not self.quests:
+				self.has_quest = False
+			if self.talking is False:
 				journal.insertln()
-				journal.addstr(1, 1, "I have no quest for you at the moment")
-				journal.refresh()
-		elif input_key is ord("3"):
-			journal.insertln()
-			journal.addstr(1, 1, self.dialogue["trade"])
-			if self.trade_inventory is not []:
-				self.trade(player, trade_window, conversation)
-			self.conversation_start(conversation)
+				journal.addstr(1, 1, self.dialogue["intro"][0])
+				self.conversation_start(conversation)
+			self.talking = True
+			conversation.refresh()
+			Func.update_journal()
+			input_key = conversation.getch()
+			if input_key is ord("1"):
+					self.talk(conversation, input_key)
+					self.conversation_start(conversation)
+					input_key = -1
+			elif input_key is ord("2"):
+
+				if self.has_quest is True:
+					while 1:
+						journal.insertln()
+						journal.addstr(1, 1, "These are the quests that I have")
+						journal.border()
+						journal.refresh()
+						quest_list = []
+						for quest in self.quests:
+							quest_list.append(quest.name)
+
+						self.show_options(conversation, quest_list)
+
+						quests = []
+						for quest in self.quests:
+							quests.append(quest)
+						input_key = conversation.getch()
+						self.choose_quest(input_key, quests, enemies, npcs, player, journal, conversation)
+						self.conversation_start(conversation)
+						break
+					input_key = -1
+				else:
+					journal.insertln()
+					journal.addstr(1, 1, "I have no quest for you at the moment")
+					journal.refresh()
+			elif input_key is ord("3"):
+				journal.insertln()
+				journal.addstr(1, 1, self.dialogue["trade"][0])
+				if self.trade_inventory is not []:
+					self.trade(player, trade_window, conversation)
+				self.conversation_start(conversation)
 
 	def refresh_trade_menu(self, journal, inv):
 		for item in inv:

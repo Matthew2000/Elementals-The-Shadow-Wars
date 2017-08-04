@@ -1,5 +1,33 @@
 {
-    "intro": "Hi my name is Darius.",
-    "talk": "I am an NPC.",
-    "trade": "Here is what I have to trade."
+  "intro": [
+    "Hi my name is Darius.",
+    "How are you doing today?"
+  ],
+  "trade": [
+    "Here is what I have to trade.",
+    "Would you like to buy something?"
+  ],
+  "talk": [
+    {
+      "topic": "the weather",
+      "base_topic": true,
+      "content": "the weather is cloudy today but tommorow it is likely to be very sunny",
+      "choices": ["Do you like the weather?", "What is the weather tomorrow like?", "Back"],
+      "responses": ["the weather1", "the weather2", ""]
+    },
+    {
+      "topic": "the weather1",
+      "base_topic": false,
+      "content": "I prefer the weather to be sunny.",
+      "choices": ["What is the weather tomorrow like?", "Back"],
+      "responses": ["the weather2", ""]
+    },
+    {
+      "topic": "the weather2",
+      "base_topic": false,
+      "content": "I am not able to tell the future.",
+      "choices": ["Do you like the weather?", "Back"],
+      "responses": ["the weather1", ""]
+    }
+  ]
 }

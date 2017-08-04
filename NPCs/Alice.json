@@ -38,8 +38,8 @@
 	1,
 	98
   ],
-  "race": 3,
-  "relationship": 2,
+  "race": "Elf",
+  "relationship": "Enemy",
   "respawn_counter": 0,
   "respawnable": true,
   "spawn_location": [
