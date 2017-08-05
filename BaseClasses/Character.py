@@ -14,6 +14,12 @@ class Race(Enum):
 	Wolf = "Wolf"
 
 
+class Relationship(Enum):
+	Friend = "Friend"
+	Neutral = "Neutral"
+	Enemy = "Enemy"
+
+
 class Character:
 	all_NPCs = []
 	all_enemies = []

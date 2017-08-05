@@ -1,16 +1,9 @@
-import curses
 import json
 import os
 
 from BaseClasses.Character import *
 from Globals import *
 from Functions import Func
-
-
-class Relationship(Enum):
-	Friend = "Friend"
-	Neutral = "Neutral"
-	Enemy = "Enemy"
 
 
 class NPC(Character):
@@ -89,6 +82,7 @@ class NPC(Character):
 		for topic in self.dialogue["talk"]:
 			if topic["base_topic"]:
 				topics.append(topic)
+		topics.append("")
 
 		Func.print_to_journal(journal, "Hello")
 
@@ -102,7 +96,7 @@ class NPC(Character):
 			if int(chr(input_key)) - 1 >= len(topic_list):
 				continue
 
-			if topic_list[int(chr(input_key))-1] == "Back":
+			if topics[int(chr(input_key))-1] == "":
 				break
 
 			chosen_topic = topics[int(chr(input_key))-1]
@@ -114,6 +108,9 @@ class NPC(Character):
 			for topic in self.dialogue["talk"]:
 				if topic["topic"] in chosen_topic["responses"]:
 					topics.append(topic)
+			for response in chosen_topic["responses"]:
+				if response == "":
+					topics.append(response)
 			Func.print_to_journal(journal, chosen_topic["content"])
 
 	def choose_quest(self, key, quests, enemies, npcs, player, journal, conversation):

@@ -11,7 +11,7 @@
     {
       "topic": "the weather",
       "base_topic": true,
-      "content": "the weather is cloudy today but tommorow it is likely to be very sunny",
+      "content": "the weather is cloudy today",
       "choices": ["Do you like the weather?", "What is the weather tomorrow like?", "Back"],
       "responses": ["the weather1", "the weather2", ""]
     },

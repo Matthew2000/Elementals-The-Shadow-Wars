@@ -60,38 +60,3 @@ LeatherGloves = Armour("Leather Gloves", 10, "gloves made out of leather", 5, Ar
 LeatherBelt = Armour("Leather Belt", 10, "a belt made out of leather", 5, Armours.Belt)
 LeatherPants = Armour("Leather Pants", 10, "pants made out of leather", 15, Armours.Pants)
 LeatherShoes = Armour("Leather Shoes", 10, "shoes made out of leather", 5, Armours.Shoes)
-
-java_all_items = []
-java_weapons = []
-java_chest = []
-java_helmet = []
-java_gloves = []
-java_belt = []
-java_shoes = []
-java_pants = []
-
-for item in all_items:
-	java_all_items.append(item.name)
-
-for item in all_weapons:
-	java_weapons.append(item.name)
-
-for item in all_armours:
-	if item.armour_type == Armours.Helmet:
-		java_helmet.append(item.name)
-	if item.armour_type == Armours.Chest:
-		java_chest.append(item.name)
-	if item.armour_type == Armours.Gloves:
-		java_gloves.append(item.name)
-	if item.armour_type == Armours.Belt:
-		java_belt.append(item.name)
-	if item.armour_type == Armours.Pants:
-		java_pants.append(item.name)
-	if item.armour_type == Armours.Shoes:
-		java_shoes.append(item.name)
-
-items = [java_shoes, java_pants, java_belt, java_gloves, java_chest, java_helmet, java_weapons, java_all_items]
-
-f = open("items.txt", "w")
-f.write(str(items))
-f.close()

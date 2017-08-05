@@ -1,5 +1,11 @@
 {
-    "intro": "Hi my name is Welch.",
-    "talk": "I am an NPC.",
-    "trade": "Here is what I have to trade."
+  "intro": [
+    "Hi my name is Welch.",
+    "How are you doing today?"
+  ],
+  "trade": [
+    "Here is what I have to trade.",
+    "Would you like to buy something?"
+  ],
+  "talk": []
 }

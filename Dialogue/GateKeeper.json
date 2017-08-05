@@ -1,5 +1,11 @@
 {
-  "intro": "Hi my name is Gate Keeper.",
-  "talk": "I am an NPC.",
-  "trade": "Here is what I have to trade."
+  "intro": [
+    "Hi I am the Gate Keeper.",
+    "How are you doing today?"
+  ],
+  "trade": [
+    "Here is what I have to trade.",
+    "Would you like to buy something?"
+  ],
+  "talk": []
 }

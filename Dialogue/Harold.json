@@ -1,5 +1,26 @@
 {
-    "intro": "Hi my name is Harold.",
-    "talk": "I an NPC.",
-    "trade": "I have nothing to trade."
+  "intro": [
+    "Hi my name is Harold.",
+    "How are you doing today?"
+  ],
+  "trade": [
+    "Here is what I have to trade.",
+    "Would you like to buy something?"
+  ],
+  "talk": [
+    {
+      "topic": "Corrupted",
+      "base_topic": true,
+      "content": "I have seen wolves to the east of the town that have been corrupted by something.",
+      "choices": ["What should I do about it", "Back"],
+      "responses": ["corrupted1", ""]
+    },
+    {
+      "topic": "corrupted1",
+      "base_topic": false,
+      "content": "Go to them and kill them. they can not be allowed to roam free and threaten the town.",
+      "choices": ["ok"],
+      "responses": [""]
+    }
+  ]
 }
