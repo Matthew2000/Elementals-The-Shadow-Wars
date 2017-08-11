@@ -1,7 +1,8 @@
 import json
 
 from Globals import *
-from NPCs.Classes.Wolf import Wolf
+from BaseClasses.Character import Relationship
+from NPCs.Classes.Races.Wolf import Wolf
 
 
 class Environment:
@@ -15,7 +16,7 @@ class Environment:
 		for npc in self.MAP["common_NPCs"]:
 			if npc["id"] not in Wolf.NPC_ids:
 				if npc["race"] == "Wolf":
-					Wolf(npc["id"], npc["spawn_location"], npc["location"], npc["health"], npc["level"])
+					Wolf(npc["name"], npc["id"], npc["spawn_location"], npc["location"], npc["health"], npc["level"], Relationship(npc["relationship"]))
 
 	def show_map(self):
 		for y in range(34):

@@ -1,6 +1,7 @@
 {
   "description": "I will pay you for every five wolf pelts that you bring to me",
   "completed": false,
+  "repeatable": true,
   "giver": "Darius",
   "name": "Wolf Pelts",
   "type": 1,

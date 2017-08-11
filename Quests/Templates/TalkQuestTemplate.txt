@@ -3,6 +3,7 @@
   "completed": false,
   "giver": "_____",
   "name": "name",
+  "topic": "topic",
   "type": 5,
   "coin_reward": 0,
   "exp_reward": 0,

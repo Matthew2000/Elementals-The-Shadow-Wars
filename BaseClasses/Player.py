@@ -54,7 +54,7 @@ class Player(Character):
 			if result["result"] is True:
 				enemy = result["enemy"]
 				Func.start_combat(self, enemy, input_key)
-				self.update_quests(enemy)
+				self.update_all_quests(enemy, "")
 			else:
 				self.regenerate_health()
 				self.update_player_status()
@@ -67,16 +67,16 @@ class Player(Character):
 				if NPC.is_enemy():
 					NPC.allow_movement = False
 					Func.start_combat(self, NPC, input_key)
-					self.update_quests(NPC)
+					self.update_all_quests(NPC, "")
 				else:
-					self.update_quests(NPC)
+					self.update_all_quests(NPC, "")
 					self.update_player_status()
 					NPC.interact(self, Character.all_enemies, Character.all_NPCs, trade_win)
 					Func.update_journal()
 					NPC.talking = False
 					conversation.clear()
 					conversation.refresh()
-					self.update_quests(NPC)
+					self.update_all_quests(NPC, "")
 
 			# updates the quests that the player has then ends the player's turn
 					Func.update_player_location(self, MAP, environment)
@@ -107,10 +107,44 @@ class Player(Character):
 	def add_quest(self, quest):
 		self.quests.append(quest)
 
-	def update_quests(self, npc):
+	def update_all_quests(self, npc, topic):
 		# TODO make function for updating each type of quest
 		for quest in self.quests:
-			quest.update_quest(self, npc)
+			if quest.type == Quest.QuestType.Collect:
+				quest.update_quest(self)
+			if quest.type == Quest.QuestType.Kill:
+				quest.update_quest(npc)
+			if quest.type == Quest.QuestType.Assassinate:
+				quest.update_quest(npc)
+			if quest.type == Quest.QuestType.Talk:
+				quest.update_quest(npc, topic)
+			if quest.type == Quest.QuestType.Craft:
+				quest.update_quest(self)
+
+	def update_collect_quests(self):
+		for quest in self.quests:
+			if quest.type == Quest.QuestType.Collect:
+				quest.update_quest(self)
+
+	def update_kill_quests(self, npc):
+		for quest in self.quests:
+			if quest.type == Quest.QuestType.Kill:
+				quest.update_quest(npc)
+
+	def update_assassinate_quests(self, npc):
+		for quest in self.quests:
+			if quest.type == Quest.QuestType.Assassinate:
+				quest.update_quest(npc)
+
+	def update_talk_quests(self, npc, topic):
+		for quest in self.quests:
+			if quest.type == Quest.QuestType.Talk:
+				quest.update_quest(npc, topic)
+
+	def update_craft_quests(self):
+		for quest in self.quests:
+			if quest.type == Quest.QuestType.Craft:
+				quest.update_quest(self)
 
 	def level_up(self):
 		self.exp_for_next_level -= self.exp_to_next_level

@@ -71,7 +71,7 @@ class NPC(Character):
 					y += 1
 		conversation.refresh()
 
-	def talk(self, conversation, input_key):
+	def talk(self, conversation, player):
 		topic_list = []
 		for topic in self.dialogue["talk"]:
 			if topic["base_topic"]:
@@ -100,6 +100,7 @@ class NPC(Character):
 				break
 
 			chosen_topic = topics[int(chr(input_key))-1]
+			player.update_talk_quests(self, chosen_topic["topic"])
 
 			topic_list = []
 			for topic in chosen_topic["choices"]:
@@ -114,8 +115,7 @@ class NPC(Character):
 			Func.print_to_journal(journal, chosen_topic["content"])
 
 	def choose_quest(self, key, quests, enemies, npcs, player, journal, conversation):
-		player.update_quests(self)
-		DebugLog.write(str(int(chr(int(key) - 1))) + "\r\n")
+		player.update_all_quests(self, "")
 		quest_list = quests
 		if int(chr(key)) - 1 >= len(quest_list):
 			pass
@@ -163,10 +163,10 @@ class NPC(Character):
 								if inv_item.name == item:
 									index = player.inventory[0].index(inv_item)
 							player.inventory[1][index] -= amount
-							DebugLog.write("working\n")
 						del player.quests[player_quest_index]
-						if quest.type == 2:
+						if not quest.repeatable:
 							del self.quests[npc_quest_index]
+							del quest
 						self.conversation_start(conversation)
 						player.update_inventory()
 				else:
@@ -189,9 +189,9 @@ class NPC(Character):
 			Func.update_journal()
 			input_key = conversation.getch()
 			if input_key is ord("1"):
-					self.talk(conversation, input_key)
-					self.conversation_start(conversation)
-					input_key = -1
+				self.talk(conversation, player)
+				self.conversation_start(conversation)
+				input_key = -1
 			elif input_key is ord("2"):
 
 				if self.has_quest is True:

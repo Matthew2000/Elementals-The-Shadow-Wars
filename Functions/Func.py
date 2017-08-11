@@ -141,7 +141,7 @@ def start_combat(player, enemy, input):
 		player.update_player_status()
 		if enemy.health <= 0:
 			is_enemy_dead(enemy, player, MAP, journal)
-			player.update_quests(enemy)
+			player.update_all_quests(enemy, "")
 			enemy.allow_movement = True
 			update_enemy_status(enemy, enemy_status)
 			break

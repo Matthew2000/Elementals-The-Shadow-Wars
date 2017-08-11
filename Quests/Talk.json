@@ -1,8 +1,10 @@
 {
   "description": "quest_description.",
   "completed": false,
+  "repeatable": false,
   "giver": "Darius",
   "name": "Talk",
+  "topic": "Corrupted",
   "type": 5,
   "coin_reward": 0,
   "exp_reward": 0,

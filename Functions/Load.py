@@ -1,6 +1,7 @@
 import json
 import os
 
+from NPCs.Classes.Races import Wolf, Dragon, Human, Avaker, Unkown
 from BaseClasses import NPC
 from Globals import *
 from Functions import Func
@@ -14,14 +15,35 @@ def load_npcs(save, npcs):
 		filename = 'NPCs/' + Func.sanitize_filename(npc["name"]) + '.json'
 		file = open(filename, "r")
 		npc_data = json.load(file)
-		temp_npc = NPC.NPC(npc["name"], "?", NPC.Race.Unknown, npc_data["id"])
-		temp_npc.race = NPC.Race(npc_data["race"])
+
+		name = npc_data["name"]
+		character = npc_data["character"]
+		race = npc_data["race"]
+		if race == "Human":
+			temp_npc = Human.Human(name, character, npc_data["id"], npc_data["spawn_location"],
+									npc_data["location"], npc_data["health"], npc_data["level"],
+									NPC.Relationship(npc_data["relationship"]))
+		elif race == "Avaker":
+			temp_npc = Avaker.Avaker(name, character, npc_data["id"], npc_data["spawn_location"],
+									npc_data["location"], npc_data["health"], npc_data["level"],
+									NPC.Relationship(npc_data["relationship"]))
+		elif race == "Dragon":
+			temp_npc = Dragon.Dragon(name, character, npc_data["id"], npc_data["spawn_location"],
+									npc_data["location"], npc_data["health"], npc_data["level"],
+									NPC.Relationship(npc_data["relationship"]))
+		elif race == "Wolf":
+			temp_npc = Wolf.Wolf(name, npc_data["id"], npc_data["spawn_location"],
+									npc_data["location"], npc_data["health"], npc_data["level"],
+									NPC.Relationship(npc_data["relationship"]))
+		else:
+			temp_npc = Unkown.Unknown(name, character, npc_data["id"], npc_data["spawn_location"],
+									npc_data["location"], npc_data["health"], npc_data["level"],
+									NPC.Relationship(npc_data["relationship"]))
+
 		DebugLog.write(temp_npc.name + " Race: " + str(temp_npc.race)[5:] + "\r\n")
-		temp_npc.location = npc["location"]
 		temp_npc.prevlocation = temp_npc.location[:]
 		temp_npc.health = npc["health"]
 		temp_npc.max_health = npc_data["max_health"]
-		temp_npc.character = npc_data["character"]
 		temp_npc.inventory = Func.load_inventory(npc_data["inventory"])
 		temp_npc.has_quest = npc_data["has_quest"]
 		temp_npc.level = npc_data["level"]
@@ -30,12 +52,10 @@ def load_npcs(save, npcs):
 		temp_npc.exp_to_next_level = npc_data["exp_to_next_level"]
 		temp_npc.strength = npc_data["strength"]
 		temp_npc.respawnable = npc_data["respawnable"]
-		temp_npc.spawn_location = npc_data["spawn_location"]
 		temp_npc.endurance = npc_data["endurance"]
 		temp_npc.defense = npc_data["defense"]
 		temp_npc.dialogue = NPC.load_npc_dialogue(npc["name"])
 		temp_npc.quests = Quest.load_quests(npc_data["quests"])
-		temp_npc.relationship = NPC.Relationship(npc["relationship"])
 		temp_npc.allow_movement = npc["allow_movement"]
 		# load equipped npc items
 		if temp_npc.race is not NPC.Race.Wolf:
@@ -83,7 +103,26 @@ def load_npcs_for_new_game(npcs):
 				name = npc_data["name"]
 				character = npc_data["character"]
 				race = npc_data["race"]
-				temp_npc = NPC.NPC(name, character, NPC.Race(race), npc_data["id"])
+				if race == "Human":
+					temp_npc = Human.Human(name, character, npc_data["id"], npc_data["spawn_location"],
+											npc_data["location"], npc_data["health"], npc_data["level"],
+											NPC.Relationship(npc_data["relationship"]))
+				elif race == "Avaker":
+					temp_npc = Avaker.Avaker(name, character, npc_data["id"], npc_data["spawn_location"],
+											npc_data["location"], npc_data["health"], npc_data["level"],
+											NPC.Relationship(npc_data["relationship"]))
+				elif race == "Dragon":
+					temp_npc = Dragon.Dragon(name, character, npc_data["id"], npc_data["spawn_location"],
+											npc_data["location"], npc_data["health"], npc_data["level"],
+											NPC.Relationship(npc_data["relationship"]))
+				elif race == "Wolf":
+					temp_npc = Wolf.Wolf(name, npc_data["id"], npc_data["spawn_location"],
+											npc_data["location"], npc_data["health"], npc_data["level"],
+											NPC.Relationship(npc_data["relationship"]))
+				else:
+					temp_npc = Unkown.Unknown(name, character, npc_data["id"], npc_data["spawn_location"],
+											npc_data["location"], npc_data["health"], npc_data["level"],
+											NPC.Relationship(npc_data["relationship"]))
 
 				temp_npc.location = npc_data["location"]
 				temp_npc.prevlocation = temp_npc.location[:]
@@ -103,7 +142,6 @@ def load_npcs_for_new_game(npcs):
 				temp_npc.defense = npc_data["defense"]
 				temp_npc.dialogue = NPC.load_npc_dialogue(name)
 				temp_npc.quests = Quest.load_quests(npc_data["quests"])
-				temp_npc.relationship = NPC.Relationship(npc_data["relationship"])
 				temp_npc.allow_movement = npc_data["allow_movement"]
 				# load equipped npc items
 				if temp_npc.race is not NPC.Race.Wolf:

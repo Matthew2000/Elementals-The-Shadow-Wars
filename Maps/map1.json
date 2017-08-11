@@ -43,8 +43,8 @@
     "west": "map5"
   },
   "common_NPCs": [
-    { "race": "Wolf", "id": "Wolf1", "spawn_location": [10, 20], "location": [10, 20], "health": 100, "level": 1},
-    { "race": "Wolf", "id": "wolf2", "spawn_location": [3, 20], "location": [3, 20], "health": 100, "level": 1}
+    { "name": "wolf", "race": "Wolf", "id": "Wolf1", "relationship": "Enemy", "spawn_location": [10, 20], "location": [10, 20], "health": 100, "level": 1},
+    { "name": "wolf", "race": "Wolf", "id": "wolf2", "relationship": "Enemy", "spawn_location": [3, 20], "location": [3, 20], "health": 100, "level": 1}
   ],
   "unique_NPCs": [
     "Alice",

@@ -1,6 +1,7 @@
 {
   "description": "A group of wolves have been attacking the town.",
   "completed": false,
+  "repeatable": false,
   "giver": "Welch",
   "name": "Wolves",
   "type": 3,

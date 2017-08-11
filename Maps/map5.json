@@ -43,8 +43,8 @@
     "west": null
   },
   "common_NPCs": [
-    { "race": "Wolf", "id": "Wolf9", "spawn_location": [10, 10], "location": [10, 10], "health": 100, "level": 1},
-    { "race": "Wolf", "id": "wolf10", "spawn_location": [3, 20], "location": [3, 20], "health": 100, "level": 1}
+    { "name": "wolf", "race": "Wolf", "id": "Wolf9", "relationship": "Enemy", "spawn_location": [10, 10], "location": [10, 10], "health": 100, "level": 1},
+    { "name": "wolf", "race": "Wolf", "id": "wolf10", "relationship": "Enemy", "spawn_location": [3, 20], "location": [3, 20], "health": 100, "level": 1}
   ],
   "unique_NPCs": []
 }

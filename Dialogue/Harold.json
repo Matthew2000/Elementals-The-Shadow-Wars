@@ -12,8 +12,8 @@
       "topic": "Corrupted",
       "base_topic": true,
       "content": "I have seen wolves to the east of the town that have been corrupted by something.",
-      "choices": ["What should I do about it", "Back"],
-      "responses": ["corrupted1", ""]
+      "choices": ["What should I do about it"],
+      "responses": ["corrupted1"]
     },
     {
       "topic": "corrupted1",

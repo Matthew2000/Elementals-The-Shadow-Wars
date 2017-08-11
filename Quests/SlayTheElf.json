@@ -1,6 +1,7 @@
 {
   "description": "If you kill Alice I will give you 100 coins.",
   "completed": false,
+  "repeatable": false,
   "giver": "Darius",
   "name": "Slay The Elf",
   "type": 2,
