@@ -20,6 +20,8 @@ Key = -1
 player_name = "Matthew"
 Quest.load_all_quests()
 
+global current_map_path
+
 
 def new_game(enemies, npcs):
     Load.load_npcs_for_new_game(npcs)
@@ -34,8 +36,8 @@ try:
     curses.curs_set(0)
     curses.noecho()
 
-    MAP.border()
-    MAP.keypad(True)
+    map_window.border()
+    map_window.keypad(True)
     journal.keypad(True)
 
     # gets the dimensions of the map
@@ -54,19 +56,19 @@ try:
         player1.inventory = Func.load_inventory(save["player"]["inventory"])
         load_player_equipment(player1, save)
         Load.load_npcs(save, Character.all_NPCs)
-        current_map = save["current_map"]
+        current_map_path = save["current_map"]
         DebugLog.write("############\nGame loaded\n############\n\n")
     else:
         new_game(Character.all_enemies, Character.all_NPCs)
 
-    map1.change_map(current_map)
+    map1.change_map(current_map_path)
     map1.show_map()
     map1.load_common_npcs()
 
-    spawn_character(MAP, player1, player1.location[0], player1.location[1])
+    spawn_character(map_window, player1, player1.location[0], player1.location[1])
 
     screen.refresh()
-    MAP.refresh()
+    map_window.refresh()
 
     journal.addstr(1, 1, "game start")
 
@@ -77,31 +79,31 @@ try:
 
     while Key != ord("q"):
 
-        Func.update_player_location(player1, MAP, map1)
-        current_map = map1.directory
+        Func.update_player_location(player1, map_window, map1)
+        current_map_path = map1.directory
         Func.update_npc_locations(Character.all_NPCs, map1)
 
         screen.refresh()
-        MAP.refresh()
-        MAP.border()
+        map_window.refresh()
+        map_window.border()
 
         Func.update_game(player1, journal)
 
-        Func.player_dead(player1, MAP, journal)
+        Func.player_dead(player1, map_window, journal)
 
         DebugLog.flush()
 
-        Key = MAP.getch()  # gets the player input
+        Key = map_window.getch()  # gets the player input
 
         if Key == curses.KEY_RESIZE:
             screen_dims = screen.getmaxyx()
             screen.erase()
             curses.doupdate()
-            Func.update_player_location(player1, MAP, map1)
+            Func.update_player_location(player1, map_window, map1)
             Func.update_npc_locations(Character.all_NPCs, map1)
             player1.update_player_status()
             journal.resize(50, 65)
-            MAP.resize(35, 100)
+            map_window.resize(35, 100)
             journal.refresh()
             conversation = curses.newwin(10, 20, 38, 84)
             player1.make_player_stat_win()
@@ -122,7 +124,7 @@ try:
         Func.update_npc_locations(Character.all_NPCs, map1)
 
         screen.refresh()
-        MAP.refresh()
+        map_window.refresh()
         Func.update_game(player1, journal)
     else:
         DebugLog.write("\n############\nGame Closed\n############\n\n")
@@ -131,7 +133,7 @@ try:
     DebugLog.write("\n############\nSave start\n############\n\n")
     save_player(player1, save)
     save_npcs(save, Character.all_NPCs)
-    save["current_map"] = current_map
+    save["current_map"] = current_map_path
     DebugLog.write("\n############\nGame saved\n############")
 except:
     DebugLog.write(str(sys.exc_info()))

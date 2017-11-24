@@ -78,12 +78,12 @@ class Character:
         if x is 0:
             pass
         else:
-            self.damage = int((randint(5, 11) + (self.strength * .2)) - (
-            (randint(5, 11) + (self.strength * .1)) * opponent.defense / 100))
+            self.damage = int((randint(5, 11) + (self.strength * .2)) -
+                              ((randint(5, 11) + (self.strength * .1)) * opponent.defense / 100))
             if self.race is not Race.Wolf:
                 if self.equipped["weapon"] is not None:
-                    self.damage = int(((randint(5, 11) + (self.strength * .2)) * self.equipped["weapon"].damage) - (
-                    (randint(5, 11) + (self.strength * .1)) * opponent.defense / 100))
+                    self.damage = int(((randint(5, 11) + (self.strength * .2)) * self.equipped["weapon"].damage) -
+                                      ((randint(5, 11) + (self.strength * .1)) * opponent.defense / 100))
             if self.damage <= 0:
                 self.damage = 0
             opponent.health -= self.damage
@@ -186,16 +186,17 @@ class Character:
                     self.health = self.max_health
 
     def save_character(self):
-        character = {}
-        character["location"] = self.location
-        character["health"] = self.health
-        character["name"] = self.name
+        character = {
+            "location": self.location,
+            "health": self.health,
+            "name": self.name
+        }
         return character
 
 
-def spawn_character(map, character, y, x):
+def spawn_character(map_window, character, y, x):
     character.location[0] = y
     character.location[1] = x
     character.prevlocation[0] = y
     character.prevlocation[1] = x
-    map.addch(y, x, ord(character.character))
+    map_window.addch(y, x, ord(character.character))

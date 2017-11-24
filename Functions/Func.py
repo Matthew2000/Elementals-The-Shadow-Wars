@@ -141,19 +141,19 @@ def start_combat(player, enemy, input):
         update_enemy_status(enemy, enemy_status)
         player.update_player_status()
         if enemy.health <= 0:
-            is_enemy_dead(enemy, player, MAP, journal)
+            is_enemy_dead(enemy, player, map_window, journal)
             player.update_all_quests(enemy, "")
             enemy.allow_movement = True
             update_enemy_status(enemy, enemy_status)
             break
         if player.health <= 0:
             if player.is_dead():
-                player_dead(player, MAP, journal)
-                update_player_location(player, MAP, DebugLog)
+                player_dead(player, map_window, journal)
+                update_player_location(player, map_window, DebugLog)
             enemy.allow_movement = True
             update_enemy_status(enemy, enemy_status)
             break
-        input = MAP.getch()
+        input = map_window.getch()
         if ord("1") <= input >= ord("2"):
             continue
         if input is ord("1"):
@@ -195,17 +195,17 @@ def update_npc_locations(npcs, environment):
     for npc in npcs:
         if npc.on_map(environment):
             if npc.prevlocation.__ne__(npc.location):  # moves the Enemy
-                if MAP.inch(npc.prevlocation[0], npc.prevlocation[1]) != ord(" "):
-                    MAP.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
-                if MAP.inch(npc.location[0], npc.location[1]) == ord(
+                if map_window.inch(npc.prevlocation[0], npc.prevlocation[1]) != ord(" "):
+                    map_window.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
+                if map_window.inch(npc.location[0], npc.location[1]) == ord(
                         " "):  # stops Enemy from moving if there's a enemy there
-                    MAP.addch(npc.location[0], npc.location[1], ord(npc.character))
-                    MAP.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
+                    map_window.addch(npc.location[0], npc.location[1], ord(npc.character))
+                    map_window.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
                     npc.prevlocation = npc.location[:]
                 else:
                     npc.location = npc.prevlocation[:]  # keeps the Enemy at its current location
-            if MAP.inch(npc.location[0], npc.location[1]) == ord(" "):
-                MAP.addch(npc.location[0], npc.location[1], ord(npc.character))
+            if map_window.inch(npc.location[0], npc.location[1]) == ord(" "):
+                map_window.addch(npc.location[0], npc.location[1], ord(npc.character))
 
 
 def enemy_at_location(enemies, location, enemy_stat_win):

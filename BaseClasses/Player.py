@@ -41,7 +41,7 @@ class Player(Character):
         if input_key is ord("r"):
             if self.is_dead():
                 self.respawn(30, 50)
-                spawn_character(MAP, self, self.location[0], self.location[1])
+                spawn_character(map_window, self, self.location[0], self.location[1])
 
         if not self.is_dead():
             self.move(input_key, dims)
@@ -78,11 +78,11 @@ class Player(Character):
                     self.update_all_quests(NPC, "")
 
                     # updates the quests that the player has then ends the player's turn
-                    Func.update_player_location(self, MAP, environment)
+                    Func.update_player_location(self, map_window, environment)
 
         player_turn = False
 
-        Func.player_dead(self, MAP, journal)
+        Func.player_dead(self, map_window, journal)
 
     def make_player_stat_win(self):
         self.player_status = curses.newwin(10, 20, 38, 3)
@@ -99,10 +99,10 @@ class Player(Character):
             self.move_right(area)
 
     def attack(self, enemy):
-        if enemy.location[0] == self.location[0] + 1 or enemy.location[0] == self.location[0] - 1 or enemy.location[
-            0] == self.location[0]:
-            if enemy.location[1] == self.location[1] + 1 or enemy.location[1] == self.location[1] - 1 or enemy.location[
-                1] == self.location[1]:
+        if enemy.location[0] == self.location[0] + 1 or enemy.location[0] == self.location[0] - 1 or \
+           enemy.location[0] == self.location[0]:
+            if enemy.location[1] == self.location[1] + 1 or enemy.location[1] == self.location[1] - 1 or \
+               enemy.location[1] == self.location[1]:
                 super().attack(enemy)
 
     def add_quest(self, quest):

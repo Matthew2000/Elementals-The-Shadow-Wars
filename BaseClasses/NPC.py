@@ -4,6 +4,7 @@ import os
 from BaseClasses.Character import *
 from Functions import Func
 from Globals import *
+from Maps import *
 
 
 class NPC(Character):
@@ -356,8 +357,8 @@ class NPC(Character):
         self.location = self.spawn_location[:]
 
     def attack(self, player):
-        if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or player.location[
-            0] == self.location[0]:
+        if player.location[0] == self.location[0] + 1 or player.location[0] == self.location[0] - 1 or \
+           player.location[0] == self.location[0]:
             if player.location[1] == self.location[1] + 1 or player.location[1] == self.location[1] - 1 or \
                             player.location[1] == self.location[1]:
                 super().attack(player)
@@ -435,13 +436,14 @@ class NPC(Character):
         if self.is_enemy():
             player.increase_exp(self.increase_exp_by)
 
-    def on_map(self, map):
-        if self.name in map.MAP["unique_NPCs"]:
+
+def on_map(name, id):
+    if name in map1.MAP["unique_NPCs"]:
+        return True
+    for npc in map1.MAP["common_NPCs"]:
+        if id == npc["id"]:
             return True
-        for npc in map.MAP["common_NPCs"]:
-            if self.id == npc["id"]:
-                return True
-        return False
+    return False
 
 
 def save_npcs(save, npcs):
@@ -468,6 +470,9 @@ def load_npc_dialogue(name):  # for NEW game only
         DebugLog.write("no dialogue\n")
 
 
-def place_npcs(npcs, map):
+def place_npcs(npcs):
     for npc in npcs:
-        spawn_character(map, npc, npc.location[0], npc.location[1])
+        spawn_character(map1, npc, npc.location[0], npc.location[1])
+
+
+global map1
