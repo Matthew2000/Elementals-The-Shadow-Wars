@@ -133,11 +133,11 @@ def npc_at_location(location, npcs):
         return {"result": False}
 
 
-def start_combat(player, enemy, input):
+def start_combat(player, enemy, key):
     print_combat_intro_text()
     update_enemy_status(enemy, enemy_status)
     player.update_player_status()
-    while input is not ord("2"):
+    while key is not ord("2"):
         update_enemy_status(enemy, enemy_status)
         player.update_player_status()
         if enemy.health <= 0:
@@ -153,10 +153,10 @@ def start_combat(player, enemy, input):
             enemy.allow_movement = True
             update_enemy_status(enemy, enemy_status)
             break
-        input = map_window.getch()
-        if ord("1") <= input >= ord("2"):
+        key = map_window.getch()
+        if ord("1") <= key >= ord("2"):
             continue
-        if input is ord("1"):
+        if key is ord("1"):
             player.attack(enemy)
         enemy.attack(player)
     else:
