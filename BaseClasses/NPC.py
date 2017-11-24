@@ -167,7 +167,7 @@ class NPC(Character):
                             for inv_item in player.inventory[0]:
                                 if inv_item.name == item:
                                     index = player.inventory[0].index(inv_item)
-                            player.inventory[1][index] -= amount
+                                    player.inventory[1][index] -= amount
                         del player.quests[player_quest_index]
                         if not quest.repeatable:
                             del self.quests[npc_quest_index]

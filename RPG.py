@@ -147,7 +147,7 @@ finally:
     if "total_exp" in save["player"]:
         with open('save.json', 'w') as f:
             json.dump(save, f, sort_keys=True, indent=2)
-    f.close()
+            f.close()
     DebugLog.close()
     error.close()
     curses.endwin()
