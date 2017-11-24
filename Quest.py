@@ -19,10 +19,10 @@ class Quest:
     all = []
     names = []
 
-    def __init__(self, name: str, type: QuestType, giver: str, coin_reward: int, exp_reward: float,
+    def __init__(self, name: str, quest_type: QuestType, giver: str, coin_reward: int, exp_reward: float,
                  object_reward: Items.Item, description: str, repeatable: bool):
         self.name = name
-        self.type = type
+        self.type = quest_type
         self.giver = giver
         self.coin_reward = coin_reward
         self.exp_reward = exp_reward
@@ -34,14 +34,14 @@ class Quest:
     @classmethod
     def dictionary(cls, quest: dict):
         name = quest["name"]
-        type = quest["type"]
+        quest_type = quest["type"]
         giver = quest["giver"]
         coin_reward = quest["coin_reward"]
         exp_reward = quest["exp_reward"]
         object_reward = quest["object_reward"]
         description = quest["description"]
         repeatable = quest["repeatable"]
-        new_quest = Quest(name, type, giver, coin_reward, exp_reward, object_reward, description, repeatable)
+        new_quest = Quest(name, quest_type, giver, coin_reward, exp_reward, object_reward, description, repeatable)
         return new_quest
 
     def update_quest(self, player, npc):
