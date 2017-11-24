@@ -1,6 +1,5 @@
 import curses
 
-
 DebugLog = open('RPGLog.txt', 'w')
 player_turn = True
 current_map = "Maps/map1.json"

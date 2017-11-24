@@ -2,18 +2,18 @@ from enum import Enum
 
 
 class Weapons(Enum):
-	Sword = 1
-	Dagger = 2
-	Club = 3
+    Sword = 1
+    Dagger = 2
+    Club = 3
 
 
 class Armours(Enum):
-	Helmet = "helmet"
-	Chest = "chest"
-	Gloves = "gloves"
-	Belt = "belt"
-	Pants = "pants"
-	Shoes = "shoes"
+    Helmet = "helmet"
+    Chest = "chest"
+    Gloves = "gloves"
+    Belt = "belt"
+    Pants = "pants"
+    Shoes = "shoes"
 
 
 all_weapons = []
@@ -24,28 +24,29 @@ all_items = []
 
 
 class Item:
-	def __init__(self, name, value, description, equipable):
-		self.name = name
-		self.value = value
-		self.description = description
-		self.equipable = equipable
-		all_items.append(self)
+    def __init__(self, name, value, description, equipable):
+        self.name = name
+        self.value = value
+        self.description = description
+        self.equipable = equipable
+        all_items.append(self)
 
 
 class Weapon(Item):
-	def __init__(self, name, value, description, damage, weapon_type: Weapons):
-		self.damage = damage
-		self.weapon_type = weapon_type
-		super().__init__(name, value, description, True)
-		all_weapons.append(self)
+    def __init__(self, name, value, description, damage, weapon_type: Weapons):
+        self.damage = damage
+        self.weapon_type = weapon_type
+        super().__init__(name, value, description, True)
+        all_weapons.append(self)
 
 
 class Armour(Item):
-	def __init__(self, name, value, description, protection, armour_type: Armours):
-		self.protection = protection
-		self.armour_type = armour_type
-		super().__init__(name, value, description, True)
-		all_armours.append(self)
+    def __init__(self, name, value, description, protection, armour_type: Armours):
+        self.protection = protection
+        self.armour_type = armour_type
+        super().__init__(name, value, description, True)
+        all_armours.append(self)
+
 
 WolfPelt = Item("Wolf Pelt", 10, "The hide of a wolf", False)
 
