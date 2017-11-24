@@ -24,7 +24,7 @@ global current_map_path
 
 
 def new_game(enemies, npcs):
-    Load.load_npcs_for_new_game(npcs)
+    Load.load_npcs_for_new_game()
     Func.set_all_stats(enemies, npcs)
     DebugLog.write('NPCs loaded: ' + str(len(npcs)) + "\n\n")
     DebugLog.write("############\nGame loaded\n############\n\n")

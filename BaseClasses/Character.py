@@ -109,7 +109,7 @@ class Character:
             self.inventory[0].append(item)
             self.inventory[1].append(1)
 
-    def remove_inventory_item(self, item, amount=1):
+    def remove_inventory_item(self, item):
         index = self.inventory[0].index(item)
         self.inventory[0].remove(item)
         del self.inventory[1][index]

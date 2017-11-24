@@ -173,7 +173,7 @@ class Player(Character):
         self.player_status.refresh()
 
     def refresh_inventory_menu(self):
-        for item in self.inventory[0]:
+        for _ in self.inventory[0]:
             self.inventory_win.deleteln()
         self.inventory_win.refresh()
 
@@ -234,7 +234,7 @@ class Player(Character):
         self.quest_log_win.addstr(0, 1, "Quest Log")
 
     def refresh_quest_log(self):
-        for item in self.quests:
+        for _ in self.quests:
             self.quest_log_win.deleteln()
         self.quest_log_win.refresh()
 

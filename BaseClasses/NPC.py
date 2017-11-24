@@ -119,7 +119,7 @@ class NPC(Character):
                     topics.append(response)
             Func.print_to_journal(chosen_topic["content"])
 
-    def choose_quest(self, key, quests, enemies, npcs, player):
+    def choose_quest(self, key, quests, player):
         player.update_all_quests(self, "")
         quest_list = quests
         if int(chr(key)) - 1 >= len(quest_list):
@@ -180,7 +180,7 @@ class NPC(Character):
                     journal.border()
                     journal.refresh()
 
-    def interact(self, player, enemies, npcs):
+    def interact(self, player):
         input_key = -1
         while input_key is not ord("4"):
             if not self.quests:
@@ -215,7 +215,7 @@ class NPC(Character):
                         for quest in self.quests:
                             quests.append(quest)
                         input_key = conversation.getch()
-                        self.choose_quest(input_key, quests, enemies, npcs, player)
+                        self.choose_quest(input_key, quests, player)
                         self.conversation_start()
                         break
                     input_key = -1
@@ -231,7 +231,7 @@ class NPC(Character):
                 self.conversation_start()
 
     def refresh_trade_menu(self, inv):
-        for item in inv:
+        for _ in inv:
             journal.deleteln()
             journal.refresh()
 
@@ -268,7 +268,7 @@ class NPC(Character):
             conversation.addstr(1, 1, "1 - sell item")
             conversation.addstr(2, 1, "2 - leave trade")
             inv = player.inventory[0]
-        for item in inv:
+        for _ in inv:
             journal.insertln()
         option = 0
         while input_key is not ord("2"):
@@ -306,7 +306,7 @@ class NPC(Character):
                         break
                 player.update_player_status()
         else:
-            for item in inv:
+            for _ in inv:
                 journal.deleteln()
                 journal.border()
                 journal.refresh()

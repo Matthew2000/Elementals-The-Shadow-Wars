@@ -91,7 +91,7 @@ def load_npcs(save, npcs):
     DebugLog.write("NPCs loaded: " + str(len(npcs)) + "\n\n")
 
 
-def load_npcs_for_new_game(npcs):
+def load_npcs_for_new_game():
     for file in os.listdir("./NPCs"):
         if file.endswith(".json"):
             filename = "NPCs/" + file
