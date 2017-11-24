@@ -10,7 +10,7 @@ from Maps import *
 class NPC(Character):
     all = []
 
-    def __init__(self, name: str, character: chr, race: Race, id):
+    def __init__(self, name: str, character: chr, race: Race, npc_id):
         super().__init__(name, character, race)
         self.allow_movement = False
         self.talking = False
@@ -27,7 +27,7 @@ class NPC(Character):
         self.trade_inventory = []
         self.relationship = Relationship.Neutral
         self.increase_exp_by = int((self.level ** 2) / .4) + 5
-        self.id = id
+        self.id = npc_id
         Character.all_NPCs.append(self)
         Character.NPC_ids.append(self.id)
 
@@ -437,11 +437,11 @@ class NPC(Character):
             player.increase_exp(self.increase_exp_by)
 
 
-def on_map(name, id):
+def on_map(name, npc_id):
     if name in map1.MAP["unique_NPCs"]:
         return True
     for npc in map1.MAP["common_NPCs"]:
-        if id == npc["id"]:
+        if npc_id == npc["id"]:
             return True
     return False
 

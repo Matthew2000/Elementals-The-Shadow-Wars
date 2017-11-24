@@ -2,8 +2,8 @@ from BaseClasses.NPC import *
 
 
 class Wolf(NPC):
-    def __init__(self, name, id, spawn_location, location, health, level, relationship):
-        super().__init__(name, "W", Race.Wolf, id)
+    def __init__(self, name, npc_id, spawn_location, location, health, level, relationship):
+        super().__init__(name, "W", Race.Wolf, npc_id)
         self.relationship = relationship
         self.spawn_location = spawn_location
         self.location = location
