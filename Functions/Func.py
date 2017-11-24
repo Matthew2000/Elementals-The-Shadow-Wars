@@ -29,49 +29,49 @@ def update_journal():
     journal.refresh()
 
 
-def update_game(player, journal):
+def update_game(player):
     player.update_player_status()
     update_journal()
 
 
-def update_player_location(player, map, environment):
+def update_player_location(player, environment):
     if player.prevlocation.__ne__(player.location):
-        if map.inch(player.location[0], player.location[1]) == ord(
+        if map_window.inch(player.location[0], player.location[1]) == ord(
                 " "):
-            map.addch(player.location[0], player.location[1], ord(player.character))
-            map.addch(player.prevlocation[0], player.prevlocation[1], " ")
+            map_window.addch(player.location[0], player.location[1], ord(player.character))
+            map_window.addch(player.prevlocation[0], player.prevlocation[1], " ")
             player.prevlocation = player.location[:]
         else:
-            if map.inch(player.location[0], player.location[1]) == ord("v"):
+            if map_window.inch(player.location[0], player.location[1]) == ord("v"):
                 if environment.MAP["adjacent_maps"]["north"] is not None:
                     environment.go_to_map("north")
                     environment.show_map()
                     player.location = [32, player.location[1]]
                     player.prevlocation = player.location[:]
-            if map.inch(player.location[0], player.location[1]) == ord("^"):
+            if map_window.inch(player.location[0], player.location[1]) == ord("^"):
                 if environment.MAP["adjacent_maps"]["south"] is not None:
                     environment.go_to_map("south")
                     environment.show_map()
                     player.location = [2, player.location[1]]
                     player.prevlocation = player.location[:]
-            if map.inch(player.location[0], player.location[1]) == ord(">"):
+            if map_window.inch(player.location[0], player.location[1]) == ord(">"):
                 if environment.MAP["adjacent_maps"]["west"] is not None:
                     environment.go_to_map("west")
                     environment.show_map()
                     player.location = [player.location[0], 97]
                     player.prevlocation = player.location[:]
-            if map.inch(player.location[0], player.location[1]) == ord("<"):
+            if map_window.inch(player.location[0], player.location[1]) == ord("<"):
                 if environment.MAP["adjacent_maps"]["east"] is not None:
                     environment.go_to_map("east")
                     environment.show_map()
                     player.location = [player.location[0], 2]
                     player.prevlocation = player.location[:]
             player.location = player.prevlocation[:]
-    if map.inch(player.location[0], player.location[1]) == ord(" "):
-        map.addch(player.location[0], player.location[1], ord(player.character))
+    if map_window.inch(player.location[0], player.location[1]) == ord(" "):
+        map_window.addch(player.location[0], player.location[1], ord(player.character))
 
 
-def print_to_journal(journal, message):
+def print_to_journal(message):
     journal.insertln()
     message = message.split()
     message_list = [""]
@@ -103,17 +103,17 @@ def player_at_location(player, location):
         return False
 
 
-def player_dead(player, map, journal):
+def player_dead(player):
     if player.is_dead():
-        if map.inch(player.location[0], player.location[1]) == ord(player.character):
+        if map_window.inch(player.location[0], player.location[1]) == ord(player.character):
             player.on_death()
-            map.addch(player.prevlocation[0], player.prevlocation[1], " ")
-            print_to_journal(journal, player.name + " is dead")
+            map_window.addch(player.prevlocation[0], player.prevlocation[1], " ")
+            print_to_journal(player.name + " is dead")
 
 
-def print_combat_intro_text(journal):
-    print_to_journal(journal, 'Press "1" to attack or "2" to leave')
-    print_to_journal(journal, "Battle has started")
+def print_combat_intro_text():
+    print_to_journal('Press "1" to attack or "2" to leave')
+    print_to_journal("Battle has started")
     update_journal()
 
 
@@ -134,22 +134,22 @@ def npc_at_location(location, npcs):
 
 
 def start_combat(player, enemy, input):
-    print_combat_intro_text(journal)
+    print_combat_intro_text()
     update_enemy_status(enemy, enemy_status)
     player.update_player_status()
     while input is not ord("2"):
         update_enemy_status(enemy, enemy_status)
         player.update_player_status()
         if enemy.health <= 0:
-            is_enemy_dead(enemy, player, map_window, journal)
+            is_enemy_dead(enemy, player)
             player.update_all_quests(enemy, "")
             enemy.allow_movement = True
             update_enemy_status(enemy, enemy_status)
             break
         if player.health <= 0:
             if player.is_dead():
-                player_dead(player, map_window, journal)
-                update_player_location(player, map_window, DebugLog)
+                player_dead(player)
+                update_player_location(player, DebugLog)
             enemy.allow_movement = True
             update_enemy_status(enemy, enemy_status)
             break
@@ -161,21 +161,21 @@ def start_combat(player, enemy, input):
         enemy.attack(player)
     else:
         enemy.allow_movement = True
-        print_to_journal(journal, "You have left combat")
+        print_to_journal("You have left combat")
 
 
 ##############################################################
 
 
-def is_enemy_dead(enemy, player, map, journal):
+def is_enemy_dead(enemy, player):
     if enemy.is_dead():
-        if map.inch(enemy.location[0], enemy.location[1]) == ord(enemy.character):
+        if map_window.inch(enemy.location[0], enemy.location[1]) == ord(enemy.character):
             enemy.on_death(player)
-            map.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
-            print_to_journal(journal, enemy.name + " is dead")
+            map_window.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
+            print_to_journal(enemy.name + " is dead")
             enemy.prevlocation = enemy.location[:]
             enemy.location = [0, 0]
-            print_to_journal(journal, "you gained " + str(enemy.increase_exp_by) + " exp")
+            print_to_journal("you gained " + str(enemy.increase_exp_by) + " exp")
 
 
 def update_enemy_status(enemy, enemy_stat_win):

@@ -48,7 +48,7 @@ class NPC(Character):
                     self.allow_movement = False
                     Func.start_combat(player, self, input_key)
 
-    def conversation_start(self, conversation):
+    def conversation_start(self):
         conversation.clear()
         conversation.border()
         conversation.addstr(0, 1, "Conversation")
@@ -58,7 +58,7 @@ class NPC(Character):
         conversation.addstr(5, 1, "4 - Leave")
         conversation.refresh()
 
-    def show_options(self, conversation, *options):
+    def show_options(self, *options):
         x = 2
         y = 1
         conversation.clear()
@@ -76,7 +76,7 @@ class NPC(Character):
                     y += 1
         conversation.refresh()
 
-    def talk(self, conversation, player):
+    def talk(self, player):
         topic_list = []
         for topic in self.dialogue["talk"]:
             if topic["base_topic"]:
@@ -89,10 +89,10 @@ class NPC(Character):
                 topics.append(topic)
         topics.append("")
 
-        Func.print_to_journal(journal, "Hello")
+        Func.print_to_journal("Hello")
 
         while 1:
-            self.show_options(conversation, topic_list)
+            self.show_options(topic_list)
 
             input_key = conversation.getch()
             if not chr(input_key).isnumeric():
@@ -117,9 +117,9 @@ class NPC(Character):
             for response in chosen_topic["responses"]:
                 if response == "":
                     topics.append(response)
-            Func.print_to_journal(journal, chosen_topic["content"])
+            Func.print_to_journal(chosen_topic["content"])
 
-    def choose_quest(self, key, quests, enemies, npcs, player, journal, conversation):
+    def choose_quest(self, key, quests, enemies, npcs, player):
         player.update_all_quests(self, "")
         quest_list = quests
         if int(chr(key)) - 1 >= len(quest_list):
@@ -141,7 +141,7 @@ class NPC(Character):
                         journal.addstr(1, 1, "You have accepted the quest")
                         journal.refresh()
                         player.add_quest(quest_list[list_key])
-                        self.conversation_start(conversation)
+                        self.conversation_start()
                         break
                     elif key is ord("2"):
                         break
@@ -153,7 +153,7 @@ class NPC(Character):
                     journal.addstr(1, 1, "You have completed my quest, here is your reward.")
                     journal.border()
                     journal.refresh()
-                    self.show_options(conversation, "1 - Accept")
+                    self.show_options("1 - Accept")
                     key = conversation.getch()
                     if key is ord("1"):
                         quest.reset()
@@ -172,7 +172,7 @@ class NPC(Character):
                         if not quest.repeatable:
                             del self.quests[npc_quest_index]
                             del quest
-                        self.conversation_start(conversation)
+                        self.conversation_start()
                         player.update_inventory()
                 else:
                     journal.insertln()
@@ -180,7 +180,7 @@ class NPC(Character):
                     journal.border()
                     journal.refresh()
 
-    def interact(self, player, enemies, npcs, trade_window):
+    def interact(self, player, enemies, npcs):
         input_key = -1
         while input_key is not ord("4"):
             if not self.quests:
@@ -188,14 +188,14 @@ class NPC(Character):
             if self.talking is False:
                 journal.insertln()
                 journal.addstr(1, 1, self.dialogue["intro"][0])
-                self.conversation_start(conversation)
+                self.conversation_start()
             self.talking = True
             conversation.refresh()
             Func.update_journal()
             input_key = conversation.getch()
             if input_key is ord("1"):
-                self.talk(conversation, player)
-                self.conversation_start(conversation)
+                self.talk(player)
+                self.conversation_start()
                 input_key = -1
             elif input_key is ord("2"):
 
@@ -209,14 +209,14 @@ class NPC(Character):
                         for quest in self.quests:
                             quest_list.append(quest.name)
 
-                        self.show_options(conversation, quest_list)
+                        self.show_options(quest_list)
 
                         quests = []
                         for quest in self.quests:
                             quests.append(quest)
                         input_key = conversation.getch()
-                        self.choose_quest(input_key, quests, enemies, npcs, player, journal, conversation)
-                        self.conversation_start(conversation)
+                        self.choose_quest(input_key, quests, enemies, npcs, player)
+                        self.conversation_start()
                         break
                     input_key = -1
                 else:
@@ -227,16 +227,16 @@ class NPC(Character):
                 journal.insertln()
                 journal.addstr(1, 1, self.dialogue["trade"][0])
                 if self.trade_inventory is not []:
-                    self.trade(player, trade_window, conversation)
-                self.conversation_start(conversation)
+                    self.trade(player)
+                self.conversation_start()
 
-    def refresh_trade_menu(self, journal, inv):
+    def refresh_trade_menu(self, inv):
         for item in inv:
             journal.deleteln()
             journal.refresh()
 
     # TODO improve the trade system
-    def trade(self, player, journal, conversation):
+    def trade(self, player):
         input_key = -1
         conversation.keypad(True)
         conversation.clear()
@@ -272,7 +272,7 @@ class NPC(Character):
             journal.insertln()
         option = 0
         while input_key is not ord("2"):
-            self.refresh_trade_menu(journal, inv)
+            self.refresh_trade_menu(inv)
             journal.clear()
             selection = [0] * len(inv)
             selection[option] = curses.A_REVERSE

@@ -79,7 +79,7 @@ try:
 
     while Key != ord("q"):
 
-        Func.update_player_location(player1, map_window, map1)
+        Func.update_player_location(player1, map1)
         current_map_path = map1.directory
         Func.update_npc_locations(Character.all_NPCs, map1)
 
@@ -87,9 +87,9 @@ try:
         map_window.refresh()
         map_window.border()
 
-        Func.update_game(player1, journal)
+        Func.update_game(player1)
 
-        Func.player_dead(player1, map_window, journal)
+        Func.player_dead(player1)
 
         DebugLog.flush()
 
@@ -99,7 +99,7 @@ try:
             screen_dims = screen.getmaxyx()
             screen.erase()
             curses.doupdate()
-            Func.update_player_location(player1, map_window, map1)
+            Func.update_player_location(player1, map1)
             Func.update_npc_locations(Character.all_NPCs, map1)
             player1.update_player_status()
             journal.resize(50, 65)
@@ -119,13 +119,13 @@ try:
 
         Func.respawn_enemies(Character.all_NPCs)
 
-        Func.update_game(player1, journal)
+        Func.update_game(player1)
 
         Func.update_npc_locations(Character.all_NPCs, map1)
 
         screen.refresh()
         map_window.refresh()
-        Func.update_game(player1, journal)
+        Func.update_game(player1)
     else:
         DebugLog.write("\n############\nGame Closed\n############\n\n")
 

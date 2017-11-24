@@ -78,11 +78,11 @@ class Player(Character):
                     self.update_all_quests(NPC, "")
 
                     # updates the quests that the player has then ends the player's turn
-                    Func.update_player_location(self, map_window, environment)
+                    Func.update_player_location(self, environment)
 
         player_turn = False
 
-        Func.player_dead(self, map_window, journal)
+        Func.player_dead(self)
 
     def make_player_stat_win(self):
         self.player_status = curses.newwin(10, 20, 38, 3)
