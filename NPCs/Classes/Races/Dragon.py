@@ -1,4 +1,4 @@
-from BaseClasses.NPC import *
+from BaseClasses.NpcClass import *
 
 
 class Dragon(NPC):

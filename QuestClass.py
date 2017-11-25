@@ -3,7 +3,7 @@ import os
 from enum import Enum
 
 import Items
-from BaseClasses import NPC
+from BaseClasses import NpcClass
 from Globals import *
 
 
@@ -85,7 +85,7 @@ class CollectQuest(Quest):
 class AssassinateQuest(Quest):
     def __init__(self, name: str, giver: str,
                  coin_reward: int, exp_reward: float, object_reward: Items.Item,
-                 description: str, target: NPC, repeatable: bool):
+                 description: str, target: NpcClass, repeatable: bool):
         super().__init__(name, QuestType.Assassinate, giver, coin_reward, exp_reward, object_reward, description,
                          repeatable)
         self.target = target
@@ -113,7 +113,7 @@ class AssassinateQuest(Quest):
 class KillQuest(Quest):
     def __init__(self, name: str, giver: str,
                  coin_reward: int, exp_reward: float, object_reward: Items.Item,
-                 description: str, target: NPC, amount: int, repeatable: bool):
+                 description: str, target: NpcClass, amount: int, repeatable: bool):
         super().__init__(name, QuestType.Kill, giver, coin_reward, exp_reward, object_reward, description, repeatable)
         self.target = target
         self.amount = amount
@@ -177,7 +177,7 @@ class CraftQuest(Quest):
 class TalkQuest(Quest):
     def __init__(self, name: str, giver: str,
                  coin_reward: int, exp_reward: float, object_reward: Items.Item,
-                 description: str, person: NPC, topic: str, repeatable: bool):
+                 description: str, person: NpcClass, topic: str, repeatable: bool):
         super().__init__(name, QuestType.Talk, giver, coin_reward, exp_reward, object_reward, description, repeatable)
         self.person = person
         self.topic = topic

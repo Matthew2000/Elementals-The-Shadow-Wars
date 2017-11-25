@@ -1,7 +1,7 @@
 import json
 import os
 
-from BaseClasses.Character import *
+from BaseClasses.CharacterClass import *
 from Functions import Func
 from Globals import *
 from Maps import *
@@ -134,7 +134,7 @@ class NPC(Character):
                 journal.refresh()
                 list_key = int(chr(int(key) - 1))
                 while 1:
-                    self.show_options(conversation, "Yes", "No")
+                    self.show_options("Yes", "No")
                     key = conversation.getch()
                     if key is ord("1"):
                         journal.insertln()

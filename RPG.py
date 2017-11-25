@@ -2,8 +2,8 @@
 import locale
 import sys
 
-from BaseClasses.NPC import *
-from BaseClasses.Player import *
+from BaseClasses.NpcClass import *
+from BaseClasses.PlayerClass import *
 from Functions import Load
 from Globals import *
 from Maps.Environment import *
@@ -18,7 +18,7 @@ error = open('RPGErrorLog.txt', 'w')
 sys.stderr = error
 Key = -1
 player_name = "Matthew"
-Quest.load_all_quests()
+QuestClass.load_all_quests()
 
 global current_map_path
 

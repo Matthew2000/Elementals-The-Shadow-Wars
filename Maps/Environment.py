@@ -1,6 +1,6 @@
 import json
 
-from BaseClasses.Character import Relationship
+from BaseClasses.CharacterClass import Relationship
 from Globals import *
 from NPCs.Classes.Races.Wolf import Wolf
 
