@@ -437,15 +437,6 @@ class NPC(Character):
             player.increase_exp(self.increase_exp_by)
 
 
-def on_map(name, npc_id):
-    if name in map1.MAP["unique_NPCs"]:
-        return True
-    for npc in map1.MAP["common_NPCs"]:
-        if npc_id == npc["id"]:
-            return True
-    return False
-
-
 def save_npcs(save, npcs):
     all_NPCs = npcs[:]
     npcs.clear()

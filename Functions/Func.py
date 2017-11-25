@@ -43,25 +43,25 @@ def update_player_location(player, environment):
             player.prevlocation = player.location[:]
         else:
             if map_window.inch(player.location[0], player.location[1]) == ord("v"):
-                if environment.MAP["adjacent_maps"]["north"] is not None:
+                if environment.map["adjacent_maps"]["north"] is not None:
                     environment.go_to_map("north")
                     environment.show_map()
                     player.location = [32, player.location[1]]
                     player.prevlocation = player.location[:]
             if map_window.inch(player.location[0], player.location[1]) == ord("^"):
-                if environment.MAP["adjacent_maps"]["south"] is not None:
+                if environment.map["adjacent_maps"]["south"] is not None:
                     environment.go_to_map("south")
                     environment.show_map()
                     player.location = [2, player.location[1]]
                     player.prevlocation = player.location[:]
             if map_window.inch(player.location[0], player.location[1]) == ord(">"):
-                if environment.MAP["adjacent_maps"]["west"] is not None:
+                if environment.map["adjacent_maps"]["west"] is not None:
                     environment.go_to_map("west")
                     environment.show_map()
                     player.location = [player.location[0], 97]
                     player.prevlocation = player.location[:]
             if map_window.inch(player.location[0], player.location[1]) == ord("<"):
-                if environment.MAP["adjacent_maps"]["east"] is not None:
+                if environment.map["adjacent_maps"]["east"] is not None:
                     environment.go_to_map("east")
                     environment.show_map()
                     player.location = [player.location[0], 2]
@@ -133,6 +133,15 @@ def npc_at_location(location, npcs):
         return {"result": False}
 
 
+def on_map(search_map, name, npc_id):
+    if name in search_map.map["unique_NPCs"]:
+        return True
+    for npc in search_map.map["common_NPCs"]:
+        if npc_id == npc["id"]:
+            return True
+    return False
+
+
 def start_combat(player, enemy, key):
     print_combat_intro_text()
     update_enemy_status(enemy, enemy_status)
@@ -193,7 +202,7 @@ def update_enemy_status(enemy, enemy_stat_win):
 
 def update_npc_locations(npcs, environment):
     for npc in npcs:
-        if npc.on_map(environment):
+        if on_map(environment, npc.name, npc.id):
             if npc.prevlocation.__ne__(npc.location):  # moves the Enemy
                 if map_window.inch(npc.prevlocation[0], npc.prevlocation[1]) != ord(" "):
                     map_window.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
