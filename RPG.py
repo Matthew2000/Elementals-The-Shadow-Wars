@@ -112,7 +112,7 @@ try:
         player1.tick(Key, map1)
 
         for npc in Character.all_NPCs:
-            if npc.on_map(map1):
+            if Func.on_map(map1, npc.name, npc.id):
                 npc.tick(Key, player1)
 
         DebugLog.flush()
