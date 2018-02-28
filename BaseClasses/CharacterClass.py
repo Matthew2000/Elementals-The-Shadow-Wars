@@ -1,6 +1,7 @@
 from enum import Enum
 from random import randint
 
+from Globals import *
 import Items
 
 
@@ -27,7 +28,7 @@ class Character:
 
     def __init__(self, name: str, character: chr, race: Race):
         self.location = [1, 1]
-        self.prevlocation = [1, 1]
+        self.prevlocation = self.location[:]
         self.health = 100
         self.max_health = 100
         self.coins = 100
@@ -199,4 +200,4 @@ def spawn_character(map_window, character, y, x):
     character.location[1] = x
     character.prevlocation[0] = y
     character.prevlocation[1] = x
-    map_window.addch(y, x, ord(character.character))
+    curses.mvwaddstr(map_window, y, x, character.character)

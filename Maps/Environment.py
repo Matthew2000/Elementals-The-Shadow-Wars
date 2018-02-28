@@ -8,7 +8,7 @@ from NPCs.Classes.Races.Wolf import Wolf
 class Environment:
     def __init__(self, map_directory: str):
         self.directory = map_directory
-        temp = open(map_directory, "r")
+        temp = open(map_directory, "r", encoding="utf-8")
         self.map = json.load(temp)
         self.environment = self.map["data"]
 
@@ -20,8 +20,8 @@ class Environment:
                          Relationship(npc["relationship"]))
 
     def show_map(self):
-        for y in range(34):
-            map_window.addstr(y, 0, self.environment[y])
+        for y in range(35):
+            curses.mvwaddstr(map_window, y, 0, self.environment[y])
 
     def change_map(self, map_directory):
         for npc_data in self.map["common_NPCs"]:
@@ -30,7 +30,7 @@ class Environment:
                     Wolf.NPC_ids.remove(npc_data["id"])
                     Wolf.all_NPCs.remove(npc)
         self.directory = map_directory
-        temp = open(map_directory, "r")
+        temp = open(map_directory, "r", encoding="utf-8")
         self.map = json.load(temp)
         self.environment = self.map["data"]
         self.load_common_npcs()

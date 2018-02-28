@@ -49,32 +49,32 @@ class NPC(Character):
                     Func.start_combat(player, self, input_key)
 
     def conversation_start(self):
-        conversation.clear()
-        conversation.border()
-        conversation.addstr(0, 1, "Conversation")
-        conversation.addstr(2, 1, "1 - Talk")
-        conversation.addstr(3, 1, "2 - Quest")
-        conversation.addstr(4, 1, "3 - Trade")
-        conversation.addstr(5, 1, "4 - Leave")
-        conversation.refresh()
+        curses.wclear(conversation)
+        curses.wborder(conversation)
+        curses.mvwaddstr(conversation, 0, 1, "Conversation")
+        curses.mvwaddstr(conversation, 2, 1, "1 - Talk")
+        curses.mvwaddstr(conversation, 3, 1, "2 - Quest")
+        curses.mvwaddstr(conversation, 4, 1, "3 - Trade")
+        curses.mvwaddstr(conversation, 5, 1, "4 - Leave")
+        curses.wrefresh(conversation)
 
     def show_options(self, *options):
         x = 2
         y = 1
-        conversation.clear()
-        conversation.border()
-        conversation.addstr(0, 1, "Conversation")
+        curses.wclear(conversation)
+        curses.wborder(conversation)
+        curses.mvwaddstr(conversation, 0, 1, "Conversation")
         for option in options:
             if option == str(option):
-                conversation.addstr(x, 1, str(y) + " - " + str(option))
+                curses.mvwaddstr(conversation, x, 1, str(y) + " - " + str(option))
                 x += 1
                 y += 1
             else:
                 for option1 in option:
-                    conversation.addstr(x, 1, str(y) + " - " + str(option1))
+                    curses.mvwaddstr(conversation, x, 1, str(y) + " - " + str(option1))
                     x += 1
                     y += 1
-        conversation.refresh()
+        curses.wrefresh(conversation)
 
     def talk(self, player):
         topic_list = []
@@ -94,7 +94,7 @@ class NPC(Character):
         while 1:
             self.show_options(topic_list)
 
-            input_key = conversation.getch()
+            input_key = curses.wgetch(conversation)
             if not chr(input_key).isnumeric():
                 continue
 
@@ -128,18 +128,18 @@ class NPC(Character):
             quest = quest_list[int(chr(int(key) - 1))]
             npc_quest_index = self.quests.index(quest)
             if quest not in player.quests:
-                journal.insertln()
-                journal.addstr(1, 1, quest.description)
-                journal.border()
-                journal.refresh()
+                curses.winsertln(journal)
+                curses.mvwaddstr(journal, 1, 1, quest.description)
+                curses.wborder(journal)
+                curses.wrefresh(journal)
                 list_key = int(chr(int(key) - 1))
                 while 1:
                     self.show_options("Yes", "No")
-                    key = conversation.getch()
+                    key = curses.wgetch(conversation)
                     if key is ord("1"):
-                        journal.insertln()
-                        journal.addstr(1, 1, "You have accepted the quest")
-                        journal.refresh()
+                        curses.winsertln(journal)
+                        curses.mvwaddstr(journal, 1, 1, "You have accepted the quest")
+                        curses.wrefresh(journal)
                         player.add_quest(quest_list[list_key])
                         self.conversation_start()
                         break
@@ -149,12 +149,12 @@ class NPC(Character):
                 player_quest_index = player.quests.index(quest)
                 if player.quests[player_quest_index].completed:
 
-                    journal.insertln()
-                    journal.addstr(1, 1, "You have completed my quest, here is your reward.")
-                    journal.border()
-                    journal.refresh()
+                    curses.winsertln(journal)
+                    curses.mvwaddstr(journal, 1, 1, "You have completed my quest, here is your reward.")
+                    curses.wborder(journal)
+                    curses.wrefresh(journal)
                     self.show_options("1 - Accept")
-                    key = conversation.getch()
+                    key = curses.wgetch(conversation)
                     if key is ord("1"):
                         quest.reset()
                         player.coins += quest.coin_reward
@@ -175,10 +175,10 @@ class NPC(Character):
                         self.conversation_start()
                         player.update_inventory()
                 else:
-                    journal.insertln()
-                    journal.addstr(1, 1, "You have already accepted that quest.")
-                    journal.border()
-                    journal.refresh()
+                    curses.winsertln(journal)
+                    curses.mvwaddstr(journal, 1, 1, "You have already accepted that quest.")
+                    curses.wborder(journal)
+                    curses.wrefresh(journal)
 
     def interact(self, player):
         input_key = -1
@@ -186,13 +186,13 @@ class NPC(Character):
             if not self.quests:
                 self.has_quest = False
             if self.talking is False:
-                journal.insertln()
-                journal.addstr(1, 1, self.dialogue["intro"][0])
+                curses.winsertln(journal)
+                curses.mvwaddstr(journal, 1, 1, self.dialogue["intro"][0])
                 self.conversation_start()
             self.talking = True
-            conversation.refresh()
+            curses.wrefresh(conversation)
             Func.update_journal()
-            input_key = conversation.getch()
+            input_key = curses.wgetch(conversation)
             if input_key is ord("1"):
                 self.talk(player)
                 self.conversation_start()
@@ -201,10 +201,10 @@ class NPC(Character):
 
                 if self.has_quest is True:
                     while 1:
-                        journal.insertln()
-                        journal.addstr(1, 1, "These are the quests that I have")
-                        journal.border()
-                        journal.refresh()
+                        curses.winsertln(journal)
+                        curses.mvwaddstr(journal, 1, 1, "These are the quests that I have")
+                        curses.wborder(journal)
+                        curses.wrefresh(journal)
                         quest_list = []
                         for quest in self.quests:
                             quest_list.append(quest.name)
@@ -214,39 +214,39 @@ class NPC(Character):
                         quests = []
                         for quest in self.quests:
                             quests.append(quest)
-                        input_key = conversation.getch()
+                        input_key = curses.wgetch(conversation)
                         self.choose_quest(input_key, quests, player)
                         self.conversation_start()
                         break
                     input_key = -1
                 else:
-                    journal.insertln()
-                    journal.addstr(1, 1, "I have no quest for you at the moment")
-                    journal.refresh()
+                    curses.winsertln(journal)
+                    curses.mvwaddstr(journal, 1, 1, "I have no quest for you at the moment")
+                    curses.wrefresh(journal)
             elif input_key is ord("3"):
-                journal.insertln()
-                journal.addstr(1, 1, self.dialogue["trade"][0])
+                curses.winsertln(journal)
+                curses.mvwaddstr(journal, 1, 1, self.dialogue["trade"][0])
                 if self.trade_inventory is not []:
                     self.trade(player)
                 self.conversation_start()
 
     def refresh_trade_menu(self, inv):
         for _ in inv:
-            journal.deleteln()
-            journal.refresh()
+            curses.wdeleteln(journal)
+            curses.wrefresh(journal)
 
     # TODO improve the trade system
     def trade(self, player):
         input_key = -1
-        conversation.keypad(True)
-        conversation.clear()
-        conversation.border()
-        conversation.addstr(1, 1, "1 - buy")
-        conversation.addstr(2, 1, "2 - sell")
-        conversation.addstr(3, 1, "3 - leave")
+        curses.keypad(conversation, True)
+        curses.wclear(conversation)
+        curses.wborder(conversation)
+        curses.mvwaddstr(conversation, 1, 1, "1 - buy")
+        curses.mvwaddstr(conversation, 2, 1, "2 - sell")
+        curses.mvwaddstr(conversation, 3, 1, "3 - leave")
         buy = True
         while input_key != ord("3"):
-            input_key = conversation.getch()
+            input_key = curses.wgetch(conversation)
             if input_key == ord("1"):
                 break
             elif input_key == ord("2"):
@@ -258,31 +258,31 @@ class NPC(Character):
         else:
             return
         input_key = -1
-        conversation.clear()
-        conversation.border()
+        curses.wclear(conversation)
+        curses.wborder(conversation)
         if buy:
-            conversation.addstr(1, 1, "1 - buy item")
-            conversation.addstr(2, 1, "2 - leave trade")
+            curses.mvwaddstr(conversation, 1, 1, "1 - buy item")
+            curses.mvwaddstr(conversation, 2, 1, "2 - leave trade")
             inv = self.trade_inventory
         else:
-            conversation.addstr(1, 1, "1 - sell item")
-            conversation.addstr(2, 1, "2 - leave trade")
+            curses.mvwaddstr(conversation, 1, 1, "1 - sell item")
+            curses.mvwaddstr(conversation, 2, 1, "2 - leave trade")
             inv = player.inventory[0]
         for _ in inv:
-            journal.insertln()
+            curses.winsertln(journal)
         option = 0
         while input_key is not ord("2"):
             self.refresh_trade_menu(inv)
-            journal.clear()
+            curses.wclear(journal)
             selection = [0] * len(inv)
             selection[option] = curses.A_REVERSE
             for item in inv:
-                journal.insertln()
-                journal.addstr(1, 1, item.name, selection[inv.index(item)])
-                journal.addstr(1, 20, "value: " + str(item.value))
-            journal.border()
-            journal.refresh()
-            input_key = conversation.getch()
+                curses.winsertln(journal)
+                curses.mvwaddstr(journal, 1, 1, item.name, selection[inv.index(item)])
+                curses.mvwaddstr(journal, 1, 20, "value: " + str(item.value))
+            curses.wborder(journal)
+            curses.wrefresh(journal)
+            input_key = curses.wgetch(conversation)
             if input_key == curses.KEY_UP:
                 option += 1
             elif input_key == curses.KEY_DOWN:
@@ -307,9 +307,9 @@ class NPC(Character):
                 player.update_player_status()
         else:
             for _ in inv:
-                journal.deleteln()
-                journal.border()
-                journal.refresh()
+                curses.wdeleteln(journal)
+                curses.wborder(journal)
+                curses.wrefresh(journal)
 
     def move_to(self, y, x):
         if y == self.location[0] and x == self.location[1]:

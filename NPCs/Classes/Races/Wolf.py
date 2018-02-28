@@ -6,6 +6,7 @@ class Wolf(NPC):
         super().__init__(name, "W", Race.Wolf, npc_id)
         self.relationship = relationship
         self.spawn_location = spawn_location
+        self.prevlocation = spawn_location
         self.location = location
         self.health = health
         self.level = level

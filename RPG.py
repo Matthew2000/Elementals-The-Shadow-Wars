@@ -8,7 +8,7 @@ from Functions import Load
 from Globals import *
 from Maps.Environment import *
 
-locale.setlocale(locale.LC_ALL, '')
+locale.setlocale(locale.LC_ALL, 'en-US')
 code = "utf-8"
 
 # initiates some required variables
@@ -36,12 +36,12 @@ try:
     curses.curs_set(0)
     curses.noecho()
 
-    map_window.border()
-    map_window.keypad(True)
-    journal.keypad(True)
+    curses.wborder(map_window)
+    curses.keypad(map_window, True)
+    curses.keypad(journal, True)
 
     # gets the dimensions of the map
-    screen_dims = screen.getmaxyx()
+    screen_dims = curses.getmaxyx(stdscr)
 
     player1 = create_player("Matthew", "@", Race.Human, [23, 71])
 
@@ -67,10 +67,10 @@ try:
 
     spawn_character(map_window, player1, player1.location[0], player1.location[1])
 
-    screen.refresh()
-    map_window.refresh()
+    curses.wrefresh(stdscr)
+    curses.wrefresh(map_window)
 
-    journal.addstr(1, 1, "game start")
+    curses.mvwaddstr(journal, 1, 1, "game start")
 
     player1.begin_play()
 
@@ -79,13 +79,16 @@ try:
 
     while Key != ord("q"):
 
+        curses.wclear(map_window)
+        map1.show_map()
+
         Func.update_player_location(player1, map1)
         current_map_path = map1.directory
         Func.update_npc_locations(Character.all_NPCs, map1)
 
-        screen.refresh()
-        map_window.refresh()
-        map_window.border()
+        curses.wrefresh(stdscr)
+        curses.wrefresh(map_window)
+        curses.wborder(map_window)
 
         Func.update_game(player1)
 
@@ -93,18 +96,18 @@ try:
 
         DebugLog.flush()
 
-        Key = map_window.getch()  # gets the player input
+        Key = curses.wgetch(map_window)  # gets the player input
 
         if Key == curses.KEY_RESIZE:
-            screen_dims = screen.getmaxyx()
-            screen.erase()
+            screen_dims = curses.getmaxyx(stdscr)
+            stdscr.erase()
             curses.doupdate()
             Func.update_player_location(player1, map1)
             Func.update_npc_locations(Character.all_NPCs, map1)
             player1.update_player_status()
             journal.resize(50, 65)
             map_window.resize(35, 100)
-            journal.refresh()
+            curses.wrefresh(journal)
             conversation = curses.newwin(10, 20, 38, 84)
             player1.make_player_stat_win()
             continue
@@ -121,10 +124,8 @@ try:
 
         Func.update_game(player1)
 
-        Func.update_npc_locations(Character.all_NPCs, map1)
-
-        screen.refresh()
-        map_window.refresh()
+        curses.wrefresh(stdscr)
+        curses.wrefresh(map_window)
         Func.update_game(player1)
     else:
         DebugLog.write("\n############\nGame Closed\n############\n\n")
@@ -141,9 +142,10 @@ finally:
     if os.path.exists('save.json'):
         temp = open("save.json", "r")
         temp_save = json.load(temp)
-        if "total_exp" in temp_save["player"]:
-            os.rename('save.json', 'save.json.bak')
         temp.close()
+        if "total_exp" in temp_save["player"]:
+            os.remove("save.json.bak")
+            os.rename('save.json', 'save.json.bak')
     if "total_exp" in save["player"]:
         with open('save.json', 'w') as f:
             json.dump(save, f, sort_keys=True, indent=2)

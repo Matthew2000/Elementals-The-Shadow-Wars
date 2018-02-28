@@ -27,13 +27,13 @@ class Player(Character):
 
         # opens the player inventory
         if input_key is ord("i"):
-            conversation.border()
-            conversation.addstr(1, 1, "1 - equip")
-            conversation.addstr(2, 1, "2 - unequip")
-            conversation.refresh()
+            curses.wborder(conversation)
+            curses.mvwaddstr(conversation, 1, 1, "1 - equip")
+            curses.mvwaddstr(conversation, 2, 1, "2 - unequip")
+            curses.wrefresh(conversation)
             self.open_inventory()
-            conversation.clear()
-            conversation.refresh()
+            curses.wclear(conversation)
+            curses.wrefresh(conversation)
 
         if input_key is ord("l"):
             self.open_quest_log()
@@ -73,11 +73,10 @@ class Player(Character):
                     NPC.interact(self)
                     Func.update_journal()
                     NPC.talking = False
-                    conversation.clear()
-                    conversation.refresh()
+                    curses.wclear(conversation)
+                    curses.wrefresh(conversation)
                     self.update_all_quests(NPC, "")
 
-                    # updates the quests that the player has then ends the player's turn
                     Func.update_player_location(self, environment)
 
         player_turn = False
@@ -154,54 +153,54 @@ class Player(Character):
         self.set_stats_by_level_and_race()
 
     def update_inventory(self):
-        self.inventory_win.clear()
-        self.inventory_win.border()
-        self.inventory_win.addstr(0, 1, "Inventory")
+        curses.wclear(self.inventory_win)
+        curses.wborder(self.inventory_win)
+        curses.mvwaddstr(self.inventory_win, 0, 1, "Inventory")
 
     def update_player_status(self):
-        self.player_status.clear()
-        self.player_status.border()
-        self.player_status.addstr(0, 1, "Player Info")
-        self.player_status.addstr(1, 1, "Health: " + str(self.health))
-        self.player_status.addstr(2, 1, "Strength: " + str(self.strength))
-        self.player_status.addstr(3, 1, "Coins: " + str(self.coins))
-        self.player_status.addstr(4, 1, "Defense: " + str(self.defense))
-        self.player_status.addstr(5, 1, "Race: " + str(self.race)[6:])
-        self.player_status.addstr(6, 1, "Level: " + str(self.level))
-        self.player_status.addstr(7, 1, "exp needed: " + str(self.exp_to_next_level - self.exp_for_next_level)[:len(
+        curses.wclear(self.player_status)
+        curses.wborder(self.player_status)
+        curses.mvwaddstr(self.player_status, 0, 1, "Player Info")
+        curses.mvwaddstr(self.player_status, 1, 1, "Health: " + str(self.health))
+        curses.mvwaddstr(self.player_status, 2, 1, "Strength: " + str(self.strength))
+        curses.mvwaddstr(self.player_status, 3, 1, "Coins: " + str(self.coins))
+        curses.mvwaddstr(self.player_status, 4, 1, "Defense: " + str(self.defense))
+        curses.mvwaddstr(self.player_status, 5, 1, "Race: " + str(self.race)[6:])
+        curses.mvwaddstr(self.player_status, 6, 1, "Level: " + str(self.level))
+        curses.mvwaddstr(self.player_status, 7, 1, "exp needed: " + str(self.exp_to_next_level - self.exp_for_next_level)[:len(
             str(self.exp_to_next_level - self.exp_for_next_level)) - 2])
-        self.player_status.refresh()
+        curses.wrefresh(self.player_status)
 
     def refresh_inventory_menu(self):
         for _ in self.inventory[0]:
-            self.inventory_win.deleteln()
-        self.inventory_win.refresh()
+            curses.wdeleteln(self.inventory_win)
+        curses.wrefresh(self.inventory_win)
 
     def open_inventory(self):
         if not self.inventory[0]:
             return
         self.update_inventory()
-        self.inventory_win.keypad(True)
+        curses.keypad(self.inventory_win, True)
         option = len(self.inventory[0]) - 1
         input_key = -1
         while input_key is not ord("i"):
             self.refresh_inventory_menu()
-            self.inventory_win.clear()
+            curses.wclear(self.inventory_win)
             selection = [0] * len(self.inventory[0])
             selection[option] = curses.A_REVERSE
             equipped_items = list(self.equipped.values())
             for item in self.inventory[0]:
-                self.inventory_win.insertln()
+                curses.winsertln(self.inventory_win)
                 index = self.inventory[0].index(item)
                 if isinstance(item, Items.Item):
-                    self.inventory_win.addstr(1, 1, item.name, selection[index])
-                    self.inventory_win.addstr(1, 20, "amount: " + str(self.inventory[1][index]))
+                    curses.mvwaddstr(self.inventory_win, 1, 1, item.name, selection[index])
+                    curses.mvwaddstr(self.inventory_win, 1, 20, "amount: " + str(self.inventory[1][index]))
                 if self.inventory[0][index] in equipped_items:
-                    self.inventory_win.addstr(1, 35, "equipped")
-            self.inventory_win.border()
-            self.inventory_win.addstr(0, 1, "Inventory")
-            self.inventory_win.refresh()
-            input_key = self.inventory_win.getch()
+                    curses.mvwaddstr(self.inventory_win, 1, 35, "equipped")
+            curses.wborder(self.inventory_win)
+            curses.mvwaddstr(self.inventory_win, 0, 1, "Inventory")
+            curses.wrefresh(self.inventory_win)
+            input_key = curses.wgetch(self.inventory_win)
             if input_key == curses.KEY_UP:
                 option += 1
             elif input_key == curses.KEY_DOWN:
@@ -229,38 +228,38 @@ class Player(Character):
                     self.update_player_status()
 
     def update_quest_log(self):
-        self.quest_log_win.clear()
-        self.quest_log_win.border()
-        self.quest_log_win.addstr(0, 1, "Quest Log")
+        curses.wclear(self.quest_log_win)
+        curses.wborder(self.quest_log_win)
+        curses.mvwaddstr(self.quest_log_win, 0, 1, "Quest Log")
 
     def refresh_quest_log(self):
         for _ in self.quests:
-            self.quest_log_win.deleteln()
-        self.quest_log_win.refresh()
+            curses.wdeleteln(self.quest_log_win)
+        curses.wrefresh(self.quest_log_win)
 
     def open_quest_log(self):
         self.update_quest_log()
-        self.quest_log_win.keypad(True)
+        curses.keypad(self.quest_log_win, True)
         option = len(self.inventory[0]) - 1
         input_key = -1
         if len(self.quests) == 0:
-            self.quest_log_win.addstr(1, 1, "You have no quests right now.")
-            self.quest_log_win.refresh()
+            curses.mvwaddstr(self.quest_log_win, 1, 1, "You have no quests right now.")
+            curses.wrefresh(self.quest_log_win)
         while input_key is not ord("l"):
-            input_key = self.quest_log_win.getch()
+            input_key = curses.wgetch(self.quest_log_win)
             if len(self.quests) == 0:
-                self.quest_log_win.addstr(1, 1, "You have no quests right now.")
-                self.quest_log_win.refresh()
+                curses.mvwaddstr(self.quest_log_win, 1, 1, "You have no quests right now.")
+                curses.wrefresh(self.quest_log_win)
                 continue
             self.refresh_quest_log()
-            self.quest_log_win.clear()
+            curses.wclear(self.quest_log_win)
             selection = [0] * len(self.quests)
             selection[option] = curses.A_REVERSE
             for quest in self.quests:
-                self.quest_log_win.insertln()
+                curses.winsertln(self.quest_log_win)
                 index = self.quests.index(quest)
-                self.inventory_win.addstr(1, 1, quest.name, selection[index])
-                # self.inventory_win.addstr(1, 20, "amount: " + str(self.inventory[1][index]))
+                curses.mvwaddstr(self.inventory_win, 1, 1, quest.name, selection[index])
+                # curses.mvwaddstr(self.inventory_win, 1, 20, "amount: " + str(self.inventory[1][index]))
 
     def on_death(self):
         self.respawn(self.location[0], self.location[1])

@@ -25,8 +25,8 @@ def load_inventory(inventory):
 
 
 def update_journal():
-    journal.border()
-    journal.refresh()
+    curses.wborder(journal)
+    curses.wrefresh(journal)
 
 
 def update_game(player):
@@ -36,43 +36,42 @@ def update_game(player):
 
 def update_player_location(player, environment):
     if player.prevlocation.__ne__(player.location):
-        if map_window.inch(player.location[0], player.location[1]) == ord(
+        if curses.mvwinch(map_window, player.location[0], player.location[1]) == ord(
                 " "):
-            map_window.addch(player.location[0], player.location[1], ord(player.character))
-            map_window.addch(player.prevlocation[0], player.prevlocation[1], " ")
+            curses.mvwaddstr(map_window, player.location[0], player.location[1], player.character)
             player.prevlocation = player.location[:]
         else:
-            if map_window.inch(player.location[0], player.location[1]) == ord("v"):
+            if curses.mvwinch(map_window, player.location[0], player.location[1]) == ord("v"):
                 if environment.map["adjacent_maps"]["north"] is not None:
                     environment.go_to_map("north")
                     environment.show_map()
                     player.location = [32, player.location[1]]
                     player.prevlocation = player.location[:]
-            if map_window.inch(player.location[0], player.location[1]) == ord("^"):
+            if curses.mvwinch(map_window, player.location[0], player.location[1]) == ord("^"):
                 if environment.map["adjacent_maps"]["south"] is not None:
                     environment.go_to_map("south")
                     environment.show_map()
                     player.location = [2, player.location[1]]
                     player.prevlocation = player.location[:]
-            if map_window.inch(player.location[0], player.location[1]) == ord(">"):
+            if curses.mvwinch(map_window, player.location[0], player.location[1]) == ord(">"):
                 if environment.map["adjacent_maps"]["west"] is not None:
                     environment.go_to_map("west")
                     environment.show_map()
                     player.location = [player.location[0], 97]
                     player.prevlocation = player.location[:]
-            if map_window.inch(player.location[0], player.location[1]) == ord("<"):
+            if curses.mvwinch(map_window, player.location[0], player.location[1]) == ord("<"):
                 if environment.map["adjacent_maps"]["east"] is not None:
                     environment.go_to_map("east")
                     environment.show_map()
                     player.location = [player.location[0], 2]
                     player.prevlocation = player.location[:]
             player.location = player.prevlocation[:]
-    if map_window.inch(player.location[0], player.location[1]) == ord(" "):
-        map_window.addch(player.location[0], player.location[1], ord(player.character))
+    if curses.mvwinch(map_window, player.location[0], player.location[1]) == ord(" "):
+        curses.mvwaddstr(map_window, player.location[0], player.location[1], player.character)
 
 
 def print_to_journal(message):
-    journal.insertln()
+    curses.winsertln(journal)
     message = message.split()
     message_list = [""]
     x = 0
@@ -81,9 +80,9 @@ def print_to_journal(message):
         if len(message_list[x]) >= 50:
             message_list.append("")
             x += 1
-            journal.insertln()
+            curses.winsertln(journal)
     if len(message_list) > 1:
-        # journal.deleteln()
+        # curses.wdeleteln(journal)
         new_message = ""
         for words in message_list:
             new_message += words + "\n "
@@ -91,8 +90,8 @@ def print_to_journal(message):
         new_message = ""
         for words in message_list:
             new_message += words
-    journal.addstr(1, 1, new_message)
-    journal.addstr(1, 1, "")
+    curses.mvwaddstr(journal, 1, 1, new_message)
+    curses.mvwaddstr(journal, 1, 1, "")
     update_journal()
 
 
@@ -105,9 +104,9 @@ def player_at_location(player, location):
 
 def player_dead(player):
     if player.is_dead():
-        if map_window.inch(player.location[0], player.location[1]) == ord(player.character):
+        if curses.mvwinch(map_window, player.location[0], player.location[1]) == ord(player.character):
             player.on_death()
-            map_window.addch(player.prevlocation[0], player.prevlocation[1], " ")
+            curses.mvwaddstr(map_window, player.prevlocation[0], player.prevlocation[1], " ")
             print_to_journal(player.name + " is dead")
 
 
@@ -162,7 +161,7 @@ def start_combat(player, enemy, key):
             enemy.allow_movement = True
             update_enemy_status(enemy, enemy_status)
             break
-        key = map_window.getch()
+        key = curses.wgetch(map_window)
         if ord("1") <= key >= ord("2"):
             continue
         if key is ord("1"):
@@ -178,9 +177,9 @@ def start_combat(player, enemy, key):
 
 def is_enemy_dead(enemy, player):
     if enemy.is_dead():
-        if map_window.inch(enemy.location[0], enemy.location[1]) == ord(enemy.character):
+        if curses.mvwinch(map_window, enemy.location[0], enemy.location[1]) == ord(enemy.character):
             enemy.on_death(player)
-            map_window.addch(enemy.prevlocation[0], enemy.prevlocation[1], " ")
+            curses.mvwaddstr(map_window, enemy.prevlocation[0], enemy.prevlocation[1], " ")
             print_to_journal(enemy.name + " is dead")
             enemy.prevlocation = enemy.location[:]
             enemy.location = [0, 0]
@@ -188,33 +187,23 @@ def is_enemy_dead(enemy, player):
 
 
 def update_enemy_status(enemy, enemy_stat_win):
-    enemy_stat_win.clear()
+    curses.wclear(enemy_stat_win)
     if enemy.allow_movement is False:
-        enemy_stat_win.border()
-        enemy_stat_win.addstr(0, 1, enemy.name + "'s Stats")
-        enemy_stat_win.addstr(1, 1, "Race: " + str(enemy.race)[5:])
-        enemy_stat_win.addstr(2, 1, "Health: " + str(enemy.health))
-        enemy_stat_win.addstr(3, 1, "Level: " + str(enemy.level))
-        enemy_stat_win.addstr(4, 1, "Strength: " + str(enemy.strength))
-        enemy_stat_win.addstr(5, 1, "Defense: " + str(enemy.defense))
-    enemy_stat_win.refresh()
+        curses.wborder(enemy_stat_win)
+        curses.mvwaddstr(enemy_stat_win, 0, 1, enemy.name + "'s Stats")
+        curses.mvwaddstr(enemy_stat_win, 1, 1, "Race: " + str(enemy.race)[5:])
+        curses.mvwaddstr(enemy_stat_win, 2, 1, "Health: " + str(enemy.health))
+        curses.mvwaddstr(enemy_stat_win, 3, 1, "Level: " + str(enemy.level))
+        curses.mvwaddstr(enemy_stat_win, 4, 1, "Strength: " + str(enemy.strength))
+        curses.mvwaddstr(enemy_stat_win, 5, 1, "Defense: " + str(enemy.defense))
+    curses.wrefresh(enemy_stat_win)
 
 
 def update_npc_locations(npcs, environment):
     for npc in npcs:
         if on_map(environment, npc.name, npc.id):
-            if npc.prevlocation.__ne__(npc.location):  # moves the Enemy
-                if map_window.inch(npc.prevlocation[0], npc.prevlocation[1]) != ord(" "):
-                    map_window.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
-                if map_window.inch(npc.location[0], npc.location[1]) == ord(
-                        " "):  # stops Enemy from moving if there's a enemy there
-                    map_window.addch(npc.location[0], npc.location[1], ord(npc.character))
-                    map_window.addch(npc.prevlocation[0], npc.prevlocation[1], " ")
-                    npc.prevlocation = npc.location[:]
-                else:
-                    npc.location = npc.prevlocation[:]  # keeps the Enemy at its current location
-            if map_window.inch(npc.location[0], npc.location[1]) == ord(" "):
-                map_window.addch(npc.location[0], npc.location[1], ord(npc.character))
+            if curses.mvwinch(map_window, npc.location[0], npc.location[1]) == ord(" "):
+                curses.mvwaddstr(map_window, npc.location[0], npc.location[1], npc.character)
 
 
 def enemy_at_location(enemies, location, enemy_stat_win):
